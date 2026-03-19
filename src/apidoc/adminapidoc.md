@@ -180,7 +180,7 @@ GET /admin/transactions?userId=123456&page=1&limit=25
 POST /admin/bet-record
 ```
 
-**Description:** Admin-only endpoint to create a bet record for a user with minimal parameters.
+**Description:** Admin-only endpoint to create a bet record for a user with minimal parameters. Turnover is automatically set equal to bet amount.
 
 **Body:**
 
@@ -192,6 +192,8 @@ POST /admin/bet-record
 | gameId | string | No | Game ID (default: "0") |
 | site | string | No | Provider code (default: JE) |
 | status | number | No | Status (1=valid, default) |
+
+**Note:** `bet`, `payout`, and `turnover` are all automatically set to the same value based on `amount`.
 
 **Example:**
 
@@ -234,6 +236,80 @@ POST /admin/bet-record
 - Positive amount = win (payout = amount)
 - Negative amount = loss (payout = 0)
 - Creating bet records will reduce user's turnover requirement
+
+### Create Bet Record (Admin - Detailed)
+
+```
+POST /api/game/create-bet
+```
+
+**Description:** Admin-only endpoint to create a bet record with full control over all fields. Matches the exact structure of bet records from game provider sync.
+
+**Body:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| member | string | Yes | Member username (e.g., u32545526) |
+| site | string | Yes | Provider code (e.g., JE) |
+| product | string | No | Game type (default: "") |
+| gameId | string | No | Game ID (default: "") |
+| refNo | string | No | Reference number (auto-generated if empty) |
+| betTime | string | No | Bet time ISO string |
+| settleTime | string | No | Settlement time ISO string |
+| bet | number | Yes | Bet amount |
+| payout | number | No | Payout amount (default: 0) |
+| status | number | No | Status (default: 0) |
+| userId | number | No | User ID for turnover processing |
+
+**Note:** `turnover` is automatically set equal to `bet`. All fields match the exact structure of game provider bet records.
+
+**Example:**
+
+```json
+{
+  "member": "u32545526",
+  "site": "JE",
+  "product": "SL",
+  "gameId": "51",
+  "refNo": "ADM1773889856810BI74RG",
+  "betTime": "2026-03-19T03:10:56.810Z",
+  "settleTime": "2026-03-19T03:10:56.810Z",
+  "bet": 200,
+  "payout": 200,
+  "status": 1,
+  "userId": 32545526
+}
+```
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "msg": "Bet record created successfully",
+  "record": {
+    "_id": "...",
+    "member": "u32545526",
+    "site": "JE",
+    "product": "SL",
+    "gameId": "51",
+    "refNo": "ADM1773889856810BI74RG",
+    "betTime": "2026-03-19T03:10:56.810Z",
+    "settleTime": "2026-03-19T03:10:56.810Z",
+    "bet": 200,
+    "payout": 200,
+    "turnover": 200,
+    "status": 1
+  },
+  "turnoverUpdated": {
+    "processed": 1,
+    "totalReduced": 200,
+    "turnover_requirement": 800,
+    "batchesRemaining": 1,
+    "canWithdraw": false
+  }
+}
+```
 
 ### Search Bets by Member
 
@@ -526,7 +602,8 @@ GET /admin/turnover-status?userId=123456
       "required": 1000,
       "completed": 1000,
       "remaining": 0,
-      "createdAt": "2026-03-17T10:00:00.000Z"
+      "createdAt": "2026-03-17T10:00:00.000Z",
+      "lastCalcAt": "2026-03-17T10:05:00.000Z"
     },
     {
       "type": "DEPOSIT",
@@ -535,7 +612,8 @@ GET /admin/turnover-status?userId=123456
       "required": 500,
       "completed": 0,
       "remaining": 500,
-      "createdAt": "2026-03-18T10:00:00.000Z"
+      "createdAt": "2026-03-18T10:00:00.000Z",
+      "lastCalcAt": "2026-03-18T10:00:00.000Z"
     }
   ]
 }
@@ -610,15 +688,47 @@ The turnover-based withdrawable system:
 3. **Bet Records** → Reduces `turnover_requirement` (based on bet amount)
 4. **Withdrawal** → Only allowed when `turnover_requirement == 0`
 
+### Batch-Based Calculation
+
+Each deposit/bonus creates a separate batch with its own timestamp:
+- Only bets settled AFTER the batch's `createdAt` are counted for that batch
+- Old bets before deposit are NOT counted for new turnover
+- Each batch tracks its own completion status via `lastCalcAt`
+
 ### Key Concepts
 
 | Term | Description |
 |------|-------------|
-| turnover_requirement | Remaining amount user must bet before withdrawal |
-| total_turnover_completed | Total turnover ever completed |
+| turnover_requirement | **Remaining amount** user must bet before withdrawal (absolute value) |
+| turnover_progress | **Percentage complete** (0-100%) - how much of turnover user has done |
+| total_turnover_completed | Total turnover ever completed (cumulative) |
 | turnover_batches | Individual deposit/bonus entries tracking progress |
+| batch.createdAt | Timestamp when batch was created (only bets AFTER this count) |
+| batch.lastCalcAt | Last time this batch was processed |
 | multiplier | Configurable per transaction type (default: 1x) |
 | canWithdraw | true only when turnover_requirement = 0 |
+
+### Scheduler Configuration
+
+| Environment Variable | Default | Description |
+|--------------------|---------|-------------|
+| BET_SYNC_INTERVAL_MINUTES | 1 | How often to sync bets from provider |
+| TURNOVER_INTERVAL_MINUTES | 1 | How often to calculate turnover |
+
+Set to 10 minutes for production:
+```
+BET_SYNC_INTERVAL_MINUTES=10
+TURNOVER_INTERVAL_MINUTES=10
+```
+
+### Example Scenario
+
+| Action | Time | Batch | Bet Considered? |
+|--------|------|-------|----------------|
+| User bets 200 | 10:00 | Old batch | NO |
+| User deposits 1000 | 10:30 | New batch (1000 required) | - |
+| User bets 500 | 10:35 | New batch | YES (counts) |
+| User bets 500 | 10:40 | New batch | YES (counts, done!) |
 
 ### Account Fields
 

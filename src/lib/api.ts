@@ -106,6 +106,20 @@ export const updateVipConfig = (levels: any[]) => api.put('/api/admin/vip-config
 export const createBetRecord = (data: { userId: number; amount: number; product?: string; gameId?: string; site?: string; status?: number }) =>
   api.post('/api/admin/bet-record', data);
 
+export const createDetailedBetRecord = (data: {
+  member: string;
+  site: string;
+  product?: string;
+  gameId?: string;
+  refNo?: string;
+  betTime?: string;
+  settleTime?: string;
+  bet: number;
+  payout?: number;
+  status?: number;
+  userId?: number;
+}) => api.post('/api/game/create-bet', data);
+
 export const searchBetsByMember = (member: string, params?: { page?: number; limit?: number; site?: string; status?: number; dateFrom?: string; dateTo?: string }) => {
   const query = new URLSearchParams({ member });
   if (params?.page) query.set('page', String(params.page));

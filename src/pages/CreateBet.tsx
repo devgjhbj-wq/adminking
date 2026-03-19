@@ -11,18 +11,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { createBetRecord } from "@/lib/api";
+import { createDetailedBetRecord } from "@/lib/api";
 
 const CreateBet = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
-    userId: "",
+    member: "",
     site: "JE",
-    product: "SL",
-    gameId: "0",
-    amount: "",
+    product: "",
+    gameId: "",
+    refNo: "",
+    betTime: "",
+    settleTime: "",
+    bet: "",
+    payout: "0",
     status: "1",
+    userId: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,35 +43,55 @@ const CreateBet = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (!form.userId || !form.amount) {
-      toast({ title: "Error", description: "User ID and Amount are required.", variant: "destructive" });
+    if (!form.member || !form.site || form.bet === "") {
+      toast({ title: "Error", description: "Member, Site and Bet amount are required.", variant: "destructive" });
       setIsLoading(false);
       return;
     }
 
-    const payload = {
-      userId: Number(form.userId),
-      amount: Number(form.amount),
-      site: form.site || "JE",
-      product: form.product || "SL",
-      gameId: form.gameId || "0",
+    const payload: any = {
+      member: form.member,
+      site: form.site,
+      bet: Number(form.bet),
+      payout: Number(form.payout || 0),
       status: Number(form.status),
     };
 
+    if (form.product) payload.product = form.product;
+    if (form.gameId) payload.gameId = form.gameId;
+    if (form.refNo) payload.refNo = form.refNo;
+    
+    if (form.betTime) {
+      const bt = new Date(form.betTime);
+      if (!isNaN(bt.getTime())) payload.betTime = bt.toISOString();
+    }
+    
+    if (form.settleTime) {
+      const st = new Date(form.settleTime);
+      if (!isNaN(st.getTime())) payload.settleTime = st.toISOString();
+    }
+    
+    if (form.userId) payload.userId = Number(form.userId);
+
     try {
-      const res = await createBetRecord(payload);
+      const res = await createDetailedBetRecord(payload);
       if (res.status === 200) {
         toast({
           title: "Success",
-          description: "Bet record created successfully.",
+          description: res.data?.msg || "Bet record created successfully.",
         });
         setForm({
-          userId: "",
+          member: "",
           site: "JE",
-          product: "SL",
-          gameId: "0",
-          amount: "",
+          product: "",
+          gameId: "",
+          refNo: "",
+          betTime: "",
+          settleTime: "",
+          bet: "",
+          payout: "0",
           status: "1",
+          userId: "",
         });
       }
     } catch (error: any) {
@@ -83,52 +108,63 @@ const CreateBet = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Create Bet Record (Manual)</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <h1 className="text-2xl font-bold mb-4">Create Bet Record (Admin - Detailed)</h1>
+      <form onSubmit={handleSubmit} className="space-y-4 max-w-4xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           <div>
-            <Label htmlFor="userId">User ID (Required)</Label>
+            <Label htmlFor="member">Member Username (Required)</Label>
             <Input
-              id="userId"
-              name="userId"
-              type="number"
-              value={form.userId}
+              id="member"
+              name="member"
+              value={form.member}
               onChange={handleInputChange}
-              placeholder="e.g., 32545513"
+              placeholder="e.g., u32545526"
               required
             />
           </div>
           <div>
-            <Label htmlFor="site">Provider Code</Label>
+            <Label htmlFor="site">Provider Code (Required)</Label>
             <Input
               id="site"
               name="site"
               value={form.site}
               onChange={handleInputChange}
-              placeholder="e.g., JE, JD"
+              placeholder="e.g., JE"
               required
             />
           </div>
           <div>
+            <Label htmlFor="bet">Bet Amount (Required)</Label>
+            <Input
+              id="bet"
+              name="bet"
+              type="number"
+              value={form.bet}
+              onChange={handleInputChange}
+              placeholder="e.g., 200"
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="payout">Payout</Label>
+            <Input
+              id="payout"
+              name="payout"
+              type="number"
+              value={form.payout}
+              onChange={handleInputChange}
+              placeholder="e.g., 200"
+            />
+          </div>
+          <div>
             <Label htmlFor="product">Game Type</Label>
-            <Select
+            <Input
+              id="product"
               name="product"
               value={form.product}
-              onValueChange={(value) => handleSelectChange("product", value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select game type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="SL">SL</SelectItem>
-                <SelectItem value="FI">FI</SelectItem>
-                <SelectItem value="TB">TB</SelectItem>
-                <SelectItem value="LC">LC</SelectItem>
-                <SelectItem value="SP">SP</SelectItem>
-                <SelectItem value="PK">PK</SelectItem>
-                <SelectItem value="ES">ES</SelectItem>
-              </SelectContent>
-            </Select>
+              onChange={handleInputChange}
+              placeholder="e.g., SL"
+            />
           </div>
           <div>
             <Label htmlFor="gameId">Game ID</Label>
@@ -141,15 +177,44 @@ const CreateBet = () => {
             />
           </div>
           <div>
-            <Label htmlFor="amount">Amount (Positive for win, Negative for loss)</Label>
+            <Label htmlFor="refNo">Reference Number</Label>
             <Input
-              id="amount"
-              name="amount"
-              type="number"
-              value={form.amount}
+              id="refNo"
+              name="refNo"
+              value={form.refNo}
               onChange={handleInputChange}
-              placeholder="e.g., 100 or -100"
-              required
+              placeholder="Auto-generated if empty"
+            />
+          </div>
+          <div>
+            <Label htmlFor="betTime">Bet Time</Label>
+            <Input
+              id="betTime"
+              name="betTime"
+              type="datetime-local"
+              value={form.betTime}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <Label htmlFor="settleTime">Settlement Time</Label>
+            <Input
+              id="settleTime"
+              name="settleTime"
+              type="datetime-local"
+              value={form.settleTime}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <Label htmlFor="userId">User ID (For Turnover)</Label>
+            <Input
+              id="userId"
+              name="userId"
+              type="number"
+              value={form.userId}
+              onChange={handleInputChange}
+              placeholder="e.g., 32545526"
             />
           </div>
           <div>
@@ -163,15 +228,15 @@ const CreateBet = () => {
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">Valid</SelectItem>
-                <SelectItem value="0">Running</SelectItem>
-                <SelectItem value="-1">Invalid</SelectItem>
+                <SelectItem value="1">Valid (1)</SelectItem>
+                <SelectItem value="0">Running (0)</SelectItem>
+                <SelectItem value="-1">Invalid (-1)</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Creating..." : "Create Bet"}
+        <Button type="submit" disabled={isLoading} className="mt-6 w-full md:w-auto">
+          {isLoading ? "Creating..." : "Create Detailed Bet Record"}
         </Button>
       </form>
     </div>
@@ -179,3 +244,4 @@ const CreateBet = () => {
 };
 
 export default CreateBet;
+
