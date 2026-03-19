@@ -57,8 +57,16 @@ export const approveDeposit = (orderId: string) =>
   api.post('/api/admin/deposits/approve', { orderId });
 
 // Withdrawals
-export const fetchWithdrawalsByUser = (userId: string, page = 1, limit = 25) =>
-  api.get(`/api/admin/withdrawals?userId=${userId}&page=${page}&limit=${limit}`);
+export const fetchWithdrawals = (params?: { userId?: string; status?: string; dateFrom?: string; dateTo?: string; page?: number; limit?: number }) => {
+  const query = new URLSearchParams();
+  if (params?.userId) query.set('userId', params.userId);
+  if (params?.status) query.set('status', params.status);
+  if (params?.dateFrom) query.set('dateFrom', params.dateFrom);
+  if (params?.dateTo) query.set('dateTo', params.dateTo);
+  if (params?.page) query.set('page', String(params.page));
+  if (params?.limit) query.set('limit', String(params.limit));
+  return api.get(`/api/admin/withdrawals?${query.toString()}`);
+};
 
 export const fetchWithdrawalByOrder = (orderId: string) =>
   api.get(`/api/admin/withdrawals/${orderId}`);

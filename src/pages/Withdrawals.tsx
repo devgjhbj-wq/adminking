@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { fetchWithdrawalsByUser, fetchWithdrawalByOrder, setAuthToken } from '@/lib/api';
+import { fetchWithdrawals, fetchWithdrawalByOrder, setAuthToken } from '@/lib/api';
 import { toast } from 'sonner';
 import SearchBar from '@/components/SearchBar';
 import LastUpdated from '@/components/LastUpdated';
@@ -21,20 +21,27 @@ const Withdrawals = () => {
   const { token } = useAuth();
   const [userId, setUserId] = useState('');
   const [orderId, setOrderId] = useState('');
+  const [status, setStatus] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [lastSearchType, setLastSearchType] = useState<'user' | 'order'>('user');
+  const [lastSearchType, setLastSearchType] = useState<'list' | 'order'>('list');
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
 
-  const loadByUser = async (p = 1) => {
-    const q = userId.trim();
-    if (!q) return;
+  const loadWithdrawals = async (p = 1) => {
     setAuthToken(token);
     setLoading(true);
-    setLastSearchType('user');
+    setLastSearchType('list');
     try {
-      const res = await fetchWithdrawalsByUser(q, p);
+      const res = await fetchWithdrawals({
+        userId: userId.trim() || undefined,
+        status: status || undefined,
+        dateFrom: dateFrom || undefined,
+        dateTo: dateTo || undefined,
+        page: p,
+      });
       setData(res.data);
       setPage(p);
       setUpdatedAt(new Date());
@@ -69,17 +76,60 @@ const Withdrawals = () => {
 
   const handleRefresh = () => {
     if (lastSearchType === 'order') loadByOrder();
-    else loadByUser(page);
+    else loadWithdrawals(page);
   };
+
+  useEffect(() => {
+    loadWithdrawals(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const totalPages = data?.total ? Math.ceil(data.total / (data.limit || 25)) : 0;
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-2">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 bg-card border border-border p-4">
-          <SearchBar value={userId} onChange={setUserId} onSearch={() => loadByUser(1)} placeholder="Search by User ID" loading={loading} />
-          <SearchBar value={orderId} onChange={setOrderId} onSearch={loadByOrder} placeholder="Search by Order ID (WD...)" loading={loading} />
+        <div className="flex flex-col gap-2 bg-card border border-border p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <SearchBar value={orderId} onChange={setOrderId} onSearch={loadByOrder} placeholder="Search by Order ID (WD...)" loading={loading && lastSearchType === 'order'} />
+            <span className="text-muted-foreground text-xs px-2 uppercase font-medium">OR</span>
+            <input
+              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder="User ID (optional)"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <select
+              className="flex h-9 w-full sm:w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="">All Statuses</option>
+              <option value="PENDING">PENDING</option>
+              <option value="APPROVED">APPROVED</option>
+              <option value="REJECTED">REJECTED</option>
+              <option value="COMPLETED">COMPLETED</option>
+              <option value="FAILED">FAILED</option>
+            </select>
+            <input
+              type="date"
+              className="flex h-9 w-full sm:w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+            />
+            <span className="text-muted-foreground text-xs">to</span>
+            <input
+              type="date"
+              className="flex h-9 w-full sm:w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+            />
+            <Button onClick={() => loadWithdrawals(1)} disabled={loading && lastSearchType === 'list'} className="w-full sm:w-auto">
+              Filter
+            </Button>
+          </div>
         </div>
         <div className="flex justify-end">
           <LastUpdated timestamp={updatedAt} onRefresh={handleRefresh} loading={loading} />
@@ -93,6 +143,7 @@ const Withdrawals = () => {
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-border bg-secondary/30">
+                    <th className="text-left p-2 text-muted-foreground font-medium">User ID</th>
                     <th className="text-left p-2 text-muted-foreground font-medium">Order ID</th>
                     <th className="text-left p-2 text-muted-foreground font-medium">Amount</th>
                     <th className="text-left p-2 text-muted-foreground font-medium">Status</th>
@@ -102,6 +153,7 @@ const Withdrawals = () => {
                 <tbody>
                   {data.items.map((d: any, i: number) => (
                     <tr key={i} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
+                      <td className="p-2 text-foreground font-medium">{d.userId}</td>
                       <td className="p-2 text-foreground font-mono text-[10px]">{d.orderId}</td>
                       <td className="p-2 text-foreground">₹{d.amount?.toLocaleString()}</td>
                       <td className="p-2">
@@ -117,14 +169,14 @@ const Withdrawals = () => {
             </div>
           </div>
 
-          {lastSearchType === 'user' && totalPages > 1 && (
+          {lastSearchType === 'list' && totalPages > 1 && (
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">Total: {data.total} — Page {page}/{totalPages}</span>
               <div className="flex gap-1">
-                <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => loadByUser(page - 1)}>
+                <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => loadWithdrawals(page - 1)}>
                   <ChevronLeft className="w-3.5 h-3.5" />
                 </Button>
-                <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => loadByUser(page + 1)}>
+                <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => loadWithdrawals(page + 1)}>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </Button>
               </div>
