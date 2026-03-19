@@ -266,6 +266,29 @@ GET /admin/withdrawals?page=1&limit=25
 | dateFrom | string | Start date (YYYY-MM-DD) |
 | dateTo | string | End date (YYYY-MM-DD) |
 
+**Response:**
+
+```json
+{
+  "status": "success",
+  "page": 1,
+  "limit": 25,
+  "total": 100,
+  "items": [
+    {
+      "userId": 123456,
+      "type": "WITHDRAW",
+      "amount": 500.0,
+      "balanceAfter": 1500.0,
+      "status": "PENDING",
+      "orderId": "WD12345617234567890",
+      "remark": "Withdrawal request",
+      "createdAt": "2026-03-19T10:30:00.000Z"
+    }
+  ]
+}
+```
+
 ---
 
 ## 6. Game - Bet Records
