@@ -328,7 +328,7 @@ const Withdrawals = () => {
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-[120px] justify-start text-left font-normal text-[11px] h-7 px-2",
+                      "w-[150px] justify-start text-left font-normal text-[11px] h-7 px-2",
                       !dateFrom && "text-muted-foreground"
                     )}
                   >
@@ -354,7 +354,7 @@ const Withdrawals = () => {
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-[120px] justify-start text-left font-normal text-[11px] h-7 px-2",
+                      "w-[150px] justify-start text-left font-normal text-[11px] h-7 px-2",
                       !dateTo && "text-muted-foreground"
                     )}
                   >

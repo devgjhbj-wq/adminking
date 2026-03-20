@@ -9,14 +9,30 @@ export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 function Calendar({ className, classNames, showOutsideDays = true, ...props }: CalendarProps) {
   return (
-    <DayPicker
-      showOutsideDays={showOutsideDays}
+    <div className="relative">
+      <style>{`
+        .rdp-vhidden {
+          display: none;
+        }
+        /* Hide caption label ONLY when dropdowns are visible */
+        .rdp-caption_dropdowns ~ .rdp-caption_label {
+          display: none;
+        }
+      `}</style>
+      <DayPicker
+        showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center",
+        caption: "flex justify-center pt-1 relative items-center h-10",
         caption_label: "text-sm font-medium",
+        caption_dropdowns: "flex justify-center gap-1 items-center z-10",
+        dropdown: "flex h-7 items-center justify-between rounded-md border border-input bg-background px-2 py-1 text-xs font-medium shadow-sm transition-colors focus:outline-none hover:bg-accent",
+        dropdown_month: "w-[85px]",
+        dropdown_year: "w-[65px]",
+        dropdown_icon: "ml-1 h-3 w-3 opacity-50",
+        vhidden: "hidden",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
