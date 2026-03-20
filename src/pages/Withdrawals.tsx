@@ -146,7 +146,10 @@ const Withdrawals = () => {
                     <th className="text-left p-2 text-muted-foreground font-medium">User ID</th>
                     <th className="text-left p-2 text-muted-foreground font-medium">Order ID</th>
                     <th className="text-left p-2 text-muted-foreground font-medium">Amount</th>
+                    <th className="text-left p-2 text-muted-foreground font-medium">Bal. After</th>
+                    <th className="text-left p-2 text-muted-foreground font-medium">Bank Details</th>
                     <th className="text-left p-2 text-muted-foreground font-medium">Status</th>
+                    <th className="text-left p-2 text-muted-foreground font-medium">Remark</th>
                     <th className="text-left p-2 text-muted-foreground font-medium">Date</th>
                   </tr>
                 </thead>
@@ -156,11 +159,23 @@ const Withdrawals = () => {
                       <td className="p-2 text-foreground font-medium">{d.userId}</td>
                       <td className="p-2 text-foreground font-mono text-[10px]">{d.orderId}</td>
                       <td className="p-2 text-foreground">₹{d.amount?.toLocaleString()}</td>
+                      <td className="p-2 text-foreground text-xs">{d.balanceAfter !== undefined ? `₹${d.balanceAfter.toLocaleString()}` : '-'}</td>
+                      <td className="p-2 text-muted-foreground text-[10px]">
+                        {d.bankDetails ? (
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-semibold text-foreground">{d.bankDetails.accountHolder}</span>
+                            <span>{d.bankDetails.bankName} - {d.bankDetails.accountNumber}</span>
+                          </div>
+                        ) : (
+                          '-'
+                        )}
+                      </td>
                       <td className="p-2">
-                        <span className={`px-1.5 py-0.5 text-[10px] font-medium ${statusColor[d.status] || 'bg-muted text-muted-foreground'}`}>
+                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-sm ${statusColor[d.status] || 'bg-muted text-muted-foreground'}`}>
                           {d.status}
                         </span>
                       </td>
+                      <td className="p-2 text-muted-foreground text-[10px] max-w-[150px] truncate" title={d.remark}>{d.remark || '-'}</td>
                       <td className="p-2 text-muted-foreground">{new Date(d.createdAt).toLocaleString()}</td>
                     </tr>
                   ))}
