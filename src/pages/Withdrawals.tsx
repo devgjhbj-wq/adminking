@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { fetchWithdrawals, fetchWithdrawalByOrder, setAuthToken } from '@/lib/api';
+import { fetchWithdrawals, fetchWithdrawalByOrder, approveWithdrawal, setAuthToken } from '@/lib/api';
 import { toast } from 'sonner';
 import SearchBar from '@/components/SearchBar';
 import LastUpdated from '@/components/LastUpdated';
+import Loading from '@/components/Loading';
 import { Button } from '@/components/ui/button';
-import { CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarIcon, ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
@@ -14,12 +15,10 @@ import { cn } from '@/lib/utils';
 
 const statusColor: Record<string, string> = {
   SUCCESS: 'bg-primary/20 text-primary',
-  COMPLETED: 'bg-primary/20 text-primary',
+  AUDITING: 'bg-blue-500/20 text-blue-400',
   PENDING: 'bg-yellow-500/20 text-yellow-400',
   FAILED: 'bg-destructive/20 text-destructive',
-  REJECTED: 'bg-destructive/20 text-destructive',
-  REFUNDED: 'bg-blue-500/20 text-blue-400',
-  EXPIRED: 'bg-muted text-muted-foreground',
+  CANCELLED: 'bg-muted text-muted-foreground',
 };
 
 const Withdrawals = () => {
@@ -42,6 +41,30 @@ const Withdrawals = () => {
   const [searchOrderId, setSearchOrderId] = useState('');
   const [searchUpdatedAt, setSearchUpdatedAt] = useState<Date | null>(null);
   const [lastSearchType, setLastSearchType] = useState<'user' | 'order' | null>(null);
+
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+
+  const handleApprove = async (orderIdToApprove: string) => {
+    setAuthToken(token);
+    setApprovingId(orderIdToApprove);
+    try {
+      const res = await approveWithdrawal(orderIdToApprove);
+      toast.success(res.data.msg || 'Withdrawal approved');
+      const updateFn = (prev: any) => {
+        if (!prev?.items) return prev;
+        return {
+          ...prev,
+          items: prev.items.map((d: any) => d.orderId === orderIdToApprove ? { ...d, status: 'AUDITING' } : d)
+        };
+      };
+      setLatestData(updateFn);
+      setSearchData(updateFn);
+    } catch (err: any) {
+      toast.error(err.response?.data?.msg || err.message || 'Failed to approve withdrawal');
+    } finally {
+      setApprovingId(null);
+    }
+  };
 
   useEffect(() => {
     loadLatest(1);
@@ -133,6 +156,7 @@ const Withdrawals = () => {
                   <th className="text-left p-2 text-muted-foreground font-medium">Status</th>
                   <th className="text-left p-2 text-muted-foreground font-medium">Remark</th>
                   <th className="text-left p-2 text-muted-foreground font-medium">Date</th>
+                  <th className="text-left p-2 text-muted-foreground font-medium">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -161,6 +185,26 @@ const Withdrawals = () => {
                     </td>
                     <td className="p-2 text-muted-foreground text-[10px] max-w-[150px] truncate" title={d.remark}>{d.remark || '-'}</td>
                     <td className="p-2 text-muted-foreground">{new Date(d.createdAt).toLocaleString()}</td>
+                    <td className="p-2">
+                       {d.status === 'PENDING' ? (
+                         <Button
+                           size="sm"
+                           variant="outline"
+                           className="text-primary border-primary/30 hover:bg-primary/10"
+                           disabled={approvingId === d.orderId}
+                           onClick={() => handleApprove(d.orderId)}
+                         >
+                           {approvingId === d.orderId ? (
+                             <Loading size={14} />
+                           ) : (
+                             <CheckCircle className="w-3.5 h-3.5 mr-1" />
+                           )}
+                           Approve
+                         </Button>
+                       ) : (
+                         <span className="text-[10px] text-muted-foreground">—</span>
+                       )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -197,17 +241,17 @@ const Withdrawals = () => {
         </TabsList>
 
         <TabsContent value="search" className="space-y-4">
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-col sm:flex-row gap-4 bg-card border border-border p-4">
-              <div className="flex-1 space-y-1">
-                <span className="text-xs font-medium text-muted-foreground">Search by Order ID</span>
+          <div className="flex flex-col gap-4 bg-card border border-border p-6 rounded-lg shadow-sm mb-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1 w-full sm:w-auto">
+                <span className="text-xs font-medium text-muted-foreground block mb-1">Search by Order ID</span>
                 <SearchBar value={searchOrderId} onChange={setSearchOrderId} onSearch={loadSearchByOrder} placeholder="Ex: WD123456..." loading={searchLoading && lastSearchType === 'order'} />
               </div>
               <div className="flex items-center justify-center pt-5">
                 <span className="text-muted-foreground text-xs px-2 uppercase font-medium">OR</span>
               </div>
-              <div className="flex-1 space-y-1">
-                <span className="text-xs font-medium text-muted-foreground">Search by User ID</span>
+              <div className="flex-1 w-full sm:w-auto">
+                <span className="text-xs font-medium text-muted-foreground block mb-1">Search by User ID</span>
                 <SearchBar value={searchUserId} onChange={setSearchUserId} onSearch={() => loadSearchByUser(1)} placeholder="Ex: 123456" loading={searchLoading && lastSearchType === 'user'} />
               </div>
             </div>
@@ -228,10 +272,10 @@ const Withdrawals = () => {
               >
                 <option value="">All Statuses</option>
                 <option value="PENDING">PENDING</option>
-                <option value="APPROVED">APPROVED</option>
-                <option value="REJECTED">REJECTED</option>
-                <option value="COMPLETED">COMPLETED</option>
+                <option value="AUDITING">AUDITING</option>
+                <option value="SUCCESS">SUCCESS</option>
                 <option value="FAILED">FAILED</option>
+                <option value="CANCELLED">CANCELLED</option>
               </select>
               <Popover>
                 <PopoverTrigger asChild>

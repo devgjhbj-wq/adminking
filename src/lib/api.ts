@@ -71,6 +71,9 @@ export const fetchWithdrawals = (params?: { userId?: string; status?: string; da
 export const fetchWithdrawalByOrder = (orderId: string) =>
   api.get(`/api/admin/withdrawals/${orderId}`);
 
+export const approveWithdrawal = (orderId: string) =>
+  api.post('/api/admin/withdrawals/approve', { orderId });
+
 // Agent Stats
 export const fetchAgentStats = (userId: string, page = 1, limit = 50) =>
   api.get(`/api/admin/agent-stats?userId=${userId}&page=${page}&limit=${limit}`);

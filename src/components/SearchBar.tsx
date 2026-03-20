@@ -22,10 +22,10 @@ const SearchBar = ({ value, onChange, onSearch, placeholder = 'Search...', loadi
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="bg-secondary/50 text-foreground placeholder:text-muted-foreground border-border max-w-xs"
+        className="bg-secondary/50 text-foreground placeholder:text-muted-foreground border-border w-full sm:w-80 h-10"
       />
-      <Button onClick={onSearch} disabled={loading || !value.trim()} size="sm">
-        <Search className="w-3.5 h-3.5 mr-1" />
+      <Button onClick={onSearch} disabled={loading || !value.trim()} className="h-10 px-4">
+        <Search className="w-4 h-4 mr-2" />
         {loading ? 'Searching...' : 'Search'}
       </Button>
     </div>

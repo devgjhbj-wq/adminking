@@ -93,10 +93,19 @@ const Deposits = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 bg-card border border-border p-4">
-          <SearchBar value={userId} onChange={setUserId} onSearch={() => loadByUser(1)} placeholder="Search by User ID" loading={loading} />
-          <SearchBar value={orderId} onChange={setOrderId} onSearch={loadByOrder} placeholder="Search by Order ID (MER...)" loading={loading} />
+      <div className="flex flex-col gap-4 bg-card border border-border p-6 rounded-lg shadow-sm mb-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1 w-full sm:w-auto">
+            <span className="text-xs font-medium text-muted-foreground block mb-1">Search by User ID</span>
+            <SearchBar value={userId} onChange={setUserId} onSearch={() => loadByUser(1)} placeholder="Search by User ID" loading={loading} />
+          </div>
+          <div className="flex items-center justify-center pt-5">
+            <span className="text-muted-foreground text-xs px-2 uppercase font-medium">OR</span>
+          </div>
+          <div className="flex-1 w-full sm:w-auto">
+            <span className="text-xs font-medium text-muted-foreground block mb-1">Search by Order ID</span>
+            <SearchBar value={orderId} onChange={setOrderId} onSearch={loadByOrder} placeholder="Search by Order ID" loading={loading} />
+          </div>
         </div>
         <div className="flex justify-end">
           <LastUpdated timestamp={updatedAt} onRefresh={handleRefresh} loading={loading} />
