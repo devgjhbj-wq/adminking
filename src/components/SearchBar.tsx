@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Search, Clock, X } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 interface SearchBarProps {
   value: string;
@@ -13,6 +14,9 @@ interface SearchBarProps {
   storageKey?: string;
   maxHistory?: number;
   debounceMs?: number;
+  modes?: { value: string; label: string }[];
+  selectedMode?: string;
+  onModeChange?: (mode: string) => void;
 }
 
 const SearchBar = ({ 
@@ -23,7 +27,10 @@ const SearchBar = ({
   loading = false,
   storageKey = 'search_history',
   maxHistory = 5,
-  debounceMs = 300
+  debounceMs = 300,
+  modes,
+  selectedMode,
+  onModeChange
 }: SearchBarProps) => {
   const [history, setHistory] = useState<string[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -115,7 +122,30 @@ const SearchBar = ({
 
   return (
     <div className="relative w-full">
-      <div className="flex gap-0.5">
+      <div className="flex gap-0.5 items-center">
+        {/* Mode Toggle */}
+        {modes && selectedMode && onModeChange && (
+          <div className="flex-shrink-0">
+            <ToggleGroup 
+              type="single" 
+              value={selectedMode} 
+              onValueChange={onModeChange}
+              className="border border-border bg-secondary/30 rounded p-0.5"
+            >
+              {modes.map((mode) => (
+                <ToggleGroupItem 
+                  key={mode.value}
+                  value={mode.value}
+                  className="text-xs h-7 px-2 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                  aria-label={mode.label}
+                >
+                  {mode.label}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          </div>
+        )}
+        
         <div className="relative flex-1">
           <Input
             ref={inputRef}
@@ -139,7 +169,7 @@ const SearchBar = ({
         <Button 
           onClick={handleSearch} 
           disabled={loading || !value.trim()} 
-          className="h-7 px-2 whitespace-nowrap text-xs"
+          className="h-7 px-2 whitespace-nowrap text-xs flex-shrink-0"
         >
           <Search className="w-3 h-3 mr-1" />
           {loading ? 'Searching...' : 'Go'}
