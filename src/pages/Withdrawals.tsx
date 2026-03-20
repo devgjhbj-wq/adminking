@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchWithdrawals, fetchWithdrawalByOrder, approveWithdrawal, setAuthToken } from '@/lib/api';
 import { toast } from 'sonner';
@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import type { WithdrawalResponse, WithdrawalItem, WithdrawalFilters } from '@/types/withdrawal';
 
 const statusColor: Record<string, string> = {
   SUCCESS: 'bg-primary/20 text-primary',
@@ -23,25 +24,17 @@ const statusColor: Record<string, string> = {
 const Withdrawals = () => {
   const { token } = useAuth();
   
-  // Search mode state
-  const [searchMode, setSearchMode] = useState('order'); // 'order' or 'latest'
+  // Search fields state
+  const [searchOrderId, setSearchOrderId] = useState('');
+  const [searchUserId, setSearchUserId] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [dateFrom, setDateFrom] = useState<Date>();
+  const [dateTo, setDateTo] = useState<Date>();
   
-  // Latest Withdrawals state
-  const [latestData, setLatestData] = useState<any>(null);
-  const [latestLoading, setLatestLoading] = useState(false);
-  const [latestPage, setLatestPage] = useState(1);
-  const [latestStatus, setLatestStatus] = useState('');
-  const [latestDateFrom, setLatestDateFrom] = useState<Date>();
-  const [latestDateTo, setLatestDateTo] = useState<Date>();
-  const [latestUpdatedAt, setLatestUpdatedAt] = useState<Date | null>(null);
-
-  // Search by Order/User state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchData, setSearchData] = useState<any>(null);
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [searchPage, setSearchPage] = useState(1);
-  const [searchUpdatedAt, setSearchUpdatedAt] = useState<Date | null>(null);
-
+  // Results state (no caching)
+  const [results, setResults] = useState<WithdrawalResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
 
   const handleApprove = async (orderIdToApprove: string) => {
@@ -50,133 +43,92 @@ const Withdrawals = () => {
     try {
       const res = await approveWithdrawal(orderIdToApprove);
       toast.success(res.data.msg || 'Withdrawal approved');
-      const updateFn = (prev: any) => {
-        if (!prev?.items) return prev;
-        return {
-          ...prev,
-          items: prev.items.map((d: any) => d.orderId === orderIdToApprove ? { ...d, status: 'AUDITING' } : d)
-        };
-      };
-      setLatestData(updateFn);
-      setSearchData(updateFn);
-    } catch (err: any) {
-      toast.error(err.response?.data?.msg || err.message || 'Failed to approve withdrawal');
+      // Refresh results without cache
+      if (results?.items) {
+        const updatedItems = results.items.map((d) => 
+          d.orderId === orderIdToApprove ? { ...d, status: 'AUDITING' as const } : d
+        );
+        setResults({ ...results, items: updatedItems });
+      }
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { msg?: string } }; message?: string };
+      toast.error(error.response?.data?.msg || error.message || 'Failed to approve withdrawal');
     } finally {
       setApprovingId(null);
     }
   };
 
-  useEffect(() => {
-    loadLatest(1);
-  }, [token]);
+  const performSearch = useCallback(async () => {
+    const hasOrderId = searchOrderId.trim();
+    const hasUserId = searchUserId.trim();
 
-  const loadLatest = async (p = 1) => {
-    setAuthToken(token);
-    setLatestLoading(true);
-    try {
-      const filters: any = {
-        page: p,
-        limit: 50,
-      };
-      
-      if (latestStatus && latestStatus.trim()) {
-        filters.status = latestStatus;
-      }
-      if (latestDateFrom) {
-        filters.dateFrom = format(latestDateFrom, 'yyyy-MM-dd');
-      }
-      if (latestDateTo) {
-        filters.dateTo = format(latestDateTo, 'yyyy-MM-dd');
-      }
-
-      const res = await fetchWithdrawals(filters);
-      setLatestData(res.data);
-      setLatestPage(p);
-      setLatestUpdatedAt(new Date());
-      
-      const appliedFilters = [];
-      if (latestStatus && latestStatus.trim()) appliedFilters.push(`Status: ${latestStatus}`);
-      if (latestDateFrom) appliedFilters.push(`From: ${format(latestDateFrom, 'MMM dd, yyyy')}`);
-      if (latestDateTo) appliedFilters.push(`To: ${format(latestDateTo, 'MMM dd, yyyy')}`);
-      
-      if (appliedFilters.length > 0) {
-        toast.success(`Filters applied: ${appliedFilters.join(' | ')}`);
-      }
-    } catch (err: any) {
-      const errorMsg = err.response?.data?.msg || 'Failed to load withdrawals';
-      toast.error(errorMsg);
-    } finally {
-      setLatestLoading(false);
-    }
-  };
-
-  const loadSearch = async (p = 1) => {
-    const q = searchQuery.trim();
-    if (!q) {
-      toast.error(`${searchMode === 'order' ? 'Order' : 'User'} ID is required`);
-      return;
-    }
-    
-    if (searchMode === 'latest') {
-      loadLatest(1);
+    if (!hasOrderId && !hasUserId) {
+      toast.error('Enter Order ID or User ID');
       return;
     }
 
+    setLoading(true);
     setAuthToken(token);
-    setSearchLoading(true);
+
     try {
-      if (searchMode === 'order') {
-        const res = await fetchWithdrawalByOrder(q);
-        if (res.data?.items && Array.isArray(res.data.items)) {
-          setSearchData({
-            items: res.data.items,
-            total: res.data.items.length,
+      let response;
+
+      if (hasOrderId) {
+        // Search by Order ID
+        response = await fetchWithdrawalByOrder(hasOrderId);
+        if (response.data?.items && Array.isArray(response.data.items)) {
+          setResults({
+            items: response.data.items,
+            total: response.data.items.length,
             limit: 1,
             page: 1,
-            status: res.data.status
+            status: response.data.status
           });
         } else {
+          setResults(null);
           toast.error('Order not found');
-          setSearchData(null);
         }
-      } else if (searchMode === 'latest') {
-        // Validate numeric user ID
-        if (isNaN(Number(q))) {
+      } else if (hasUserId) {
+        // Search by User ID
+        if (isNaN(Number(hasUserId))) {
           toast.error('User ID must be a number');
-          setSearchData(null);
-          setSearchLoading(false);
+          setResults(null);
+          setLoading(false);
           return;
         }
-        const res = await fetchWithdrawals({
-          userId: q,
-          page: p,
+
+        const filters: WithdrawalFilters = {
+          page: 1,
           limit: 50,
-        });
-        setSearchData(res.data);
-        setSearchPage(p);
+          userId: hasUserId
+        };
+
+        if (filterStatus && filterStatus !== 'all') {
+          filters.status = filterStatus;
+        }
+        if (dateFrom) {
+          filters.dateFrom = format(dateFrom, 'yyyy-MM-dd');
+        }
+        if (dateTo) {
+          filters.dateTo = format(dateTo, 'yyyy-MM-dd');
+        }
+
+        response = await fetchWithdrawals(filters);
+        setResults(response.data);
       }
-      setSearchUpdatedAt(new Date());
-    } catch (err: any) {
-      const errorMsg = err.response?.data?.msg || `Failed to search withdrawals`;
-      if (searchMode === 'order' && err.message === 'Order ID is required') {
-        toast.error('Please enter a valid order ID');
-      } else {
-        toast.error(errorMsg);
-      }
-      setSearchData(null);
+
+      setUpdatedAt(new Date());
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { msg?: string } }; message?: string };
+      const errorMsg = error.response?.data?.msg || 'Failed to fetch withdrawals';
+      toast.error(errorMsg);
+      setResults(null);
     } finally {
-      setSearchLoading(false);
+      setLoading(false);
     }
-  };
+  }, [token, searchOrderId, searchUserId, filterStatus, dateFrom, dateTo]);
 
-  const handleModeChange = (newMode: string) => {
-    setSearchMode(newMode);
-    setSearchQuery('');
-    setSearchData(null);
-    setSearchPage(1);
-  };
-
-  const renderTable = (data: any, page: number, totalPages: number, loadMoreFn: (p: number) => void, isPaginated: boolean) => {
+  const renderTable = (data: WithdrawalResponse, page: number, totalPages: number, loadMoreFn: (p: number) => void, isPaginated: boolean) => {
     if (!data?.items?.length) return <div className="p-4 text-center text-muted-foreground text-sm border border-border bg-card">No withdrawals found.</div>;
 
     return (
@@ -198,7 +150,7 @@ const Withdrawals = () => {
                 </tr>
               </thead>
               <tbody>
-                {data.items.map((d: any, i: number) => (
+                {data.items.map((d: WithdrawalItem, i: number) => (
                   <tr key={i} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
                     <td className="p-2 text-foreground font-medium">{d.userId}</td>
                     <td className="p-2 text-foreground font-mono text-[10px]">{d.orderId}</td>
