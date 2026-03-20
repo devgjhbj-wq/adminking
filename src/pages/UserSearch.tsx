@@ -88,8 +88,8 @@ const UserSearch = () => {
   const { user, account, deviceRisk } = result || {};
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-card border border-border p-6 rounded-lg shadow-sm mb-4">
+    <div className="space-y-1.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 bg-card border border-border p-2 rounded-lg shadow-sm mb-2">
         <div className="w-full sm:w-auto">
           <SearchBar 
             value={userId} 
@@ -105,9 +105,9 @@ const UserSearch = () => {
       </div>
 
       {result && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
           {user && (
-            <div className="bg-card border border-border p-4 space-y-2">
+            <div className="bg-card border border-border p-2 space-y-1">
               <h3 className="text-sm font-semibold text-foreground">User Profile</h3>
               <InfoRow label="User ID" value={user.userId} />
               <InfoRow label="Mobile" value={user.mobile} />
@@ -117,7 +117,7 @@ const UserSearch = () => {
             </div>
           )}
           {account && (
-            <div className="bg-card border border-border p-4 space-y-2">
+            <div className="bg-card border border-border p-2 space-y-1">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-foreground">Account</h3>
                 <Button variant="outline" size="sm" onClick={() => setStatusDialogOpen(true)}>
@@ -329,7 +329,9 @@ const UserSearch = () => {
 const InfoRow = ({ label, value }: { label: string; value: any }) => (
   <div className="flex justify-between items-center py-0.5 border-b border-border last:border-0">
     <span className="text-xs text-muted-foreground">{label}</span>
-    <span className="text-xs font-medium text-foreground">{String(value ?? '—')}</span>
+    <span className="text-xs font-medium text-foreground">
+      {typeof value === 'object' && value !== null && value.$$typeof ? value : (String(value ?? '—'))}
+    </span>
   </div>
 );
 

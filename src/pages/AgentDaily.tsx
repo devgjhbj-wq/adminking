@@ -51,8 +51,8 @@ const AgentDaily = () => {
   );
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-end gap-2 bg-card border border-border p-4">
+    <div className="space-y-1.5">
+      <div className="flex flex-col sm:flex-row sm:items-end gap-1 bg-card border border-border p-2">
         <div className="flex-1">
           <SearchBar 
             value={userId} 

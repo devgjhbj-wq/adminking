@@ -56,8 +56,8 @@ const TurnoverConfig = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between pb-2 border-b border-border">
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between pb-1 border-b border-border">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Turnover Requirements</h2>
           <p className="text-xs text-muted-foreground">Configure turnover multipliers for various transactions.</p>
@@ -68,9 +68,9 @@ const TurnoverConfig = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
         {configs.map((config, i) => (
-          <div key={config.type} className="bg-card border border-border p-4 rounded-md space-y-4">
+          <div key={config.type} className="bg-card border border-border p-2 rounded-md space-y-1.5\">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold flex items-center gap-2">
                 {config.type}

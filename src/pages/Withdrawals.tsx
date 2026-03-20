@@ -277,22 +277,22 @@ const Withdrawals = () => {
   return (
     <div className="space-y-4">
       <Tabs defaultValue="search" className="w-full">
-        <TabsList className="mb-4">
+        <TabsList className="mb-2">
           <TabsTrigger value="search">Search Orders</TabsTrigger>
           <TabsTrigger value="latest">Latest Withdrawals</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="search" className="space-y-4">
-          <div className="flex flex-col gap-4 bg-card border border-border p-6 rounded-lg shadow-sm mb-4">
+        <TabsContent value="search" className="space-y-1.5">
+          <div className="flex flex-col gap-2 bg-card border border-border p-2 rounded-lg shadow-sm mb-2">
             <div>
               <h3 className="text-sm font-semibold text-foreground mb-3">Search Withdrawal Orders</h3>
               <p className="text-xs text-muted-foreground mb-4">Find withdrawal orders by User ID or Order ID</p>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-2">
               <div className="flex-1 w-full sm:w-auto">
-                <span className="text-xs font-medium text-muted-foreground block mb-1.5">Search by Order ID</span>
-                <div className="flex gap-1.5">
+                <span className="text-xs font-medium text-muted-foreground block mb-0.5">Search by Order ID</span>
+                <div className="flex gap-0.5">
                   <SearchBar 
                     value={searchOrderId} 
                     onChange={setSearchOrderId} 
@@ -365,8 +365,8 @@ const Withdrawals = () => {
             </div>
 
             {/* Filters */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 bg-card border border-border p-4 rounded-lg">
-              <div className="space-y-1.5">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 bg-card border border-border p-2 rounded-lg">
+              <div className="space-y-0.5">
                 <label className="text-xs font-medium text-muted-foreground">Status Filter</label>
                 <select
                   className="flex h-9 w-full sm:w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
@@ -382,9 +382,9 @@ const Withdrawals = () => {
                 </select>
               </div>
               
-              <div className="space-y-1.5">
+              <div className="space-y-0.5">
                 <label className="text-xs font-medium text-muted-foreground">Date Range</label>
-                <div className="flex gap-1 items-center">
+                <div className="flex gap-0.5 items-center">
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button

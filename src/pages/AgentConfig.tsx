@@ -54,8 +54,8 @@ const AgentConfig = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="bg-card border border-border p-4 flex items-center justify-between">
+    <div className="space-y-1.5">
+      <div className="bg-card border border-border p-2 flex items-center justify-between">
         <div>
           <h2 className="text-sm font-semibold text-foreground">Commission Rates</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Configure agent referral commission rates per level</p>
@@ -70,8 +70,8 @@ const AgentConfig = () => {
           <Loading />
         </div>
       ) : (
-        <div className="bg-card border border-border p-4 space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-card border border-border p-2 space-y-1.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             {['Level 1 (Direct)', 'Level 2', 'Level 3'].map((label, i) => (
               <div key={i} className="space-y-1">
                 <label className="text-xs font-medium text-muted-foreground">{label}</label>

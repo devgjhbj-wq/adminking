@@ -44,13 +44,13 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-1.5">
       <div className="flex justify-end">
         <LastUpdated timestamp={updatedAt} onRefresh={load} loading={loading} />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
         {cards.map((c) => (
-          <div key={c.label} className="bg-card border border-border p-4 hover:border-primary/30 transition-colors">
+          <div key={c.label} className="bg-card border border-border p-2 hover:border-primary/30 transition-colors\">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-muted-foreground">{c.label}</span>
               <c.icon className="w-4 h-4 text-muted-foreground" />

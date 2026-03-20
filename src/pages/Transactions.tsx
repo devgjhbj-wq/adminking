@@ -44,8 +44,8 @@ const Transactions = () => {
   const totalPages = data ? Math.ceil(data.total / data.limit) : 0;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-card border border-border p-6 rounded-lg shadow-sm mb-4">
+    <div className="space-y-1.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 bg-card border border-border p-2 rounded-lg shadow-sm mb-2">
         <div className="w-full sm:w-auto">
           <SearchBar 
             value={userId} 

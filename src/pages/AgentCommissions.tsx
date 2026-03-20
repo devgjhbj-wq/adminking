@@ -61,10 +61,10 @@ const AgentCommissions = () => {
   const totalPages = data?.total ? Math.ceil(data.total / (data.limit || 50)) : 0;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-2">
-        <div className="bg-card border border-border p-4 space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+    <div className="space-y-1.5">
+      <div className="flex flex-col gap-1">
+        <div className="bg-card border border-border p-2 space-y-1.5">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1">
             <SearchBar 
               value={recUser} 
               onChange={setRecUser} 
@@ -75,7 +75,7 @@ const AgentCommissions = () => {
               maxHistory={5}
             />
           </div>
-          <div className="flex flex-wrap items-end gap-2">
+          <div className="flex flex-wrap items-end gap-1">
             <div className="space-y-0.5">
               <label className="text-[10px] text-muted-foreground">Claim Status</label>
               <select

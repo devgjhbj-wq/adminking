@@ -57,8 +57,8 @@ const MoveGameBalance = () => {
   };
 
   return (
-    <div className="space-y-4 max-w-3xl mx-auto mt-4">
-      <div className="bg-card border border-border p-6 space-y-6 rounded-lg">
+    <div className="space-y-1.5 max-w-3xl mx-auto mt-2">
+      <div className="bg-card border border-border p-2 space-y-1.5 rounded-lg">
         <div className="space-y-1 border-b border-border pb-4">
           <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <ArrowRightLeft className="w-4 h-4 text-primary" />

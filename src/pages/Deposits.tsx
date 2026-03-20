@@ -116,9 +116,9 @@ const Deposits = () => {
   const totalPages = data?.total ? Math.ceil(data.total / (data.limit || 25)) : 0;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-4 bg-card border border-border p-6 rounded-lg shadow-sm mb-4">
-        <div className="flex flex-col sm:flex-row gap-4">
+    <div className="space-y-1.5">
+      <div className="flex flex-col gap-2 bg-card border border-border p-2 rounded-lg shadow-sm mb-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <div className="flex-1 w-full sm:w-auto">
             <span className="text-xs font-medium text-muted-foreground block mb-1">Search by User ID</span>
             <SearchBar 

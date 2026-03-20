@@ -42,9 +42,9 @@ const AdminLogs = () => {
   const formatTime = (ts: string) => new Date(ts).toLocaleString();
 
   return (
-    <div className="space-y-4">
-      <div className="bg-card border border-border p-4">
-        <div className="flex flex-wrap items-end gap-2">
+    <div className="space-y-1.5">
+      <div className="bg-card border border-border p-2">
+        <div className="flex flex-wrap items-end gap-1">
           <div className="space-y-0.5">
             <label className="text-[10px] text-muted-foreground">Level</label>
             <select

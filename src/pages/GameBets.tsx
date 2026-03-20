@@ -60,8 +60,8 @@ const GameBets = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="bg-card border border-border p-4 rounded-md flex flex-wrap gap-3 items-end">
+    <div className="space-y-1.5">
+      <div className="bg-card border border-border p-2 rounded-md flex flex-wrap gap-1.5 items-end">
         <div className="space-y-1 w-full sm:w-48">
           <label className="text-xs font-medium text-muted-foreground">Member (Required)</label>
           <SearchBar 

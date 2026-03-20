@@ -35,8 +35,8 @@ const AgentStats = () => {
   const totalPages = data?.totalInvitees ? Math.ceil(data.totalInvitees / (data.limit || 50)) : 0;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-card border border-border p-4">
+    <div className="space-y-1.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 bg-card border border-border p-2">
         <SearchBar 
           value={userId} 
           onChange={setUserId} 
@@ -50,8 +50,8 @@ const AgentStats = () => {
       </div>
 
       {data?.agent && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="bg-card border border-border p-4 space-y-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+          <div className="bg-card border border-border p-2 space-y-1">
             <h3 className="text-sm font-semibold text-foreground">Agent Info</h3>
             <InfoRow label="User ID" value={data.agent.userId} />
             <InfoRow label="Mobile" value={data.agent.mobile} />
@@ -129,7 +129,9 @@ const AgentStats = () => {
 const InfoRow = ({ label, value }: { label: string; value: any }) => (
   <div className="flex justify-between items-center py-0.5 border-b border-border last:border-0">
     <span className="text-xs text-muted-foreground">{label}</span>
-    <span className="text-xs font-medium text-foreground">{String(value ?? '—')}</span>
+    <span className="text-xs font-medium text-foreground">
+      {typeof value === 'object' && value !== null && value.$$typeof ? value : (String(value ?? '—'))}
+    </span>
   </div>
 );
 

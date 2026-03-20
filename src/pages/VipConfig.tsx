@@ -65,8 +65,8 @@ const VipConfig = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="bg-card border border-border p-4 flex items-center justify-between">
+    <div className="space-y-1.5">
+      <div className="bg-card border border-border p-2 flex items-center justify-between\">
         <div>
           <h2 className="text-sm font-semibold text-foreground">VIP Configuration</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Configure VIP levels with deposit limits and bonuses</p>

@@ -115,7 +115,7 @@ const SearchBar = ({
 
   return (
     <div className="relative w-full">
-      <div className="flex gap-1.5">
+      <div className="flex gap-0.5">
         <div className="relative flex-1">
           <Input
             ref={inputRef}
@@ -124,46 +124,46 @@ const SearchBar = ({
             onKeyDown={handleKeyDown}
             onFocus={() => setShowSuggestions(true)}
             placeholder={placeholder}
-            className="bg-secondary/50 text-foreground placeholder:text-muted-foreground border-border w-full h-10 pr-8"
+            className="bg-secondary/50 text-foreground placeholder:text-muted-foreground border-border w-full h-7 px-2 py-1 text-xs pr-6"
           />
           {value && (
             <button
               onClick={handleClear}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Clear search"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3 h-3" />
             </button>
           )}
         </div>
         <Button 
           onClick={handleSearch} 
           disabled={loading || !value.trim()} 
-          className="h-10 px-4 whitespace-nowrap"
+          className="h-7 px-2 whitespace-nowrap text-xs"
         >
-          <Search className="w-4 h-4 mr-2" />
-          {loading ? 'Searching...' : 'Search'}
+          <Search className="w-3 h-3 mr-1" />
+          {loading ? 'Searching...' : 'Go'}
         </Button>
       </div>
 
       {/* Suggestions dropdown */}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-md shadow-lg z-50">
-          <div className="max-h-64 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-0.5 bg-card border border-border rounded-sm shadow-lg z-50">
+          <div className="max-h-40 overflow-y-auto">
             {suggestions.map((suggestion, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSuggestionClick(suggestion)}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-secondary/50 transition-colors flex items-center gap-2 first:rounded-t-md last:rounded-b-md"
+                className="w-full text-left px-2 py-1 text-xs hover:bg-secondary/50 transition-colors flex items-center gap-1 first:rounded-t-sm last:rounded-b-sm"
               >
-                <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                 <span className="truncate">{suggestion}</span>
               </button>
             ))}
             {history.length > 0 && (
               <button
                 onClick={handleClearHistory}
-                className="w-full text-left px-4 py-2 text-xs text-muted-foreground hover:bg-secondary/50 transition-colors border-t border-border"
+                className="w-full text-left px-2 py-1 text-[10px] text-muted-foreground hover:bg-secondary/50 transition-colors border-t border-border"
               >
                 Clear history
               </button>
@@ -174,22 +174,22 @@ const SearchBar = ({
 
       {/* Empty state message */}
       {showSuggestions && suggestions.length === 0 && value === '' && history.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-md shadow-lg z-50">
-          <div className="p-2 text-xs text-muted-foreground">
-            <p className="px-2 py-1 font-semibold">Recent searches</p>
+        <div className="absolute top-full left-0 right-0 mt-0.5 bg-card border border-border rounded-sm shadow-lg z-50">
+          <div className="p-1 text-[10px] text-muted-foreground">
+            <p className="px-2 py-0.5 font-semibold">Recent</p>
             {history.slice(0, maxHistory).map((item, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSuggestionClick(item)}
-                className="w-full text-left px-3 py-2 text-sm hover:bg-secondary/50 transition-colors rounded flex items-center gap-2"
+                className="w-full text-left px-2 py-1 text-xs hover:bg-secondary/50 transition-colors rounded flex items-center gap-1"
               >
-                <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
                 <span className="truncate">{item}</span>
               </button>
             ))}
             <button
               onClick={handleClearHistory}
-              className="w-full text-left px-3 py-2 text-xs text-muted-foreground hover:bg-secondary/50 transition-colors rounded"
+              className="w-full text-left px-2 py-1 text-[10px] text-muted-foreground hover:bg-secondary/50 transition-colors rounded"
             >
               Clear all
             </button>
