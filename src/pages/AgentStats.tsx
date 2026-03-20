@@ -37,7 +37,15 @@ const AgentStats = () => {
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-card border border-border p-4">
-        <SearchBar value={userId} onChange={setUserId} onSearch={() => loadStats(1)} placeholder="Enter Agent User ID" loading={loading} />
+        <SearchBar 
+          value={userId} 
+          onChange={setUserId} 
+          onSearch={() => loadStats(1)} 
+          placeholder="Enter Agent User ID" 
+          loading={loading}
+          storageKey="agent_stats_search"
+          maxHistory={5}
+        />
         <LastUpdated timestamp={updatedAt} onRefresh={() => loadStats(page)} loading={loading} />
       </div>
 

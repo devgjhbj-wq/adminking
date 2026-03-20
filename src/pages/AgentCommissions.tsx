@@ -65,7 +65,15 @@ const AgentCommissions = () => {
       <div className="flex flex-col gap-2">
         <div className="bg-card border border-border p-4 space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <SearchBar value={recUser} onChange={setRecUser} onSearch={() => loadCommissions(1)} placeholder="Agent User ID" loading={loading} />
+            <SearchBar 
+              value={recUser} 
+              onChange={setRecUser} 
+              onSearch={() => loadCommissions(1)} 
+              placeholder="Agent User ID" 
+              loading={loading}
+              storageKey="agent_commission_search"
+              maxHistory={5}
+            />
           </div>
           <div className="flex flex-wrap items-end gap-2">
             <div className="space-y-0.5">

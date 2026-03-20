@@ -54,7 +54,15 @@ const AgentDaily = () => {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-end gap-2 bg-card border border-border p-4">
         <div className="flex-1">
-          <SearchBar value={userId} onChange={setUserId} onSearch={loadDaily} placeholder="Enter Agent User ID" loading={loading} />
+          <SearchBar 
+            value={userId} 
+            onChange={setUserId} 
+            onSearch={loadDaily} 
+            placeholder="Enter Agent User ID" 
+            loading={loading}
+            storageKey="agent_daily_search"
+            maxHistory={5}
+          />
         </div>
         <div className="w-full sm:w-36">
           <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full" />

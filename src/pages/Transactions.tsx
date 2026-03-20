@@ -37,7 +37,15 @@ const Transactions = () => {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-card border border-border p-6 rounded-lg shadow-sm mb-4">
         <div className="w-full sm:w-auto">
-          <SearchBar value={userId} onChange={setUserId} onSearch={() => load(1)} placeholder="Enter User ID" loading={loading} />
+          <SearchBar 
+            value={userId} 
+            onChange={setUserId} 
+            onSearch={() => load(1)} 
+            placeholder="Enter User ID" 
+            loading={loading}
+            storageKey="transaction_user_search"
+            maxHistory={10}
+          />
         </div>
         <LastUpdated timestamp={updatedAt} onRefresh={() => load(page)} loading={loading} />
       </div>

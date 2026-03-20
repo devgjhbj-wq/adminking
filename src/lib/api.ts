@@ -69,7 +69,7 @@ export const fetchWithdrawals = (params?: { userId?: string; status?: string; da
 };
 
 export const fetchWithdrawalByOrder = (orderId: string) =>
-  api.get(`/api/admin/withdrawals/${orderId}`);
+  api.get(`/api/admin/withdrawals?orderId=${orderId}`);
 
 export const approveWithdrawal = (orderId: string) =>
   api.post('/api/admin/withdrawals/approve', { orderId });
@@ -168,3 +168,35 @@ export const clearTurnover = (userId: number | string, reason?: string) =>
 
 export const addTurnover = (data: { userId: number | string; amount: number; type: string; sourceRef?: string }) =>
   api.post('/api/admin/turnover/add', data);
+
+// Additional helper functions for search optimization
+export const searchUserByMobile = (mobile: string) => 
+  api.get(`/api/admin/user?mobile=${mobile}`);
+
+export const searchAgentStats = (agentId: string, page = 1, limit = 50) =>
+  api.get(`/api/admin/agent-stats?userId=${agentId}&page=${page}&limit=${limit}`);
+
+// Utility function to validate numeric inputs
+export const validateUserId = (userId: string | number): boolean => {
+  const num = typeof userId === 'string' ? parseInt(userId, 10) : userId;
+  return !isNaN(num) && num > 0;
+};
+
+// Utility function to validate order IDs
+export const validateOrderId = (orderId: string): boolean => {
+  return orderId && orderId.trim().length > 0;
+};
+
+// Error handler utility
+export const handleApiError = (error: any): string => {
+  if (error.response?.data?.msg) {
+    return error.response.data.msg;
+  }
+  if (error.response?.data?.message) {
+    return error.response.data.message;
+  }
+  if (error.message) {
+    return error.message;
+  }
+  return 'An error occurred. Please try again.';
+};

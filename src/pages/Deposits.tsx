@@ -97,14 +97,30 @@ const Deposits = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 w-full sm:w-auto">
             <span className="text-xs font-medium text-muted-foreground block mb-1">Search by User ID</span>
-            <SearchBar value={userId} onChange={setUserId} onSearch={() => loadByUser(1)} placeholder="Search by User ID" loading={loading} />
+            <SearchBar 
+              value={userId} 
+              onChange={setUserId} 
+              onSearch={() => loadByUser(1)} 
+              placeholder="Search by User ID" 
+              loading={loading}
+              storageKey="deposit_user_search"
+              maxHistory={5}
+            />
           </div>
           <div className="flex items-center justify-center pt-5">
             <span className="text-muted-foreground text-xs px-2 uppercase font-medium">OR</span>
           </div>
           <div className="flex-1 w-full sm:w-auto">
             <span className="text-xs font-medium text-muted-foreground block mb-1">Search by Order ID</span>
-            <SearchBar value={orderId} onChange={setOrderId} onSearch={loadByOrder} placeholder="Search by Order ID" loading={loading} />
+            <SearchBar 
+              value={orderId} 
+              onChange={setOrderId} 
+              onSearch={loadByOrder} 
+              placeholder="Search by Order ID" 
+              loading={loading}
+              storageKey="deposit_order_search"
+              maxHistory={5}
+            />
           </div>
         </div>
         <div className="flex justify-end">

@@ -44,7 +44,9 @@ const UserSearch = () => {
       setAccountNumber('');
       setAccountHolder('');
     } catch (err: any) {
-      toast.error(err.response?.data?.msg || err.response?.data?.message || 'User not found');
+      const errorMsg = err.response?.data?.msg || err.response?.data?.message || 'User not found';
+      toast.error(errorMsg);
+      setResult(null);
     } finally {
       setLoading(false);
     }
@@ -89,7 +91,15 @@ const UserSearch = () => {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-card border border-border p-6 rounded-lg shadow-sm mb-4">
         <div className="w-full sm:w-auto">
-          <SearchBar value={userId} onChange={setUserId} onSearch={handleSearch} placeholder="Enter User ID" loading={loading} />
+          <SearchBar 
+            value={userId} 
+            onChange={setUserId} 
+            onSearch={handleSearch} 
+            placeholder="Enter User ID" 
+            loading={loading}
+            storageKey="user_search_history"
+            maxHistory={10}
+          />
         </div>
         <LastUpdated timestamp={updatedAt} onRefresh={handleSearch} loading={loading} />
       </div>

@@ -70,6 +70,8 @@ const GameBets = () => {
             onSearch={() => handleSearch(1)} 
             placeholder="e.g., u123456" 
             loading={loading}
+            storageKey="game_bets_member_search"
+            maxHistory={10}
           />
         </div>
         <div className="space-y-1 w-full sm:w-32">
