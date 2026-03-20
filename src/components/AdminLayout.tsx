@@ -17,9 +17,12 @@ import {
   Gamepad2,
   RefreshCcw,
   ArrowRightLeft,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
 import Logo from "@/assets/logo.png";
 
 const navItems = [
@@ -42,6 +45,7 @@ const navItems = [
 
 const AdminLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, isAuthenticated, isLoading, user } = useAuth();
@@ -74,12 +78,16 @@ const AdminLayout = () => {
           key={item.url}
           to={item.url}
           end={item.url === "/dashboard"}
-          className="flex items-center gap-2.5 px-3 py-2 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors text-xs font-medium"
+          className={cn(
+            "flex items-center gap-2.5 px-3 py-2 text-muted-foreground hover:bg-secondary hover:text-foreground transition-all text-xs font-medium",
+            sidebarCollapsed && "justify-center px-2"
+          )}
           activeClassName="bg-primary/10 text-primary"
           onClick={() => setMobileOpen(false)}
+          title={sidebarCollapsed ? item.title : undefined}
         >
-          <item.icon className="w-4 h-4" />
-          <span>{item.title}</span>
+          <item.icon className="w-4 h-4 flex-shrink-0" />
+          {!sidebarCollapsed && <span className="truncate">{item.title}</span>}
         </NavLink>
       ))}
     </nav>
@@ -91,25 +99,59 @@ const AdminLayout = () => {
 
   return (
     <div className="h-screen w-full bg-background flex overflow-hidden">
+      <style>{`
+        /* Hide scrollbars but keep scrolling */
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
+      
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-56 border-r border-border bg-card">
-        <div className="p-4 border-b border-border flex items-center gap-2.5">
-          <img src={Logo} alt="Logo" className="w-8 h-8 object-contain bg-white" />
-          <div>
-            <h2 className="text-sm font-bold text-primary">Admin</h2>
-            <p className="text-[10px] text-muted-foreground">Management Panel</p>
-          </div>
+      <aside 
+        className={cn(
+          "hidden lg:flex flex-col border-r border-border bg-card transition-all duration-300 relative",
+          sidebarCollapsed ? "w-16" : "w-56"
+        )}
+      >
+        {/* Toggle Button */}
+        <button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="absolute -right-3 top-20 z-20 bg-card border border-border rounded-full p-1 shadow-sm hover:bg-secondary transition-colors"
+        >
+          {sidebarCollapsed ? (
+            <ChevronRightIcon className="w-3.5 h-3.5" />
+          ) : (
+            <ChevronLeftIcon className="w-3.5 h-3.5" />
+          )}
+        </button>
+
+        <div className={cn("p-4 border-b border-border flex items-center gap-2.5 overflow-hidden", sidebarCollapsed && "justify-center px-2")}>
+          <img src={Logo} alt="Logo" className="w-8 h-8 object-contain bg-white flex-shrink-0" />
+          {!sidebarCollapsed && (
+            <div className="truncate">
+              <h2 className="text-sm font-bold text-primary truncate">Admin</h2>
+              <p className="text-[10px] text-muted-foreground truncate">Management Panel</p>
+            </div>
+          )}
         </div>
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto no-scrollbar">
           <NavContent />
         </div>
         <div className="p-2 border-t border-border">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2.5 px-3 py-2 w-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-xs font-medium"
+            className={cn(
+              "flex items-center gap-2.5 px-3 py-2 w-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-xs font-medium",
+              sidebarCollapsed && "justify-center px-2"
+            )}
+            title={sidebarCollapsed ? "Logout" : undefined}
           >
-            <LogOut className="w-4 h-4" />
-            <span>Logout</span>
+            <LogOut className="w-4 h-4 flex-shrink-0" />
+            {!sidebarCollapsed && <span>Logout</span>}
           </button>
         </div>
       </aside>
@@ -137,7 +179,7 @@ const AdminLayout = () => {
             <X className="w-4 h-4" />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto no-scrollbar">
           <NavContent />
         </div>
         <div className="p-2 border-t border-border bg-card">
@@ -171,7 +213,7 @@ const AdminLayout = () => {
           </div>
         </header>
 
-        <main className="flex-1 p-3 lg:p-5 overflow-auto">
+        <main className="flex-1 p-3 lg:p-5 overflow-auto no-scrollbar">
           <Outlet />
         </main>
       </div>
