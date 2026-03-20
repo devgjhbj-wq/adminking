@@ -6,6 +6,7 @@ import SearchBar from '@/components/SearchBar';
 import LastUpdated from '@/components/LastUpdated';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const statusColor: Record<string, string> = {
   SUCCESS: 'bg-primary/20 text-primary',
@@ -19,186 +20,237 @@ const statusColor: Record<string, string> = {
 
 const Withdrawals = () => {
   const { token } = useAuth();
-  const [userId, setUserId] = useState('');
-  const [orderId, setOrderId] = useState('');
-  const [status, setStatus] = useState('');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [lastSearchType, setLastSearchType] = useState<'list' | 'order'>('list');
-  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+  
+  // Latest Withdrawals state
+  const [latestData, setLatestData] = useState<any>(null);
+  const [latestLoading, setLatestLoading] = useState(false);
+  const [latestPage, setLatestPage] = useState(1);
+  const [latestStatus, setLatestStatus] = useState('');
+  const [latestDateFrom, setLatestDateFrom] = useState('');
+  const [latestDateTo, setLatestDateTo] = useState('');
+  const [latestUpdatedAt, setLatestUpdatedAt] = useState<Date | null>(null);
 
-  const loadWithdrawals = async (p = 1) => {
+  // Search Withdrawals state
+  const [searchData, setSearchData] = useState<any>(null);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchPage, setSearchPage] = useState(1);
+  const [searchUserId, setSearchUserId] = useState('');
+  const [searchOrderId, setSearchOrderId] = useState('');
+  const [searchUpdatedAt, setSearchUpdatedAt] = useState<Date | null>(null);
+  const [lastSearchType, setLastSearchType] = useState<'user' | 'order' | null>(null);
+
+  useEffect(() => {
+    loadLatest(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const loadLatest = async (p = 1) => {
     setAuthToken(token);
-    setLoading(true);
-    setLastSearchType('list');
+    setLatestLoading(true);
     try {
       const res = await fetchWithdrawals({
-        userId: userId.trim() || undefined,
-        status: status || undefined,
-        dateFrom: dateFrom || undefined,
-        dateTo: dateTo || undefined,
+        status: latestStatus || undefined,
+        dateFrom: latestDateFrom || undefined,
+        dateTo: latestDateTo || undefined,
         page: p,
       });
-      setData(res.data);
-      setPage(p);
-      setUpdatedAt(new Date());
+      setLatestData(res.data);
+      setLatestPage(p);
+      setLatestUpdatedAt(new Date());
     } catch (err: any) {
-      toast.error(err.response?.data?.msg || 'Failed to load withdrawals');
+      toast.error(err.response?.data?.msg || 'Failed to load latest withdrawals');
     } finally {
-      setLoading(false);
+      setLatestLoading(false);
     }
   };
 
-  const loadByOrder = async () => {
-    const q = orderId.trim();
+  const loadSearchByUser = async (p = 1) => {
+    const q = searchUserId.trim();
     if (!q) return;
     setAuthToken(token);
-    setLoading(true);
+    setSearchLoading(true);
+    setLastSearchType('user');
+    try {
+      const res = await fetchWithdrawals({
+        userId: q,
+        page: p,
+      });
+      setSearchData(res.data);
+      setSearchPage(p);
+      setSearchUpdatedAt(new Date());
+    } catch (err: any) {
+      toast.error(err.response?.data?.msg || 'Failed to load withdrawals by user');
+      setSearchData(null);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const loadSearchByOrder = async () => {
+    const q = searchOrderId.trim();
+    if (!q) return;
+    setAuthToken(token);
+    setSearchLoading(true);
     setLastSearchType('order');
     try {
       const res = await fetchWithdrawalByOrder(q);
       if (res.data?.withdrawal) {
-        setData({ items: [res.data.withdrawal], total: 1, limit: 1, page: 1 });
+        setSearchData({ items: [res.data.withdrawal], total: 1, limit: 1, page: 1 });
+      } else if (res.data?.items) {
+        setSearchData(res.data);
       } else {
-        setData(res.data);
+        setSearchData(res.data);
       }
-      setPage(1);
-      setUpdatedAt(new Date());
+      setSearchPage(1);
+      setSearchUpdatedAt(new Date());
     } catch (err: any) {
-      toast.error(err.response?.data?.msg || 'Failed to load withdrawal');
+      toast.error(err.response?.data?.msg || 'Failed to load withdrawal order');
+      setSearchData(null);
     } finally {
-      setLoading(false);
+      setSearchLoading(false);
     }
   };
 
-  const handleRefresh = () => {
-    if (lastSearchType === 'order') loadByOrder();
-    else loadWithdrawals(page);
+  const renderTable = (data: any, page: number, totalPages: number, loadMoreFn: (p: number) => void, isPaginated: boolean) => {
+    if (!data?.items?.length) return <div className="p-4 text-center text-muted-foreground text-sm border border-border bg-card">No withdrawals found.</div>;
+
+    return (
+      <>
+        <div className="bg-card border border-border overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-border bg-secondary/30">
+                  <th className="text-left p-2 text-muted-foreground font-medium">User ID</th>
+                  <th className="text-left p-2 text-muted-foreground font-medium">Order ID</th>
+                  <th className="text-left p-2 text-muted-foreground font-medium">Amount</th>
+                  <th className="text-left p-2 text-muted-foreground font-medium">Bal. After</th>
+                  <th className="text-left p-2 text-muted-foreground font-medium">Bank Details</th>
+                  <th className="text-left p-2 text-muted-foreground font-medium">Status</th>
+                  <th className="text-left p-2 text-muted-foreground font-medium">Remark</th>
+                  <th className="text-left p-2 text-muted-foreground font-medium">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.items.map((d: any, i: number) => (
+                  <tr key={i} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
+                    <td className="p-2 text-foreground font-medium">{d.userId}</td>
+                    <td className="p-2 text-foreground font-mono text-[10px]">{d.orderId}</td>
+                    <td className="p-2 text-foreground">₹{d.amount?.toLocaleString()}</td>
+                    <td className="p-2 text-foreground text-xs">{d.balanceAfter !== undefined ? `₹${d.balanceAfter.toLocaleString()}` : '-'}</td>
+                    <td className="p-2 text-muted-foreground text-[10px]">
+                      {d.bankDetails ? (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-semibold text-foreground">{d.bankDetails.accountHolder}</span>
+                          <span>{d.bankDetails.bankName} - {d.bankDetails.accountNumber}</span>
+                        </div>
+                      ) : (
+                        '-'
+                      )}
+                    </td>
+                    <td className="p-2">
+                      <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-sm ${statusColor[d.status] || 'bg-muted text-muted-foreground'}`}>
+                        {d.status}
+                      </span>
+                    </td>
+                    <td className="p-2 text-muted-foreground text-[10px] max-w-[150px] truncate" title={d.remark}>{d.remark || '-'}</td>
+                    <td className="p-2 text-muted-foreground">{new Date(d.createdAt).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {isPaginated && totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4">
+            <span className="text-xs text-muted-foreground">Total: {data.total} — Page {page}/{totalPages}</span>
+            <div className="flex gap-1">
+              <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => loadMoreFn(page - 1)}>
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </Button>
+              <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => loadMoreFn(page + 1)}>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          </div>
+        )}
+      </>
+    );
   };
 
-  useEffect(() => {
-    loadWithdrawals(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const totalPages = data?.total ? Math.ceil(data.total / (data.limit || 25)) : 0;
+  const latestTotalPages = latestData?.total ? Math.ceil(latestData.total / (latestData.limit || 25)) : 0;
+  const searchTotalPages = searchData?.total ? Math.ceil(searchData.total / (searchData.limit || 25)) : 0;
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-col gap-2 bg-card border border-border p-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <SearchBar value={orderId} onChange={setOrderId} onSearch={loadByOrder} placeholder="Search by Order ID (WD...)" loading={loading && lastSearchType === 'order'} />
-            <span className="text-muted-foreground text-xs px-2 uppercase font-medium">OR</span>
-            <input
-              className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="User ID (optional)"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <select
-              className="flex h-9 w-full sm:w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-            >
-              <option value="">All Statuses</option>
-              <option value="PENDING">PENDING</option>
-              <option value="APPROVED">APPROVED</option>
-              <option value="REJECTED">REJECTED</option>
-              <option value="COMPLETED">COMPLETED</option>
-              <option value="FAILED">FAILED</option>
-            </select>
-            <input
-              type="date"
-              className="flex h-9 w-full sm:w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-            />
-            <span className="text-muted-foreground text-xs">to</span>
-            <input
-              type="date"
-              className="flex h-9 w-full sm:w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-            />
-            <Button onClick={() => loadWithdrawals(1)} disabled={loading && lastSearchType === 'list'} className="w-full sm:w-auto">
-              Filter
-            </Button>
-          </div>
-        </div>
-        <div className="flex justify-end">
-          <LastUpdated timestamp={updatedAt} onRefresh={handleRefresh} loading={loading} />
-        </div>
-      </div>
+      <Tabs defaultValue="search" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="search">Search Orders</TabsTrigger>
+          <TabsTrigger value="latest">Latest Withdrawals</TabsTrigger>
+        </TabsList>
 
-      {data?.items && (
-        <>
-          <div className="bg-card border border-border overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="border-b border-border bg-secondary/30">
-                    <th className="text-left p-2 text-muted-foreground font-medium">User ID</th>
-                    <th className="text-left p-2 text-muted-foreground font-medium">Order ID</th>
-                    <th className="text-left p-2 text-muted-foreground font-medium">Amount</th>
-                    <th className="text-left p-2 text-muted-foreground font-medium">Bal. After</th>
-                    <th className="text-left p-2 text-muted-foreground font-medium">Bank Details</th>
-                    <th className="text-left p-2 text-muted-foreground font-medium">Status</th>
-                    <th className="text-left p-2 text-muted-foreground font-medium">Remark</th>
-                    <th className="text-left p-2 text-muted-foreground font-medium">Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.items.map((d: any, i: number) => (
-                    <tr key={i} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
-                      <td className="p-2 text-foreground font-medium">{d.userId}</td>
-                      <td className="p-2 text-foreground font-mono text-[10px]">{d.orderId}</td>
-                      <td className="p-2 text-foreground">₹{d.amount?.toLocaleString()}</td>
-                      <td className="p-2 text-foreground text-xs">{d.balanceAfter !== undefined ? `₹${d.balanceAfter.toLocaleString()}` : '-'}</td>
-                      <td className="p-2 text-muted-foreground text-[10px]">
-                        {d.bankDetails ? (
-                          <div className="flex flex-col gap-0.5">
-                            <span className="font-semibold text-foreground">{d.bankDetails.accountHolder}</span>
-                            <span>{d.bankDetails.bankName} - {d.bankDetails.accountNumber}</span>
-                          </div>
-                        ) : (
-                          '-'
-                        )}
-                      </td>
-                      <td className="p-2">
-                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-sm ${statusColor[d.status] || 'bg-muted text-muted-foreground'}`}>
-                          {d.status}
-                        </span>
-                      </td>
-                      <td className="p-2 text-muted-foreground text-[10px] max-w-[150px] truncate" title={d.remark}>{d.remark || '-'}</td>
-                      <td className="p-2 text-muted-foreground">{new Date(d.createdAt).toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {lastSearchType === 'list' && totalPages > 1 && (
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">Total: {data.total} — Page {page}/{totalPages}</span>
-              <div className="flex gap-1">
-                <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => loadWithdrawals(page - 1)}>
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                </Button>
-                <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => loadWithdrawals(page + 1)}>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </Button>
+        <TabsContent value="search" className="space-y-4">
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col sm:flex-row gap-4 bg-card border border-border p-4">
+              <div className="flex-1 space-y-1">
+                <span className="text-xs font-medium text-muted-foreground">Search by Order ID</span>
+                <SearchBar value={searchOrderId} onChange={setSearchOrderId} onSearch={loadSearchByOrder} placeholder="Ex: WD123456..." loading={searchLoading && lastSearchType === 'order'} />
+              </div>
+              <div className="flex items-center justify-center pt-5">
+                <span className="text-muted-foreground text-xs px-2 uppercase font-medium">OR</span>
+              </div>
+              <div className="flex-1 space-y-1">
+                <span className="text-xs font-medium text-muted-foreground">Search by User ID</span>
+                <SearchBar value={searchUserId} onChange={setSearchUserId} onSearch={() => loadSearchByUser(1)} placeholder="Ex: 123456" loading={searchLoading && lastSearchType === 'user'} />
               </div>
             </div>
-          )}
-        </>
-      )}
+            <div className="flex justify-end">
+              <LastUpdated timestamp={searchUpdatedAt} onRefresh={() => lastSearchType === 'order' ? loadSearchByOrder() : loadSearchByUser(searchPage)} loading={searchLoading} />
+            </div>
+          </div>
+          {searchData && renderTable(searchData, searchPage, searchTotalPages, loadSearchByUser, lastSearchType === 'user')}
+        </TabsContent>
+
+        <TabsContent value="latest" className="space-y-4">
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 bg-card border border-border p-4">
+              <select
+                className="flex h-9 w-full sm:w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                value={latestStatus}
+                onChange={(e) => setLatestStatus(e.target.value)}
+              >
+                <option value="">All Statuses</option>
+                <option value="PENDING">PENDING</option>
+                <option value="APPROVED">APPROVED</option>
+                <option value="REJECTED">REJECTED</option>
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="FAILED">FAILED</option>
+              </select>
+              <input
+                type="date"
+                className="flex h-9 w-full sm:w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                value={latestDateFrom}
+                onChange={(e) => setLatestDateFrom(e.target.value)}
+              />
+              <span className="text-muted-foreground text-xs">to</span>
+              <input
+                type="date"
+                className="flex h-9 w-full sm:w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                value={latestDateTo}
+                onChange={(e) => setLatestDateTo(e.target.value)}
+              />
+              <Button onClick={() => loadLatest(1)} disabled={latestLoading} className="w-full sm:w-auto">
+                Filter
+              </Button>
+            </div>
+            <div className="flex justify-end">
+              <LastUpdated timestamp={latestUpdatedAt} onRefresh={() => loadLatest(latestPage)} loading={latestLoading} />
+            </div>
+          </div>
+          {renderTable(latestData, latestPage, latestTotalPages, loadLatest, true)}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

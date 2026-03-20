@@ -174,23 +174,30 @@ GET /admin/transactions?userId=123456&page=1&limit=25
 
 ## 5. Withdrawals
 
-### Get Withdrawal Orders by User ID
+### Get Withdrawal Orders
 
 ```
 GET /admin/withdrawals?userId=123456&page=1&limit=25&status=PENDING
 ```
 
-**Description:** Retrieve all withdrawal orders for a specific user with pagination and optional status filtering.
+or
+
+```
+GET /admin/withdrawals?orderId=WD12345617234567890
+```
+
+**Description:** Search for withdrawal orders by userId or orderId. Returns paginated results with optional status filtering.
 
 **Query Params:**
-| Param | Type | Description |
-|-------|------|-------------|
-| userId | number | User ID (required) |
-| page | number | Page number (default: 1) |
-| limit | number | Items per page (default: 25, max: 100) |
-| status | string | Filter by status: PENDING, APPROVED, REJECTED, COMPLETED |
+| Param | Type | Required | Description |
+|-------|------|---------|-------------|
+| userId | number | Yes* | User ID (*required if orderId not provided) |
+| orderId | string | Yes* | Withdrawal order ID (*required if userId not provided) |
+| page | number | No | Page number (default: 1) |
+| limit | number | No | Items per page (default: 25, max: 100) |
+| status | string | No | Filter by status: PENDING, APPROVED, REJECTED, COMPLETED |
 
-**Response:**
+**Response (by userId):**
 
 ```json
 {
@@ -201,6 +208,7 @@ GET /admin/withdrawals?userId=123456&page=1&limit=25&status=PENDING
   "total": 5,
   "items": [
     {
+      "_id": "507f1f77bcf86cd799439011",
       "userId": 123456,
       "type": "WITHDRAW",
       "amount": 500.0,
@@ -208,74 +216,26 @@ GET /admin/withdrawals?userId=123456&page=1&limit=25&status=PENDING
       "status": "PENDING",
       "orderId": "WD12345617234567890",
       "remark": "Withdrawal request",
-      "createdAt": "2026-03-19T10:30:00.000Z"
+      "createdAt": "2026-03-19T10:30:00.000Z",
+      "bankDetails": {
+        "bankName": "SBI",
+        "bankCode": "SBI",
+        "accountNumber": "1234567890",
+        "accountHolder": "John Doe"
+      }
     }
   ]
 }
 ```
 
-### Get Withdrawal Order by Order ID
-
-```
-GET /admin/withdrawals/:orderId
-```
-
-**Description:** Retrieve a specific withdrawal order by its order ID.
-
-**Path Parameters:**
-| Param | Type | Description |
-|-------|------|-------------|
-| orderId | string | Withdrawal order ID (e.g., WD12345617234567890) |
-
-**Response:**
+**Response (by orderId):**
 
 ```json
 {
   "status": "success",
-  "withdrawal": {
-    "_id": "507f1f77bcf86cd799439011",
-    "userId": 123456,
-    "type": "WITHDRAW",
-    "amount": 500.0,
-    "balanceAfter": 1500.0,
-    "status": "PENDING",
-    "orderId": "WD12345617234567890",
-    "remark": "Withdrawal request",
-    "createdAt": "2026-03-19T10:30:00.000Z"
-  }
-}
-```
-
-
-
-### Get Withdrawals (All Statuses)
-
-```
-GET /admin/withdrawals?page=1&limit=25
-```
-
-**Description:** Get paginated list of all withdrawal orders across all users.
-
-**Query Params:**
-| Param | Type | Description |
-|-------|------|-------------|
-| page | number | Page number (default: 1) |
-| limit | number | Items per page (default: 25, max: 100) |
-| status | string | Filter by status: PENDING, APPROVED, REJECTED, COMPLETED |
-| userId | number | Filter by user ID (optional) |
-| dateFrom | string | Start date (YYYY-MM-DD) |
-| dateTo | string | End date (YYYY-MM-DD) |
-
-**Response:**
-
-```json
-{
-  "status": "success",
-  "page": 1,
-  "limit": 25,
-  "total": 100,
   "items": [
     {
+      "_id": "507f1f77bcf86cd799439011",
       "userId": 123456,
       "type": "WITHDRAW",
       "amount": 500.0,
@@ -283,9 +243,24 @@ GET /admin/withdrawals?page=1&limit=25
       "status": "PENDING",
       "orderId": "WD12345617234567890",
       "remark": "Withdrawal request",
-      "createdAt": "2026-03-19T10:30:00.000Z"
+      "createdAt": "2026-03-19T10:30:00.000Z",
+      "bankDetails": {
+        "bankName": "SBI",
+        "bankCode": "SBI",
+        "accountNumber": "1234567890",
+        "accountHolder": "John Doe"
+      }
     }
   ]
+}
+```
+
+**Error Response (no results):**
+
+```json
+{
+  "status": "failed",
+  "msg": "No withdrawal orders found"
 }
 ```
 
@@ -689,15 +664,17 @@ PUT /admin/turnover-config
 
 **Transaction Types:**
 
-| Type           | Description                    |
-| -------------- | ------------------------------ |
-| DEPOSIT        | Deposit turnover requirement   |
-| VIP_BONUS      | VIP Bonus turnover requirement |
-| MONTHLY_BONUS  | Monthly check-in bonus         |
-| UPGRADE_BONUS  | VIP upgrade bonus              |
-| ADMIN_BONUS    | Admin added bonus              |
-| REFERRAL_BONUS | Referral bonus                 |
-| PROMOTION      | Promotion bonus                |
+| Type                 | Description                        |
+| -------------------- | ---------------------------------- |
+| DEPOSIT              | Deposit turnover requirement       |
+| SIGNUP_BONUS         | Signup bonus turnover             |
+| FIRST_DEPOSIT_BONUS  | First deposit bonus turnover      |
+| VIP_BONUS            | VIP Bonus turnover requirement    |
+| MONTHLY_BONUS         | Monthly check-in bonus            |
+| UPGRADE_BONUS        | VIP upgrade bonus                 |
+| ADMIN_BONUS          | Admin added bonus                 |
+| REFERRAL_BONUS       | Referral bonus                    |
+| PROMOTION            | Promotion bonus                   |
 
 ### Get User Turnover Status
 
@@ -807,6 +784,20 @@ The turnover-based withdrawable system:
 2. **VIP Bonuses** → Adds to `turnover_requirement` (bonus × multiplier)
 3. **Bet Records** → Reduces `turnover_requirement` (based on bet amount)
 4. **Withdrawal** → Only allowed when `turnover_requirement == 0`
+
+### Bonus Wager Requirements (1x Multiplier)
+
+| Bonus Type          | Amount | Wager Required | Description |
+| ------------------- | ------ | --------------- | ----------- |
+| Signup Bonus        | ₹26    | ₹26             | One-time bonus on registration |
+| First Deposit Bonus | ₹20-₹7500 | Bonus Amount | Milestone-based bonus on first deposit |
+
+**Formula:** `Wager Required = Bonus Amount × Multiplier` (default: 1x)
+
+**Examples:**
+- Signup ₹26 bonus → Bet ₹26 to unlock
+- First deposit ₹500 → Bonus ₹100 → Bet ₹100 to unlock
+- First deposit ₹1000 → Bonus ₹250 → Bet ₹250 to unlock
 
 ### Batch-Based Calculation
 
