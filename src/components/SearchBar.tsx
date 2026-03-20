@@ -17,6 +17,7 @@ interface SearchBarProps {
   modes?: { value: string; label: string }[];
   selectedMode?: string;
   onModeChange?: (mode: string) => void;
+  hideButton?: boolean;
 }
 
 const SearchBar = ({ 
@@ -30,7 +31,8 @@ const SearchBar = ({
   debounceMs = 300,
   modes,
   selectedMode,
-  onModeChange
+  onModeChange,
+  hideButton = false
 }: SearchBarProps) => {
   const [history, setHistory] = useState<string[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -166,14 +168,16 @@ const SearchBar = ({
             </button>
           )}
         </div>
-        <Button 
-          onClick={handleSearch} 
-          disabled={loading || !value.trim()} 
-          className="h-7 px-2 whitespace-nowrap text-xs flex-shrink-0"
-        >
-          <Search className="w-3 h-3 mr-1" />
-          {loading ? 'Searching...' : 'Go'}
-        </Button>
+        {!hideButton && (
+          <Button 
+            onClick={handleSearch} 
+            disabled={loading || !value.trim()} 
+            className="h-7 px-2 whitespace-nowrap text-xs flex-shrink-0"
+          >
+            <Search className="w-3 h-3 mr-1" />
+            {loading ? 'Searching...' : 'Go'}
+          </Button>
+        )}
       </div>
 
       {/* Suggestions dropdown */}

@@ -24,8 +24,9 @@ const statusColor: Record<string, string> = {
 const Withdrawals = () => {
   const { token } = useAuth();
   
-  // Unified search state
-  const [searchQuery, setSearchQuery] = useState('');
+  // Search state
+  const [userId, setUserId] = useState('');
+  const [orderId, setOrderId] = useState('');
   const [status, setStatus] = useState('');
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
@@ -34,6 +35,7 @@ const Withdrawals = () => {
   const [results, setResults] = useState<WithdrawalResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [lastSearchType, setLastSearchType] = useState<'user' | 'order' | 'filters'>('filters');
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
 
@@ -57,72 +59,100 @@ const Withdrawals = () => {
     }
   };
 
-  const loadData = useCallback(async (p = 1) => {
+  const loadByUserId = useCallback(async (p = 1) => {
+    const q = userId.trim();
+    if (!q) {
+      toast.error('Enter User ID');
+      return;
+    }
+    if (isNaN(Number(q))) {
+      toast.error('User ID must be numeric');
+      return;
+    }
     setLoading(true);
     setAuthToken(token);
-
+    setLastSearchType('user');
     try {
-      const query = searchQuery.trim();
-      let response;
-
-      // Logic: 
-      // 1. If query starts with WD, it's an Order ID
-      // 2. If query is numeric, it's a User ID
-      // 3. Otherwise, it's a general search (latest withdrawals)
-
-      if (query.startsWith('WD')) {
-        response = await fetchWithdrawalByOrder(query);
-        if (response.data?.items && Array.isArray(response.data.items)) {
-          setResults({
-            items: response.data.items,
-            total: response.data.items.length,
-            limit: 1,
-            page: 1,
-            status: response.data.status
-          });
-        } else {
-          setResults(null);
-          toast.error('Order not found');
-        }
-      } else {
-        const filters: WithdrawalFilters = {
-          page: p,
-          limit: 50,
-        };
-
-        if (query && !isNaN(Number(query))) {
-          filters.userId = query;
-        }
-
-        if (status && status !== 'all') {
-          filters.status = status;
-        }
-
-        if (dateFrom) {
-          filters.dateFrom = format(dateFrom, 'yyyy-MM-dd');
-        }
-
-        if (dateTo) {
-          filters.dateTo = format(dateTo, 'yyyy-MM-dd');
-        }
-
-        response = await fetchWithdrawals(filters);
-        setResults(response.data);
-        setPage(p);
-      }
-
+      const response = await fetchWithdrawals({
+        userId: q,
+        page: p,
+        limit: 50,
+      });
+      setResults(response.data);
+      setPage(p);
       setUpdatedAt(new Date());
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { msg?: string } }; message?: string };
-      toast.error(error.response?.data?.msg || 'Failed to fetch withdrawals');
-      setResults(null);
+    } catch (err: any) {
+      toast.error(err.response?.data?.msg || 'Failed to fetch user withdrawals');
     } finally {
       setLoading(false);
     }
-  }, [token, searchQuery, status, dateFrom, dateTo]);
+  }, [token, userId]);
+
+  const loadByOrderId = useCallback(async () => {
+    const q = orderId.trim();
+    if (!q) {
+      toast.error('Enter Order ID');
+      return;
+    }
+    setLoading(true);
+    setAuthToken(token);
+    setLastSearchType('order');
+    try {
+      const response = await fetchWithdrawalByOrder(q);
+      if (response.data?.items && Array.isArray(response.data.items)) {
+        setResults({
+          items: response.data.items,
+          total: response.data.items.length,
+          limit: 1,
+          page: 1,
+          status: response.data.status
+        });
+        setPage(1);
+      } else {
+        setResults(null);
+        toast.error('Order not found');
+      }
+      setUpdatedAt(new Date());
+    } catch (err: any) {
+      toast.error(err.response?.data?.msg || 'Failed to fetch order');
+    } finally {
+      setLoading(false);
+    }
+  }, [token, orderId]);
+
+  const loadByFilters = useCallback(async (p = 1) => {
+    setLoading(true);
+    setAuthToken(token);
+    setLastSearchType('filters');
+    try {
+      const filters: WithdrawalFilters = {
+        page: p,
+        limit: 50,
+      };
+      if (status && status !== 'all') filters.status = status;
+      if (dateFrom) filters.dateFrom = format(dateFrom, 'yyyy-MM-dd');
+      if (dateTo) filters.dateTo = format(dateTo, 'yyyy-MM-dd');
+
+      const response = await fetchWithdrawals(filters);
+      setResults(response.data);
+      setPage(p);
+      setUpdatedAt(new Date());
+    } catch (err: any) {
+      toast.error(err.response?.data?.msg || 'Failed to fetch withdrawals');
+    } finally {
+      setLoading(false);
+    }
+  }, [token, status, dateFrom, dateTo]);
+
+  const handleRefresh = () => {
+    if (lastSearchType === 'user') loadByUserId(page);
+    else if (lastSearchType === 'order') loadByOrderId();
+    else loadByFilters(page);
+  };
 
   const handleClear = () => {
-    setSearchQuery('');
+    setUserId('');
+    setOrderId('');
     setStatus('');
     setDateFrom(undefined);
     setDateTo(undefined);
@@ -215,27 +245,66 @@ const Withdrawals = () => {
 
   return (
     <div className="space-y-3">
-      {/* Compact Search & Filter Bar */}
-      <div className="bg-card border border-border p-2 rounded-lg shadow-sm">
-        <div className="flex flex-wrap items-end gap-2">
-          {/* ID Search */}
-          <div className="flex-1 min-w-[180px]">
-            <label className="text-[10px] font-medium text-muted-foreground uppercase mb-1 block">User / Order ID</label>
-            <div className="relative">
-              <SearchBar 
-                value={searchQuery} 
-                onChange={setSearchQuery} 
-                onSearch={() => loadData(1)} 
-                placeholder="Ex: 123456 or WD..."
-                loading={loading}
-                storageKey="withdrawal_search"
-                maxHistory={5}
-              />
+      {/* Search & Filter Bar */}
+      <div className="bg-card border border-border p-3 rounded-lg shadow-sm space-y-3">
+        {/* Row 1: ID Searches */}
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="flex-1 min-w-[200px]">
+            <label className="text-[10px] font-medium text-muted-foreground uppercase mb-1 block">User ID Search</label>
+            <div className="flex gap-1.5">
+              <div className="flex-1">
+                <SearchBar 
+                  value={userId} 
+                  onChange={setUserId} 
+                  onSearch={() => loadByUserId(1)} 
+                  placeholder="Ex: 123456"
+                  loading={loading && lastSearchType === 'user'}
+                  storageKey="withdrawal_user_search"
+                  maxHistory={5}
+                  hideButton={true}
+                />
+              </div>
+              <Button 
+                onClick={() => loadByUserId(1)} 
+                disabled={loading} 
+                size="sm"
+                className="h-7 px-3 text-xs"
+              >
+                Search
+              </Button>
             </div>
           </div>
 
-          {/* Status Filter */}
-          <div className="w-[120px]">
+          <div className="flex-1 min-w-[200px]">
+            <label className="text-[10px] font-medium text-muted-foreground uppercase mb-1 block">Order ID Search</label>
+            <div className="flex gap-1.5">
+              <div className="flex-1">
+                <SearchBar 
+                  value={orderId} 
+                  onChange={setOrderId} 
+                  onSearch={loadByOrderId} 
+                  placeholder="Ex: WD..."
+                  loading={loading && lastSearchType === 'order'}
+                  storageKey="withdrawal_order_search"
+                  maxHistory={5}
+                  hideButton={true}
+                />
+              </div>
+              <Button 
+                onClick={loadByOrderId} 
+                disabled={loading} 
+                size="sm"
+                className="h-7 px-3 text-xs"
+              >
+                Search
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Row 2: Global Filters */}
+        <div className="flex flex-wrap items-end gap-3 pt-2 border-t border-border/50">
+          <div className="w-[140px]">
             <label className="text-[10px] font-medium text-muted-foreground uppercase mb-1 block">Status</label>
             <select
               className="flex h-7 w-full rounded border border-input bg-background px-2 py-1 text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
@@ -251,58 +320,72 @@ const Withdrawals = () => {
             </select>
           </div>
 
-          {/* Date Range */}
           <div className="flex flex-col gap-1">
             <label className="text-[10px] font-medium text-muted-foreground uppercase mb-0.5 block">Date Range</label>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-[110px] justify-start text-left font-normal text-[11px] h-7 px-2",
+                      "w-[120px] justify-start text-left font-normal text-[11px] h-7 px-2",
                       !dateFrom && "text-muted-foreground"
                     )}
                   >
                     <CalendarIcon className="mr-1.5 h-3 w-3" />
-                    {dateFrom ? format(dateFrom, "MMM dd") : "From"}
+                    {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} initialFocus />
+                  <Calendar 
+                    mode="single" 
+                    selected={dateFrom} 
+                    onSelect={setDateFrom} 
+                    initialFocus 
+                    captionLayout="dropdown-buttons"
+                    fromYear={2024}
+                    toYear={2026}
+                  />
                 </PopoverContent>
               </Popover>
-              <span className="text-muted-foreground text-[10px]">-</span>
+              <span className="text-muted-foreground text-[10px]">to</span>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-[110px] justify-start text-left font-normal text-[11px] h-7 px-2",
+                      "w-[120px] justify-start text-left font-normal text-[11px] h-7 px-2",
                       !dateTo && "text-muted-foreground"
                     )}
                   >
                     <CalendarIcon className="mr-1.5 h-3 w-3" />
-                    {dateTo ? format(dateTo, "MMM dd") : "To"}
+                    {dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={dateTo} onSelect={setDateTo} initialFocus />
+                  <Calendar 
+                    mode="single" 
+                    selected={dateTo} 
+                    onSelect={setDateTo} 
+                    initialFocus 
+                    captionLayout="dropdown-buttons"
+                    fromYear={2024}
+                    toYear={2026}
+                  />
                 </PopoverContent>
               </Popover>
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <Button 
-              onClick={() => loadData(1)} 
+              onClick={() => loadByFilters(1)} 
               disabled={loading} 
               size="sm"
-              className="h-7 px-3 text-xs"
+              className="h-7 px-4 text-xs font-semibold"
             >
-              {loading ? <Loading size={12} className="mr-1" /> : null}
-              Search
+              {loading && lastSearchType === 'filters' ? <Loading size={12} className="mr-1" /> : null}
+              Search Filters
             </Button>
             <Button 
               onClick={handleClear} 
@@ -310,12 +393,12 @@ const Withdrawals = () => {
               size="sm"
               className="h-7 px-3 text-xs"
             >
-              Clear
+              Reset
             </Button>
-            <div className="ml-1 border-l border-border pl-2">
+            <div className="ml-1 border-l border-border pl-2 flex items-center h-7">
               <LastUpdated 
                 timestamp={updatedAt} 
-                onRefresh={() => loadData(page)} 
+                onRefresh={handleRefresh} 
                 loading={loading} 
                 compact 
               />
@@ -341,7 +424,11 @@ const Withdrawals = () => {
                   size="sm"
                   className="h-7 w-7 p-0"
                   disabled={page <= 1 || loading}
-                  onClick={() => loadData(page - 1)}
+                  onClick={() => {
+                    const nextPage = page - 1;
+                    if (lastSearchType === 'user') loadByUserId(nextPage);
+                    else if (lastSearchType === 'filters') loadByFilters(nextPage);
+                  }}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -353,7 +440,11 @@ const Withdrawals = () => {
                   size="sm"
                   className="h-7 w-7 p-0"
                   disabled={page >= totalPages || loading}
-                  onClick={() => loadData(page + 1)}
+                  onClick={() => {
+                    const nextPage = page + 1;
+                    if (lastSearchType === 'user') loadByUserId(nextPage);
+                    else if (lastSearchType === 'filters') loadByFilters(nextPage);
+                  }}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
