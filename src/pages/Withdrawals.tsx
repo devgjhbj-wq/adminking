@@ -68,32 +68,42 @@ const Withdrawals = () => {
 
   useEffect(() => {
     loadLatest(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const loadLatest = async (p = 1) => {
     setAuthToken(token);
     setLatestLoading(true);
     try {
-      const res = await fetchWithdrawals({
+      // Build filters object with current state values
+      const filters: any = {
         page: p,
         limit: 50,
-        status: latestStatus || undefined,
-        dateFrom: latestDateFrom ? format(latestDateFrom, 'yyyy-MM-dd') : undefined,
-        dateTo: latestDateTo ? format(latestDateTo, 'yyyy-MM-dd') : undefined,
-      });
+      };
+      
+      // Explicitly add filters if they have values
+      if (latestStatus && latestStatus.trim()) {
+        filters.status = latestStatus;
+      }
+      if (latestDateFrom) {
+        filters.dateFrom = format(latestDateFrom, 'yyyy-MM-dd');
+      }
+      if (latestDateTo) {
+        filters.dateTo = format(latestDateTo, 'yyyy-MM-dd');
+      }
+
+      const res = await fetchWithdrawals(filters);
       setLatestData(res.data);
       setLatestPage(p);
       setLatestUpdatedAt(new Date());
       
       // Show feedback for applied filters
-      const filters = [];
-      if (latestStatus) filters.push(`Status: ${latestStatus}`);
-      if (latestDateFrom) filters.push(`From: ${format(latestDateFrom, 'MMM dd, yyyy')}`);
-      if (latestDateTo) filters.push(`To: ${format(latestDateTo, 'MMM dd, yyyy')}`);
+      const appliedFilters = [];
+      if (latestStatus && latestStatus.trim()) appliedFilters.push(`Status: ${latestStatus}`);
+      if (latestDateFrom) appliedFilters.push(`From: ${format(latestDateFrom, 'MMM dd, yyyy')}`);
+      if (latestDateTo) appliedFilters.push(`To: ${format(latestDateTo, 'MMM dd, yyyy')}`);
       
-      if (filters.length > 0) {
-        toast.success(`Filters applied: ${filters.join(' | ')}`);
+      if (appliedFilters.length > 0) {
+        toast.success(`Filters applied: ${appliedFilters.join(' | ')}`);
       }
     } catch (err: any) {
       const errorMsg = err.response?.data?.msg || 'Failed to load withdrawals';

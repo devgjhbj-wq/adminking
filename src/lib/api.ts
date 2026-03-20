@@ -104,13 +104,14 @@ export const fetchWithdrawals = (params?: { userId?: string; status?: string; da
   const query = new URLSearchParams();
   if (params?.userId) query.set('userId', params.userId);
   if (params?.status) query.set('status', params.status);
-  if (params?.dateFrom) query.set('dateFrom', params.dateFrom);
-  if (params?.dateTo) query.set('dateTo', params.dateTo);
+  if (params?.dateFrom) query.set('dateFrom', params.dateFrom); // YYYY-MM-DD format
+  if (params?.dateTo) query.set('dateTo', params.dateTo); // YYYY-MM-DD format
   const page = params?.page || 1;
   const limit = Math.min(params?.limit || 50, 100); // Default 50, Max 100
   query.set('page', String(page));
   query.set('limit', String(limit));
-  return api.get(`/api/admin/withdrawals?${query.toString()}`);
+  const url = `/api/admin/withdrawals?${query.toString()}`;
+  return api.get(url);
 };
 
 /**
