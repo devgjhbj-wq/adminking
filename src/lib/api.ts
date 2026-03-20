@@ -57,22 +57,46 @@ export const approveDeposit = (orderId: string) =>
   api.post('/api/admin/deposits/approve', { orderId });
 
 // Withdrawals
+/**
+ * Fetch withdrawal orders with filters
+ * @param params Optional parameters: userId, status, dateFrom, dateTo, page, limit
+ * Status options: PENDING, AUDITING, SUCCESS, FAILED, CANCELLED
+ * Default limit: 50, Max limit: 100
+ */
 export const fetchWithdrawals = (params?: { userId?: string; status?: string; dateFrom?: string; dateTo?: string; page?: number; limit?: number }) => {
   const query = new URLSearchParams();
   if (params?.userId) query.set('userId', params.userId);
   if (params?.status) query.set('status', params.status);
   if (params?.dateFrom) query.set('dateFrom', params.dateFrom);
   if (params?.dateTo) query.set('dateTo', params.dateTo);
-  if (params?.page) query.set('page', String(params.page));
-  if (params?.limit) query.set('limit', String(params.limit));
+  const page = params?.page || 1;
+  const limit = Math.min(params?.limit || 50, 100); // Default 50, Max 100
+  query.set('page', String(page));
+  query.set('limit', String(limit));
   return api.get(`/api/admin/withdrawals?${query.toString()}`);
 };
 
-export const fetchWithdrawalByOrder = (orderId: string) =>
-  api.get(`/api/admin/withdrawals?orderId=${orderId}`);
+/**
+ * Fetch a single withdrawal order by Order ID
+ * @param orderId The withdrawal order ID
+ */
+export const fetchWithdrawalByOrder = (orderId: string) => {
+  if (!orderId || orderId.trim().length === 0) {
+    return Promise.reject(new Error('Order ID is required'));
+  }
+  return api.get(`/api/admin/withdrawals?orderId=${orderId}`);
+};
 
-export const approveWithdrawal = (orderId: string) =>
-  api.post('/api/admin/withdrawals/approve', { orderId });
+/**
+ * Approve a withdrawal order
+ * @param orderId The withdrawal order ID to approve
+ */
+export const approveWithdrawal = (orderId: string) => {
+  if (!orderId || orderId.trim().length === 0) {
+    return Promise.reject(new Error('Order ID is required'));
+  }
+  return api.post('/api/admin/withdrawals/approve', { orderId });
+};
 
 // Agent Stats
 export const fetchAgentStats = (userId: string, page = 1, limit = 50) =>
