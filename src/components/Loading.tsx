@@ -4,15 +4,18 @@ dotPulse.register();
 interface LoadingProps {
   size?: number;
   color?: string;
+  className?: string;
 }
 
-const Loading = ({ size = 43, color = 'currentColor' }: LoadingProps) => {
+const Loading = ({ size = 43, color = 'currentColor', className }: LoadingProps) => {
   return (
-    <l-dot-pulse
-      size={size}
-      speed="1.3"
-      color={color}
-    />
+    <div className={className}>
+      <l-dot-pulse
+        size={size}
+        speed="1.3"
+        color={color}
+      />
+    </div>
   );
 };
 
