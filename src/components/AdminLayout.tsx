@@ -79,8 +79,8 @@ const AdminLayout = () => {
           to={item.url}
           end={item.url === "/dashboard"}
           className={cn(
-            "flex items-center gap-2.5 px-3 py-2 text-muted-foreground hover:bg-secondary hover:text-foreground transition-all text-xs font-medium",
-            sidebarCollapsed && "justify-center px-2"
+            "flex items-center gap-2 px-2 py-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-all text-[11px] font-medium",
+            sidebarCollapsed && "justify-center px-1"
           )}
           activeClassName="bg-primary/10 text-primary"
           onClick={() => setMobileOpen(false)}
@@ -114,7 +114,7 @@ const AdminLayout = () => {
       <aside 
         className={cn(
           "hidden lg:flex flex-col border-r border-border bg-card transition-all duration-300 relative",
-          sidebarCollapsed ? "w-16" : "w-56"
+          sidebarCollapsed ? "w-16" : "w-44"
         )}
       >
         {/* Toggle Button */}
@@ -145,8 +145,8 @@ const AdminLayout = () => {
           <button
             onClick={handleLogout}
             className={cn(
-              "flex items-center gap-2.5 px-3 py-2 w-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-xs font-medium",
-              sidebarCollapsed && "justify-center px-2"
+              "flex items-center gap-2 px-2 py-1.5 w-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-[11px] font-medium",
+              sidebarCollapsed && "justify-center px-1"
             )}
             title={sidebarCollapsed ? "Logout" : undefined}
           >
@@ -166,12 +166,12 @@ const AdminLayout = () => {
 
       {/* Mobile Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-60 bg-card border-r border-border flex flex-col transform transition-transform duration-300 lg:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 w-48 bg-card border-r border-border flex flex-col transform transition-transform duration-300 lg:hidden ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <img src={Logo} alt="Logo" className="w-8 h-8 object-contain bg-white" />
             <h2 className="text-sm font-bold text-primary">Admin</h2>
           </div>
@@ -185,7 +185,7 @@ const AdminLayout = () => {
         <div className="p-2 border-t border-border bg-card">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2.5 px-3 py-2 w-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-xs font-medium"
+            className="flex items-center gap-2 px-3 py-1.5 w-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-[11px] font-medium"
           >
             <LogOut className="w-4 h-4" />
             <span>Logout</span>
