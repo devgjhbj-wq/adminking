@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Users, Wallet, ArrowUpCircle, ArrowDownCircle, Percent, Clock, Calendar as CalendarIcon, Filter } from 'lucide-react';
+import { Users, Wallet, ArrowUpCircle, ArrowDownCircle, Percent, Clock, Calendar as CalendarIcon, Filter, Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchDashboard, setAuthToken } from '@/lib/api';
 import { toast } from 'sonner';
@@ -49,7 +49,7 @@ interface DashboardStats {
 const Dashboard = () => {
   const { token } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [period, setPeriod] = useState<'today' | 'month' | 'custom'>('today');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -75,10 +75,10 @@ const Dashboard = () => {
       .finally(() => setLoading(false));
   }, [token]);
 
-  useEffect(() => { 
+  const handleSearch = () => {
     const dateStr = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : undefined;
-    load(period, period === 'custom' ? dateStr : undefined); 
-  }, [load, period, selectedDate]);
+    load(period, period === 'custom' ? dateStr : undefined);
+  };
 
   if (loading && !stats) {
     return (
@@ -170,6 +170,16 @@ const Dashboard = () => {
               </PopoverContent>
             </Popover>
           )}
+
+          <Button 
+            onClick={handleSearch} 
+            disabled={loading}
+            size="sm" 
+            className="h-8 text-xs gap-1.5"
+          >
+            <Search className="w-3.5 h-3.5" />
+            Search
+          </Button>
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-border/50">
@@ -179,106 +189,123 @@ const Dashboard = () => {
           </div>
           <LastUpdated 
             timestamp={updatedAt} 
-            onRefresh={() => load(period, period === 'custom' && selectedDate ? format(selectedDate, 'yyyy-MM-dd') : undefined)} 
+            onRefresh={handleSearch} 
             loading={loading} 
             compact 
           />
         </div>
       </div>
 
-      {/* Overview */}
-      <div className="space-y-2">
-        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider pl-1">Overview & Commissions</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {overviewCards.map((c) => (
-            <div key={c.label} className="bg-card border border-border p-3 rounded-lg hover:border-primary/30 transition-all shadow-sm group">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase">{c.label}</span>
-                <div className={cn("p-1.5 rounded-md bg-secondary group-hover:bg-primary/10 transition-colors", c.color)}>
-                  <c.icon className="w-3.5 h-3.5" />
+      {!stats && !loading ? (
+        <div className="flex flex-col items-center justify-center h-64 bg-card border border-border rounded-lg shadow-sm space-y-3">
+          <div className="p-3 rounded-full bg-secondary">
+            <Search className="w-6 h-6 text-muted-foreground" />
+          </div>
+          <div className="text-center">
+            <p className="text-sm font-bold text-foreground">No data to display</p>
+            <p className="text-xs text-muted-foreground">Click the search button to load dashboard statistics.</p>
+          </div>
+          <Button onClick={handleSearch} size="sm" variant="outline" className="h-8 text-xs">
+            Search Now
+          </Button>
+        </div>
+      ) : stats && (
+        <>
+          {/* Overview */}
+          <div className="space-y-2">
+            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider pl-1">Overview & Commissions</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {overviewCards.map((c) => (
+                <div key={c.label} className="bg-card border border-border p-3 rounded-lg hover:border-primary/30 transition-all shadow-sm group">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase">{c.label}</span>
+                    <div className={cn("p-1.5 rounded-md bg-secondary group-hover:bg-primary/10 transition-colors", c.color)}>
+                      <c.icon className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                  <p className="text-xl font-black text-foreground">{c.value}</p>
                 </div>
-              </div>
-              <p className="text-xl font-black text-foreground">{c.value}</p>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Deposits Section */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-green-500 uppercase tracking-wider pl-1 flex items-center gap-1.5">
-            <ArrowUpCircle className="w-3.5 h-3.5" />
-            Deposit Statistics
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {depositCards.map((c) => (
-              <div key={c.label} className="bg-card border border-border p-3 rounded-lg hover:border-green-500/30 transition-all shadow-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase">{c.label}</span>
-                  <c.icon className={cn("w-3.5 h-3.5 opacity-70", c.color)} />
-                </div>
-                <p className="text-lg font-black text-foreground">{c.value}</p>
-              </div>
-            ))}
           </div>
-        </div>
 
-        {/* Withdrawals Section */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-red-500 uppercase tracking-wider pl-1 flex items-center gap-1.5">
-            <ArrowDownCircle className="w-3.5 h-3.5" />
-            Withdrawal Statistics
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-3">
-            {withdrawCards.map((c) => (
-              <div key={c.label} className="bg-card border border-border p-3 rounded-lg hover:border-red-500/30 transition-all shadow-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase leading-tight">{c.label}</span>
-                  <c.icon className={cn("w-3.5 h-3.5 opacity-70", c.color)} />
-                </div>
-                <p className="text-base font-black text-foreground">{c.value}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Withdrawal Status Breakdown */}
-      {stats?.withdrawals?.byStatus && (
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider pl-1">Withdrawal Status Breakdown</h3>
-          <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
-            <table className="w-full text-left text-[11px]">
-              <thead>
-                <tr className="bg-secondary/30 border-b border-border">
-                  <th className="px-4 py-2 font-bold text-muted-foreground uppercase tracking-wider">Status</th>
-                  <th className="px-4 py-2 font-bold text-muted-foreground uppercase tracking-wider text-right">Count</th>
-                  <th className="px-4 py-2 font-bold text-muted-foreground uppercase tracking-wider text-right">Total Amount</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {Object.entries(stats.withdrawals.byStatus).map(([status, data]) => (
-                  <tr key={status} className="hover:bg-secondary/10 transition-colors">
-                    <td className="px-4 py-2.5">
-                      <span className={cn(
-                        "px-2 py-0.5 rounded-full font-bold text-[9px] uppercase",
-                        status === 'SUCCESS' ? "bg-green-500/10 text-green-500 border border-green-500/20" :
-                        status === 'PENDING' ? "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20" :
-                        status === 'AUDITING' ? "bg-blue-500/10 text-blue-500 border border-blue-500/20" :
-                        "bg-red-500/10 text-red-500 border border-red-500/20"
-                      )}>
-                        {status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2.5 text-right font-medium">{data.count.toLocaleString()}</td>
-                    <td className="px-4 py-2.5 text-right font-black">₹{data.total.toLocaleString()}</td>
-                  </tr>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Deposits Section */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold text-green-500 uppercase tracking-wider pl-1 flex items-center gap-1.5">
+                <ArrowUpCircle className="w-3.5 h-3.5" />
+                Deposit Statistics
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {depositCards.map((c) => (
+                  <div key={c.label} className="bg-card border border-border p-3 rounded-lg hover:border-green-500/30 transition-all shadow-sm">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase">{c.label}</span>
+                      <c.icon className={cn("w-3.5 h-3.5 opacity-70", c.color)} />
+                    </div>
+                    <p className="text-lg font-black text-foreground">{c.value}</p>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
+
+            {/* Withdrawals Section */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold text-red-500 uppercase tracking-wider pl-1 flex items-center gap-1.5">
+                <ArrowDownCircle className="w-3.5 h-3.5" />
+                Withdrawal Statistics
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-3">
+                {withdrawCards.map((c) => (
+                  <div key={c.label} className="bg-card border border-border p-3 rounded-lg hover:border-red-500/30 transition-all shadow-sm">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase leading-tight">{c.label}</span>
+                      <c.icon className={cn("w-3.5 h-3.5 opacity-70", c.color)} />
+                    </div>
+                    <p className="text-base font-black text-foreground">{c.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+
+          {/* Withdrawal Status Breakdown */}
+          {stats?.withdrawals?.byStatus && (
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider pl-1">Withdrawal Status Breakdown</h3>
+              <div className="bg-card border border-border rounded-lg overflow-hidden shadow-sm">
+                <table className="w-full text-left text-[11px]">
+                  <thead>
+                    <tr className="bg-secondary/30 border-b border-border">
+                      <th className="px-4 py-2 font-bold text-muted-foreground uppercase tracking-wider">Status</th>
+                      <th className="px-4 py-2 font-bold text-muted-foreground uppercase tracking-wider text-right">Count</th>
+                      <th className="px-4 py-2 font-bold text-muted-foreground uppercase tracking-wider text-right">Total Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/50">
+                    {Object.entries(stats.withdrawals.byStatus).map(([status, data]) => (
+                      <tr key={status} className="hover:bg-secondary/10 transition-colors">
+                        <td className="px-4 py-2.5">
+                          <span className={cn(
+                            "px-2 py-0.5 rounded-full font-bold text-[9px] uppercase",
+                            status === 'SUCCESS' ? "bg-green-500/10 text-green-500 border border-green-500/20" :
+                            status === 'PENDING' ? "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20" :
+                            status === 'AUDITING' ? "bg-blue-500/10 text-blue-500 border border-blue-500/20" :
+                            "bg-red-500/10 text-red-500 border border-red-500/20"
+                          )}>
+                            {status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2.5 text-right font-medium">{data.count.toLocaleString()}</td>
+                        <td className="px-4 py-2.5 text-right font-black">₹{data.total.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
