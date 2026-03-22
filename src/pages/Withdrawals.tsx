@@ -200,6 +200,7 @@ const Withdrawals = () => {
                 <th className="text-left p-2 text-muted-foreground font-medium">User ID</th>
                 <th className="text-left p-2 text-muted-foreground font-medium">Order ID</th>
                 <th className="text-left p-2 text-muted-foreground font-medium">Amount</th>
+                <th className="text-left p-2 text-muted-foreground font-medium">Charge</th>
                 <th className="text-left p-2 text-muted-foreground font-medium">Bank Details</th>
                 <th className="text-left p-2 text-muted-foreground font-medium">Status</th>
                 <th className="text-left p-2 text-muted-foreground font-medium">Remark</th>
@@ -214,6 +215,9 @@ const Withdrawals = () => {
                   <td className="p-2 text-foreground font-medium">{d.userId}</td>
                   <td className="p-2 text-foreground font-mono text-[10px]">{d.orderId}</td>
                   <td className="p-2 text-foreground">₹{d.amount?.toLocaleString()}</td>
+                  <td className="p-2 text-destructive font-medium">
+                    {d.charge ? `₹${Number(d.charge).toFixed(2)}` : '—'}
+                  </td>
                   <td className="p-2 text-[10px]">
                     {d.bankDetails ? (
                       <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 w-max">

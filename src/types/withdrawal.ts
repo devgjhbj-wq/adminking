@@ -10,6 +10,7 @@ export interface WithdrawalItem {
   userId: number | string;
   orderId: string;
   amount: number;
+  charge?: number;
   balanceAfter?: number;
   bankDetails?: BankDetails;
   status: 'PENDING' | 'AUDITING' | 'SUCCESS' | 'FAILED' | 'CANCELLED';
