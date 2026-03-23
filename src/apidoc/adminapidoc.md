@@ -1018,3 +1018,303 @@ GET /admin/logs?level=error&limit=100
   "msg": "Error message here"
 }
 ```
+
+---
+
+## 12. Gift Code System
+
+### Create Gift Code
+
+```
+POST /admin/gift-codes
+```
+
+**Body:**
+
+```json
+{
+  "rewardAmount": 100,
+  "turnoverMultiplier": 2,
+  "maxRedemptions": 100,
+  "expiryDate": "2026-12-31T23:59:59.000Z",
+  "minDepositToday": 0,
+  "isActive": true,
+  "description": "Welcome bonus",
+  "codeLength": 12
+}
+```
+
+Or with a custom code:
+
+```json
+{
+  "code": "WELCOME2026",
+  "rewardAmount": 50,
+  "turnoverMultiplier": 1,
+  "maxRedemptions": 1000,
+  "expiryDate": "2026-12-31T23:59:59.000Z"
+}
+```
+
+| Param | Type | Required | Description |
+|-------|------|---------|-------------|
+| code | string | No | Custom code (auto-generated if not provided) |
+| rewardAmount | number | Yes | Amount user receives |
+| turnoverMultiplier | number | No | Turnover requirement multiplier (default: 1) |
+| maxRedemptions | number | Yes | Max number of redemptions allowed |
+| expiryDate | string | Yes | ISO date string |
+| minDepositToday | number | No | Minimum deposit required today to redeem (default: 0) |
+| isActive | boolean | No | Enable immediately (default: true) |
+| description | string | No | Description for admin reference |
+| codeLength | number | No | Auto-generated code length (default: 12) |
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "msg": "Gift code created",
+  "giftCode": {
+    "_id": "...",
+    "code": "A1B2C3D4E5F6",
+    "rewardAmount": 100,
+    "turnoverMultiplier": 2,
+    "maxRedemptions": 100,
+    "usedCount": 0,
+    "expiryDate": "2026-12-31T23:59:59.000Z",
+    "minDepositToday": 0,
+    "isActive": true,
+    "description": "Welcome bonus",
+    "createdAt": "2026-03-23T10:00:00.000Z"
+  }
+}
+```
+
+---
+
+### List Gift Codes
+
+```
+GET /admin/gift-codes?page=1&limit=25&isActive=true&search=PROMO
+```
+
+**Query Params:**
+| Param | Type | Required | Description |
+|-------|------|---------|-------------|
+| page | number | No | Page number (default: 1) |
+| limit | number | No | Items per page (default: 25, max: 100) |
+| isActive | boolean | No | Filter by active status |
+| search | string | No | Search by code |
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "total": 50,
+  "page": 1,
+  "limit": 25,
+  "items": [
+    {
+      "_id": "...",
+      "code": "WELCOME2026",
+      "rewardAmount": 100,
+      "turnoverMultiplier": 2,
+      "maxRedemptions": 100,
+      "usedCount": 15,
+      "expiryDate": "2026-12-31T23:59:59.000Z",
+      "minDepositToday": 500,
+      "isActive": true,
+      "description": "Welcome bonus for new users"
+    }
+  ]
+}
+```
+
+---
+
+### Get Gift Code
+
+```
+GET /admin/gift-codes/:code
+```
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "giftCode": {
+    "_id": "...",
+    "code": "WELCOME2026",
+    "rewardAmount": 100,
+    "turnoverMultiplier": 2,
+    "maxRedemptions": 100,
+    "usedCount": 15,
+    "expiryDate": "2026-12-31T23:59:59.000Z",
+    "minDepositToday": 500,
+    "isActive": true,
+    "description": "Welcome bonus for new users",
+    "createdAt": "2026-03-01T10:00:00.000Z",
+    "updatedAt": "2026-03-15T14:30:00.000Z"
+  }
+}
+```
+
+---
+
+### Update Gift Code
+
+```
+PUT /admin/gift-codes/:code
+```
+
+**Body:**
+
+```json
+{
+  "rewardAmount": 150,
+  "turnoverMultiplier": 3,
+  "maxRedemptions": 200,
+  "expiryDate": "2027-06-30T23:59:59.000Z",
+  "minDepositToday": 1000,
+  "description": "Updated description"
+}
+```
+
+| Param | Type | Required | Description |
+|-------|------|---------|-------------|
+| rewardAmount | number | No | New reward amount |
+| turnoverMultiplier | number | No | New turnover multiplier |
+| maxRedemptions | number | No | New max redemptions (cannot be less than usedCount) |
+| expiryDate | string | No | New expiry date |
+| minDepositToday | number | No | New minimum deposit today requirement |
+| isActive | boolean | No | Enable/disable via PATCH endpoint |
+| description | string | No | New description |
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "msg": "Gift code updated",
+  "giftCode": {
+    "code": "WELCOME2026",
+    "rewardAmount": 150,
+    "turnoverMultiplier": 3,
+    "maxRedemptions": 200,
+    "usedCount": 15,
+    "expiryDate": "2027-06-30T23:59:59.000Z",
+    "minDepositToday": 1000,
+    "isActive": true,
+    "description": "Updated description"
+  }
+}
+```
+
+---
+
+### Toggle Gift Code (Enable/Disable)
+
+```
+PATCH /admin/gift-codes/:code/toggle
+```
+
+**Body:**
+
+```json
+{
+  "isActive": false
+}
+```
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "msg": "Gift code disabled",
+  "giftCode": {
+    "code": "WELCOME2026",
+    "isActive": false
+  }
+}
+```
+
+---
+
+### Delete Gift Code
+
+```
+DELETE /admin/gift-codes/:code
+```
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "msg": "Gift code deleted",
+  "code": "WELCOME2026"
+}
+```
+
+**Note:** This also deletes all redemption records for this code.
+
+---
+
+### Get Gift Code Redemptions
+
+```
+GET /admin/gift-codes/:code/redemptions?page=1&limit=25
+```
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "code": "WELCOME2026",
+  "usedCount": 15,
+  "maxRedemptions": 100,
+  "total": 15,
+  "page": 1,
+  "limit": 25,
+  "items": [
+    {
+      "_id": "...",
+      "code": "WELCOME2026",
+      "userId": 123456,
+      "rewardAmount": 100,
+      "turnoverAdded": 200,
+      "createdAt": "2026-03-20T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+### Gift Code Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| code | string | Unique gift code (alphanumeric, uppercase) |
+| rewardAmount | number | Amount credited to user balance |
+| turnoverMultiplier | number | Turnover requirement multiplier (reward × multiplier) |
+| maxRedemptions | number | Maximum number of times this code can be redeemed |
+| usedCount | number | Current number of redemptions |
+| expiryDate | datetime | Code becomes invalid after this date |
+| minDepositToday | number | User must have deposited this amount today to redeem |
+| isActive | boolean | Manual enable/disable by admin |
+
+---
+
+### Redemption Validation Rules
+
+1. Code must exist
+2. Code must be active (isActive: true)
+3. Current time must be before expiryDate
+4. usedCount must be less than maxRedemptions
+5. User must not have already redeemed this code
+6. If minDepositToday > 0, user must have deposited at least that amount today

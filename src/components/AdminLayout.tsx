@@ -17,6 +17,7 @@ import {
   Gamepad2,
   RefreshCcw,
   ArrowRightLeft,
+  Gift,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
 } from "lucide-react";
@@ -31,6 +32,7 @@ const navItems = [
   { title: "Transactions", url: "/dashboard/transactions", icon: Receipt },
   { title: "Deposits", url: "/dashboard/deposits", icon: Wallet },
   { title: "Withdrawals", url: "/dashboard/withdrawals", icon: Wallet },
+  { title: "Gift Codes", url: "/dashboard/gift-codes", icon: Gift },
   { title: "Agent Stats", url: "/dashboard/agent-stats", icon: UserCheck },
   { title: "Agent Daily", url: "/dashboard/agent-daily", icon: UserCheck },
   { title: "Commissions", url: "/dashboard/commissions", icon: Coins },

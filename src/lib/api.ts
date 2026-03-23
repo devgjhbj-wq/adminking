@@ -237,6 +237,46 @@ export const clearTurnover = (userId: number | string, reason?: string) =>
 export const addTurnover = (data: { userId: number | string; amount: number; type: string; sourceRef?: string }) =>
   api.post('/api/admin/turnover/add', data);
 
+// Gift Code System
+export interface GiftCodeCreateData {
+  code?: string;
+  rewardAmount: number;
+  turnoverMultiplier?: number;
+  maxRedemptions: number;
+  expiryDate: string;
+  minDepositToday?: number;
+  isActive?: boolean;
+  description?: string;
+  codeLength?: number;
+}
+
+export const createGiftCode = (data: GiftCodeCreateData) =>
+  api.post('/api/admin/gift-codes', data);
+
+export const fetchGiftCodes = (params?: { page?: number; limit?: number; isActive?: boolean; search?: string }) => {
+  const query = new URLSearchParams();
+  if (params?.page) query.set('page', String(params.page));
+  if (params?.limit) query.set('limit', String(params.limit));
+  if (params?.isActive !== undefined) query.set('isActive', String(params.isActive));
+  if (params?.search) query.set('search', params.search);
+  return api.get(`/api/admin/gift-codes?${query.toString()}`);
+};
+
+export const fetchGiftCodeByCode = (code: string) =>
+  api.get(`/api/admin/gift-codes/${code}`);
+
+export const updateGiftCode = (code: string, data: Partial<GiftCodeCreateData>) =>
+  api.put(`/api/admin/gift-codes/${code}`, data);
+
+export const toggleGiftCode = (code: string, isActive: boolean) =>
+  api.patch(`/api/admin/gift-codes/${code}/toggle`, { isActive });
+
+export const deleteGiftCode = (code: string) =>
+  api.delete(`/api/admin/gift-codes/${code}`);
+
+export const fetchGiftCodeRedemptions = (code: string, page = 1, limit = 25) =>
+  api.get(`/api/admin/gift-codes/${code}/redemptions?page=${page}&limit=${limit}`);
+
 // Additional helper functions for search optimization
 export const searchUserByMobile = (mobile: string) => 
   api.get(`/api/admin/user?mobile=${mobile}`);
