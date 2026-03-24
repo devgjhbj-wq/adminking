@@ -6,7 +6,6 @@
     <title>King Admin</title>
     <meta name="description" content="King Admin Management Panel" />
     <meta name="theme-color" content="#09090b" />
-    <link rel="manifest" href="/manifest.json" />
     <link rel="icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/logo.png" />
 
@@ -20,12 +19,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js');
-        });
-      }
-    </script>
   </body>
 </html>

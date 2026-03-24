@@ -180,6 +180,12 @@ const Withdrawals = () => {
     setPage(1);
   };
 
+  const handleToday = () => {
+    const today = new Date();
+    setDateFrom(today);
+    setDateTo(today);
+  };
+
   const totalPages = results?.total ? Math.ceil(results.total / (results.limit || 50)) : 0;
 
   const renderTable = (data: WithdrawalResponse) => {
@@ -347,7 +353,15 @@ const Withdrawals = () => {
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-medium text-muted-foreground uppercase mb-0.5 block">Date Range</label>
+            <div className="flex items-center justify-between mb-0.5">
+              <label className="text-[10px] font-medium text-muted-foreground uppercase block">Date Range</label>
+              <button 
+                onClick={handleToday}
+                className="text-[10px] font-bold text-primary hover:underline"
+              >
+                Today
+              </button>
+            </div>
             <div className="flex items-center gap-1">
               <Popover>
                 <PopoverTrigger asChild>
