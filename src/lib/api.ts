@@ -64,17 +64,23 @@ export const fetchTransactions = (userId: string, page = 1, limit = 25) => {
 
 // Deposits
 /**
- * Fetch deposits by User ID
- * @param userId User ID
- * @param page Page number (default: 1)
- * @param limit Items per page (default: 25, max: 100)
+ * Fetch deposit orders with filters
+ * @param params Optional parameters: userId, status, dateFrom, dateTo, page, limit
+ * Status options: PENDING, SUCCESS, FAILED, REFUNDED, EXPIRED
+ * Default limit: 50, Max limit: 100
  */
-export const fetchDepositsByUser = (userId: string, page = 1, limit = 25) => {
-  if (!userId || userId.trim().length === 0) {
-    return Promise.reject(new Error('User ID is required'));
-  }
-  const validatedLimit = Math.min(limit, 100); // Max 100
-  return api.get(`/api/admin/deposits?userId=${userId}&page=${page}&limit=${validatedLimit}`);
+export const fetchDeposits = (params?: { userId?: string; status?: string; dateFrom?: string; dateTo?: string; page?: number; limit?: number }) => {
+  const query = new URLSearchParams();
+  if (params?.userId) query.set('userId', params.userId);
+  if (params?.status) query.set('status', params.status);
+  if (params?.dateFrom) query.set('dateFrom', params.dateFrom); // YYYY-MM-DD format
+  if (params?.dateTo) query.set('dateTo', params.dateTo); // YYYY-MM-DD format
+  const page = params?.page || 1;
+  const limit = Math.min(params?.limit || 50, 100); // Default 50, Max 100
+  query.set('page', String(page));
+  query.set('limit', String(limit));
+  const url = `/api/admin/deposits?${query.toString()}`;
+  return api.get(url);
 };
 
 /**

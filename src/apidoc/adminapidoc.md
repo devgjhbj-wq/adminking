@@ -241,11 +241,19 @@ PUT /admin/user/bind-bank
 
 ### Get Deposit Orders
 
+**Get all orders with filters:**
+
 ```
-GET /admin/deposits?userId=123456&page=1&limit=25
+GET /admin/deposits?page=1&limit=50&status=PENDING&dateFrom=2026-03-01&dateTo=2026-03-20
 ```
 
-or
+**Get orders by user:**
+
+```
+GET /admin/deposits?userId=123456&page=1&limit=50
+```
+
+**Get single order:**
 
 ```
 GET /admin/deposits?orderId=ODR1234567890123456
@@ -254,20 +262,22 @@ GET /admin/deposits?orderId=ODR1234567890123456
 **Query Params:**
 | Param | Type | Required | Description |
 |-------|------|---------|-------------|
-| userId | number | Yes* | User ID (*required if orderId not provided) |
-| orderId | string | Yes* | Deposit order ID (*required if userId not provided) |
 | page | number | No | Page number (default: 1) |
-| limit | number | No | Items per page (default: 25, max: 100) |
+| limit | number | No | Items per page (default: 50, max: 100) |
+| status | string | No | Filter: PENDING, SUCCESS, FAILED, REFUNDED, EXPIRED |
+| userId | number | No | Filter by user ID |
+| dateFrom | string | No | Start date (YYYY-MM-DD) |
+| dateTo | string | No | End date (YYYY-MM-DD) |
+| orderId | string | No | Get single order by ID |
 
-**Response (by userId):**
+**Response (paginated):**
 
 ```json
 {
   "status": "success",
-  "userId": 123456,
-  "total": 5,
+  "total": 150,
   "page": 1,
-  "limit": 25,
+  "limit": 50,
   "items": [
     {
       "_id": "...",
@@ -275,33 +285,27 @@ GET /admin/deposits?orderId=ODR1234567890123456
       "userId": 123456,
       "amount": 1000.0,
       "currency": "INR",
-      "status": "SUCCESS",
-      "gatewayOrderNo": "gw123456",
-      "paymentLinks": {},
-      "channelName": "SimplyPay",
-      "createdAt": "2026-03-19T10:30:00.000Z"
-    }
-  ]
-}
-```
-
-**Response (by orderId):**
-
-```json
-{
-  "status": "success",
-  "items": [
-    {
-      "orderId": "ODR1234567890123456",
-      "userId": 123456,
-      "amount": 1000.0,
       "status": "PENDING",
       "gatewayOrderNo": "gw123456",
-      "createdAt": "2026-03-19T10:30:00.000Z"
+      "paymentLinks": {},
+      "channelName": "Paysimply",
+      "note": "Deposit request",
+      "createdAt": "2026-03-19T10:30:00.000Z",
+      "updatedAt": "2026-03-19T10:30:00.000Z"
     }
   ]
 }
 ```
+
+**Deposit Status Values:**
+
+| Status | Description |
+|--------|-------------|
+| PENDING | Deposit initiated, awaiting payment confirmation |
+| SUCCESS | Payment received and credited to user wallet |
+| FAILED | Payment failed or rejected |
+| REFUNDED | Amount refunded to user |
+| EXPIRED | Payment link expired |
 
 ### Approve Deposit Order
 
