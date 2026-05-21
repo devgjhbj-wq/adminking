@@ -301,6 +301,18 @@ export const validateOrderId = (orderId: string): boolean => {
   return orderId && orderId.trim().length > 0;
 };
 
+// Wingo Admin APIs
+export const fetchWingoCurrentRound = () => api.get('/api/wingo/admin/current-round');
+export const fetchWingoCurrentRoundBets = (page = 1, limit = 50) => 
+  api.get(`/api/wingo/admin/current-round/bets?page=${page}&limit=${limit}`);
+export const fetchWingoRoundStats = (issueNumber: string) => 
+  api.get(`/api/wingo/admin/round-stats/${issueNumber}`);
+export const fetchWingoRounds = (page = 1, limit = 25) => 
+  api.get(`/api/wingo/admin/rounds?page=${page}&limit=${limit}`);
+export const fetchWingoResultMode = () => api.get('/api/wingo/admin/result-mode');
+export const setWingoResultMode = (mode: 'RANDOM' | 'MAX_PROFIT' | 'MAX_LOSS') => 
+  api.post('/api/wingo/admin/result-mode', { mode });
+
 // Error handler utility
 export const handleApiError = (error: any): string => {
   if (error.response?.data?.msg) {

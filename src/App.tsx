@@ -22,6 +22,7 @@ import CreateBet from "./pages/CreateBet";
 import TurnoverConfig from "./pages/TurnoverConfig";
 import GameBets from "./pages/GameBets";
 import MoveGameBalance from "./pages/MoveGameBalance";
+import WingoDashboard from "./pages/WingoDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="create-bet" element={<CreateBet />} />
               <Route path="game-bets" element={<GameBets />} />
               <Route path="move-game" element={<MoveGameBalance />} />
+              <Route path="wingo" element={<WingoDashboard />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

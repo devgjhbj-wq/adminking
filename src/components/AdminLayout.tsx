@@ -18,6 +18,7 @@ import {
   RefreshCcw,
   ArrowRightLeft,
   Gift,
+  Dices,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
 } from "lucide-react";
@@ -43,6 +44,7 @@ const navItems = [
   { title: "Create Bet", url: "/dashboard/create-bet", icon: Pencil },
   { title: "Game Bets", url: "/dashboard/game-bets", icon: Gamepad2 },
   { title: "Move Game Bal", url: "/dashboard/move-game", icon: ArrowRightLeft },
+  { title: "Wingo", url: "/dashboard/wingo", icon: Dices },
 ];
 
 const AdminLayout = () => {
