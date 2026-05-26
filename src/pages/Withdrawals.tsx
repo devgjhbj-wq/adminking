@@ -63,11 +63,12 @@ const Withdrawals = () => {
   };
 
   const handleCancel = async (item: WithdrawalItem) => {
-    if (!window.confirm(`Cancel withdrawal ${item.orderId} for ₹${item.amount?.toLocaleString()}?`)) return;
+    const note = window.prompt(`Reason for cancelling withdrawal ${item.orderId} (₹${item.amount?.toLocaleString()}):`, '');
+    if (note === null) return;
     setAuthToken(token);
     setCancellingId(item.orderId);
     try {
-      const res = await cancelWithdrawal(item.orderId);
+      const res = await cancelWithdrawal(item.orderId, note || undefined);
       toast.success(res.data.msg || 'Withdrawal cancelled');
       if (results?.items) {
         const updatedItems = results.items.map((d) =>
