@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { fetchWithdrawals, fetchWithdrawalByOrder, approveWithdrawal, cancelWithdrawal, setAuthToken } from '@/lib/api';
+import { fetchWithdrawals, fetchWithdrawalByOrder, approveWithdrawal, cancelWithdrawal, fetchWithdrawalConfig, updateWithdrawalConfig, setAuthToken } from '@/lib/api';
 import { toast } from 'sonner';
 import SearchBar from '@/components/SearchBar';
 import LastUpdated from '@/components/LastUpdated';
@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import type { WithdrawalResponse, WithdrawalItem, WithdrawalFilters } from '@/types/withdrawal';
+import type { WithdrawalResponse, WithdrawalItem, WithdrawalConfig, WithdrawalFilters } from '@/types/withdrawal';
 
 const statusColor: Record<string, string> = {
   SUCCESS: 'bg-primary/20 text-primary',
@@ -41,6 +41,66 @@ const Withdrawals = () => {
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+
+  // Tab state
+  const [tab, setTab] = useState<'orders' | 'config'>('orders');
+
+  // Config state
+  const [config, setConfig] = useState<WithdrawalConfig | null>(null);
+  const [configLoading, setConfigLoading] = useState(false);
+  const [configSaving, setConfigSaving] = useState(false);
+  const [editPerDayLimit, setEditPerDayLimit] = useState(3);
+  const [editLimits, setEditLimits] = useState({ BANK: { min: 110, max: 50000 }, UPI: { min: 300, max: 15000 }, UPAY: { min: 300, max: 50000 } });
+
+  const loadConfig = useCallback(async () => {
+    setAuthToken(token);
+    setConfigLoading(true);
+    try {
+      const res = await fetchWithdrawalConfig();
+      const data = res.data?.data;
+      if (data) {
+        setConfig(data);
+        setEditPerDayLimit(data.perDayLimit);
+        setEditLimits({
+          BANK: { min: data.limits.BANK.min, max: data.limits.BANK.max },
+          UPI: { min: data.limits.UPI.min, max: data.limits.UPI.max },
+          UPAY: { min: data.limits.UPAY.min, max: data.limits.UPAY.max },
+        });
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.msg || 'Failed to load config');
+    } finally {
+      setConfigLoading(false);
+    }
+  }, [token]);
+
+  const handleSaveConfig = async () => {
+    setAuthToken(token);
+    setConfigSaving(true);
+    try {
+      const payload: Record<string, any> = {};
+      if (editPerDayLimit !== config?.perDayLimit) payload.perDayLimit = editPerDayLimit;
+      const changedLimits: Record<string, { min?: number; max?: number }> = {};
+      for (const method of ['BANK', 'UPI', 'UPAY'] as const) {
+        const lim: { min?: number; max?: number } = {};
+        if (editLimits[method].min !== config?.limits[method].min) lim.min = editLimits[method].min;
+        if (editLimits[method].max !== config?.limits[method].max) lim.max = editLimits[method].max;
+        if (Object.keys(lim).length) changedLimits[method] = lim;
+      }
+      if (Object.keys(changedLimits).length) payload.limits = changedLimits;
+      const res = await updateWithdrawalConfig(payload);
+      setConfig(res.data?.data || res.data);
+      toast.success('Config updated');
+    } catch (err: any) {
+      toast.error(err.response?.data?.msg || 'Failed to update config');
+    } finally {
+      setConfigSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    if (tab === 'config') loadConfig();
+  }, [tab, loadConfig]);
 
   const handleApprove = async (orderIdToApprove: string) => {
     setAuthToken(token);
@@ -346,6 +406,18 @@ const Withdrawals = () => {
 
   return (
     <div className="space-y-3">
+      {/* Tab Bar */}
+      <div className="flex gap-4 border-b border-border">
+        <button onClick={() => setTab('orders')} className={`pb-1.5 text-xs font-medium border-b-2 transition-colors ${tab === 'orders' ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'}`}>
+          Orders
+        </button>
+        <button onClick={() => setTab('config')} className={`pb-1.5 text-xs font-medium border-b-2 transition-colors ${tab === 'config' ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'}`}>
+          Config
+        </button>
+      </div>
+
+      {tab === 'orders' && (
+      <>
       {/* Search & Filter Bar */}
       <div className="bg-card border border-border p-2 rounded-lg shadow-sm space-y-2">
         {/* Row 1: ID Searches */}
@@ -613,6 +685,68 @@ const Withdrawals = () => {
                   onKeyDown={handlePageGo}
                   className="w-12 h-8 rounded border border-input bg-background px-2 py-1 text-xs text-center focus:outline-none focus:ring-1 focus:ring-primary"
                 />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      </>
+      )}
+
+      {tab === 'config' && (
+        <div className="bg-card border border-border p-4 rounded-lg space-y-4">
+          <h3 className="text-sm font-semibold">Withdrawal Configuration</h3>
+          {configLoading ? (
+            <div className="flex justify-center py-8"><Loading size={20} /></div>
+          ) : (
+            <div className="space-y-4">
+              <div className="w-[140px]">
+                <label className="text-[10px] font-medium text-muted-foreground uppercase mb-1 block">Per Day Limit</label>
+                <input
+                  type="number"
+                  className="flex h-7 w-full rounded border border-input bg-background px-2 py-0.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  value={editPerDayLimit}
+                  onChange={(e) => setEditPerDayLimit(Number(e.target.value))}
+                  min={1}
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                {(['BANK', 'UPI', 'UPAY'] as const).map((method) => (
+                  <div key={method} className="border border-border rounded p-3 space-y-2">
+                    <span className="text-xs font-semibold text-foreground">{method}</span>
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <label className="text-[10px] text-muted-foreground">Min</label>
+                        <input
+                          type="number"
+                          className="flex h-7 w-full rounded border border-input bg-background px-2 py-0.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          value={editLimits[method].min}
+                          onChange={(e) => setEditLimits({ ...editLimits, [method]: { ...editLimits[method], min: Number(e.target.value) } })}
+                          min={0}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-[10px] text-muted-foreground">Max</label>
+                        <input
+                          type="number"
+                          className="flex h-7 w-full rounded border border-input bg-background px-2 py-0.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          value={editLimits[method].max}
+                          onChange={(e) => setEditLimits({ ...editLimits, [method]: { ...editLimits[method], max: Number(e.target.value) } })}
+                          min={0}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleSaveConfig} disabled={configSaving} size="sm" className="h-7 text-xs">
+                  {configSaving && <Loading size={12} className="mr-1" />}
+                  Save Config
+                </Button>
+                <Button onClick={loadConfig} variant="outline" size="sm" className="h-7 text-xs" disabled={configLoading}>
+                  Reset
+                </Button>
               </div>
             </div>
           )}

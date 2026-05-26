@@ -44,6 +44,22 @@ export interface WithdrawalResponse {
   status?: string;
 }
 
+export interface WithdrawalLimits {
+  min: number;
+  max: number;
+}
+
+export interface WithdrawalConfig {
+  _id?: string;
+  key: string;
+  perDayLimit: number;
+  limits: {
+    BANK: WithdrawalLimits;
+    UPI: WithdrawalLimits;
+    UPAY: WithdrawalLimits;
+  };
+}
+
 export interface WithdrawalFilters {
   page: number;
   limit: number;
