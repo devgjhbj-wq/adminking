@@ -207,11 +207,12 @@ const Withdrawals = () => {
                 <th className="text-left p-2 text-muted-foreground font-medium">Order ID</th>
                 <th className="text-left p-2 text-muted-foreground font-medium">Amount</th>
                 <th className="text-left p-2 text-muted-foreground font-medium">Charge</th>
-                <th className="text-left p-2 text-muted-foreground font-medium">Bank Details</th>
+                <th className="text-left p-2 text-muted-foreground font-medium">Pay Method</th>
+                <th className="text-left p-2 text-muted-foreground font-medium">Payment Details</th>
                 <th className="text-left p-2 text-muted-foreground font-medium">Channel</th>
                 <th className="text-left p-2 text-muted-foreground font-medium">Gateway Order No</th>
                 <th className="text-left p-2 text-muted-foreground font-medium">Status</th>
-                <th className="text-left p-2 text-muted-foreground font-medium">Remark</th>
+                <th className="text-left p-2 text-muted-foreground font-medium">Note</th>
                 <th className="text-left p-2 text-muted-foreground font-medium whitespace-nowrap">Created At</th>
                 <th className="text-left p-2 text-muted-foreground font-medium whitespace-nowrap">Updated At</th>
                 <th className="text-left p-2 text-muted-foreground font-medium">Action</th>
@@ -226,8 +227,31 @@ const Withdrawals = () => {
                   <td className="p-2 text-destructive font-medium">
                     {d.charge ? `₹${Number(d.charge).toFixed(2)}` : '—'}
                   </td>
+                  <td className="p-2">
+                    {d.paymentMethod ? (
+                      <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-sm ${
+                        d.paymentMethod === 'UPI' ? 'bg-green-500/20 text-green-400' :
+                        d.paymentMethod === 'BANK' ? 'bg-blue-500/20 text-blue-400' :
+                        'bg-purple-500/20 text-purple-400'
+                      }`}>
+                        {d.paymentMethod}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground text-[10px]">-</span>
+                    )}
+                  </td>
                   <td className="p-2 text-[10px]">
-                    {d.bankDetails ? (
+                    {d.paymentMethod === 'UPI' && d.paymentDetails?.upiId ? (
+                      <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 w-max">
+                        <div className="flex gap-1"><span className="text-muted-foreground font-medium w-10">UPI ID:</span><span className="text-foreground font-mono">{d.paymentDetails.upiId}</span></div>
+                        <div className="flex gap-1"><span className="text-muted-foreground font-medium w-10">Name:</span><span className="text-foreground">{d.paymentDetails.holderName}</span></div>
+                      </div>
+                    ) : d.paymentMethod === 'UPAY' && d.paymentDetails?.rplId ? (
+                      <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 w-max">
+                        <div className="flex gap-1"><span className="text-muted-foreground font-medium w-10">RPL ID:</span><span className="text-foreground font-mono">{d.paymentDetails.rplId}</span></div>
+                        <div className="flex gap-1"><span className="text-muted-foreground font-medium w-10">Name:</span><span className="text-foreground">{d.paymentDetails.holderName}</span></div>
+                      </div>
+                    ) : d.bankDetails ? (
                       <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 w-max">
                         <div className="flex gap-1"><span className="text-muted-foreground font-medium w-7">A/C:</span><span className="text-foreground font-mono">{d.bankDetails.accountNumber}</span></div>
                         <div className="flex gap-1"><span className="text-muted-foreground font-medium w-7">IFSC:</span><span className="text-foreground font-mono">{d.bankDetails.ifsc || d.bankDetails.bankCode || '-'}</span></div>
@@ -245,7 +269,7 @@ const Withdrawals = () => {
                       {d.status}
                     </span>
                   </td>
-                  <td className="p-2 text-muted-foreground text-[10px] max-w-[120px] truncate" title={d.remark}>{d.remark || '-'}</td>
+                  <td className="p-2 text-muted-foreground text-[10px] max-w-[120px] truncate" title={d.note || d.remark}>{d.note || d.remark || '-'}</td>
                   <td className="p-2 text-muted-foreground text-[10px] whitespace-nowrap">{new Date(d.createdAt).toLocaleString()}</td>
                   <td className="p-2 text-muted-foreground text-[10px] whitespace-nowrap">
                     {d.updatedAt ? new Date(d.updatedAt).toLocaleString() : '—'}
