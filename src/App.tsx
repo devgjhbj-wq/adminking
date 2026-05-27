@@ -12,10 +12,7 @@ import Transactions from "./pages/Transactions";
 import Deposits from "./pages/Deposits";
 import Withdrawals from "./pages/Withdrawals";
 import GiftCodes from "./pages/GiftCodes";
-import AgentStats from "./pages/AgentStats";
-import AgentConfig from "./pages/AgentConfig";
-import AgentCommissions from "./pages/AgentCommissions";
-import AgentDaily from "./pages/AgentDaily";
+import AgentStats from "./pages/AgencyDashboard";
 import AdminLogs from "./pages/AdminLogs";
 import VipConfig from "./pages/VipConfig";
 import CreateBet from "./pages/CreateBet";
@@ -43,10 +40,7 @@ const App = () => (
               <Route path="deposits" element={<Deposits />} />
               <Route path="withdrawals" element={<Withdrawals />} />
               <Route path="gift-codes" element={<GiftCodes />} />
-              <Route path="agent-stats" element={<AgentStats />} />
-              <Route path="agent-daily" element={<AgentDaily />} />
-              <Route path="commissions" element={<AgentCommissions />} />
-              <Route path="agent-config" element={<AgentConfig />} />
+              <Route path="agency" element={<AgentStats />} />
               <Route path="logs" element={<AdminLogs />} />
               <Route path="vip-config" element={<VipConfig />} />
               <Route path="turnover-config" element={<TurnoverConfig />} />

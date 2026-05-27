@@ -173,38 +173,35 @@ export const fetchWithdrawalConfig = () => api.get('/api/admin/withdrawal-config
 export const updateWithdrawalConfig = (data: { perDayLimit?: number; limits?: Record<string, { min?: number; max?: number }> }) =>
   api.put('/api/admin/withdrawal-config', data);
 
-// Agent Stats
+// Agency
 export const fetchAgentStats = (userId: string, page = 1, limit = 50) =>
   api.get(`/api/admin/agent-stats?userId=${userId}&page=${page}&limit=${limit}`);
 
-// Agent Config
-export const fetchAgentConfig = () => api.get('/api/admin/agent-config');
-export const updateAgentConfig = (comRates: number[]) =>
-  api.put('/api/admin/agent-config', { comRates });
+export const fetchAgencyConfigs = () => api.get('/api/agency/configs');
 
-// Agent Daily
-export const fetchAgentDaily = (userId: string, date?: string) => {
+export const updateAgencyConfigLevel = (level: number, data: { minMembers?: number; minBets?: number; minDeposit?: number; l1Rate?: number; l2Rate?: number; l3Rate?: number }) =>
+  api.put(`/api/agency/configs/${level}`, data);
+
+export const seedAgencyConfigs = () => api.post('/api/agency/configs/seed');
+
+export const fetchAgentLevel = (userId: string) => api.get(`/api/agency/admin/level?userId=${userId}`);
+
+export const fetchAgencyDaily = (userId: string, date?: string) => {
   const params = new URLSearchParams({ userId });
   if (date) params.set('date', date);
-  return api.get(`/api/admin/agent-daily?${params.toString()}`);
+  return api.get(`/api/agency/admin/daily?${params.toString()}`);
 };
 
-// Agent Commissions (admin)
-export const fetchAgentCommissions = (
-  recUser: string,
-  params?: { claim?: boolean; from?: string; to?: string; page?: number; limit?: number }
-) => {
-  const query = new URLSearchParams({ recUser });
-  if (params?.claim !== undefined) query.set('claim', String(params.claim));
-  if (params?.from) query.set('from', params.from);
-  if (params?.to) query.set('to', params.to);
+export const fetchAgentTeam = (agentId: string, toDate: string, params?: { fromDate?: string; tier?: number; page?: number; limit?: number }) => {
+  const query = new URLSearchParams({ agentId, toDate });
+  if (params?.fromDate) query.set('fromDate', params.fromDate);
+  if (params?.tier) query.set('tier', String(params.tier));
   if (params?.page) query.set('page', String(params.page));
   if (params?.limit) query.set('limit', String(params.limit));
-  return api.get(`/api/admin/agent/commissions?${query.toString()}`);
+  return api.get(`/api/agency/admin/team?${query.toString()}`);
 };
 
-export const claimAgentCommission = (recUser: number, upTo?: string) =>
-  api.post('/api/admin/agent/commissions/claim', { recUser, upTo });
+export const runMidnightBatch = () => api.post('/api/agency/admin/run-midnight');
 
 // Admin Logs
 export const fetchAdminLogs = (params?: { level?: 'info' | 'error'; since?: string; limit?: number }) => {
@@ -311,9 +308,6 @@ export const fetchGiftCodeRedemptions = (code: string, page = 1, limit = 25) =>
 // Additional helper functions for search optimization
 export const searchUserByMobile = (mobile: string) => 
   api.get(`/api/admin/user?mobile=${mobile}`);
-
-export const searchAgentStats = (agentId: string, page = 1, limit = 50) =>
-  api.get(`/api/admin/agent-stats?userId=${agentId}&page=${page}&limit=${limit}`);
 
 // Utility function to validate numeric inputs
 export const validateUserId = (userId: string | number): boolean => {

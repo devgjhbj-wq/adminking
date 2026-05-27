@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Users, Wallet, ArrowUpCircle, ArrowDownCircle, Percent, Clock, Calendar as CalendarIcon, Filter, Search } from 'lucide-react';
+import { Users, Wallet, ArrowUpCircle, ArrowDownCircle, Clock, Calendar as CalendarIcon, Filter, Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchDashboard, setAuthToken } from '@/lib/api';
 import { toast } from 'sonner';
@@ -39,10 +39,6 @@ interface DashboardStats {
       total: number;
     };
     byStatus: Record<string, { count: number; total: number }>;
-  };
-  agentCommission: {
-    total: number;
-    count: number;
   };
 }
 
@@ -91,7 +87,6 @@ const Dashboard = () => {
   const overviewCards = [
     { label: 'Total Users', value: stats?.overview?.totalUsers?.toLocaleString() ?? '0', icon: Users, color: 'text-blue-500' },
     { label: 'New Users', value: stats?.overview?.newUsers?.toLocaleString() ?? '0', icon: Users, color: 'text-indigo-500' },
-    { label: 'Commission', value: `₹${stats?.agentCommission?.total?.toLocaleString() ?? '0'}`, icon: Percent, color: 'text-orange-500' },
   ];
 
   const depositCards = [
@@ -213,7 +208,7 @@ const Dashboard = () => {
         <>
           {/* Overview */}
           <div className="space-y-2">
-            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider pl-1">Overview & Commissions</h3>
+            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider pl-1">Overview</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {overviewCards.map((c) => (
                 <div key={c.label} className="bg-card border border-border p-3 rounded-lg hover:border-primary/30 transition-all shadow-sm group">
