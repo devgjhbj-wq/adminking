@@ -108,11 +108,11 @@ const Dashboard = () => {
   return (
     <PageContainer>
       <SearchHeader>
-        <div className="flex bg-secondary/30 p-1 rounded-md border border-border">
+        <div className="flex bg-secondary/30 p-0.5 rounded-md border border-border h-[26px]">
           <button
             onClick={() => setPeriod('today')}
             className={cn(
-              "px-3 py-1 text-xs font-medium rounded transition-colors",
+              "px-3 text-xs font-medium rounded transition-colors h-full",
               period === 'today' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -121,7 +121,7 @@ const Dashboard = () => {
           <button
             onClick={() => setPeriod('month')}
             className={cn(
-              "px-3 py-1 text-xs font-medium rounded transition-colors",
+              "px-3 text-xs font-medium rounded transition-colors h-full",
               period === 'month' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -130,7 +130,7 @@ const Dashboard = () => {
           <button
             onClick={() => setPeriod('custom')}
             className={cn(
-              "px-3 py-1 text-xs font-medium rounded transition-colors",
+              "px-3 text-xs font-medium rounded transition-colors h-full",
               period === 'custom' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
             )}
           >

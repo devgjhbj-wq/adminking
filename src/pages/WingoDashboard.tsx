@@ -13,7 +13,7 @@ import {
 } from '@/lib/api';
 import Loading from '@/components/Loading';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import {
   Card,
   CardContent,
@@ -193,22 +193,26 @@ const WingoDashboard = () => {
   return (
     <div className="space-y-4">
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full justify-start overflow-x-auto">
-          <TabsTrigger value="current" className="text-xs">
-            Current Round
-          </TabsTrigger>
-          <TabsTrigger value="history" className="text-xs">
-            <List className="w-3.5 h-3.5 mr-1.5" />
-            History
-          </TabsTrigger>
-          <TabsTrigger value="mode" className="text-xs">
-            <Settings className="w-3.5 h-3.5 mr-1.5" />
-            Mode
-          </TabsTrigger>
-        </TabsList>
+      {/* Tab Bar */}
+      <div className="flex items-center gap-0 bg-card border border-border rounded px-1" style={{ height: 34 }}>
+        {(['current', 'history', 'mode'] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setActiveTab(t)}
+            className={`px-2 text-xs font-medium rounded transition-all ${
+              activeTab === t
+                ? 'bg-[#42b983] text-white border border-[#42b983]'
+                : 'text-muted-foreground border border-transparent hover:text-foreground hover:border-border'
+            }`}
+            style={{ height: 26, lineHeight: '26px', marginRight: 5 }}
+          >
+            {t === 'current' ? 'Current Round' : t === 'history' ? 'History' : 'Mode'}
+          </button>
+        ))}
+      </div>
 
-        <TabsContent value="current" className="space-y-4 mt-4">
+      {activeTab === 'current' && (
+        <div className="space-y-4 mt-4">
           {loading && !currentRound ? (
             <div className="flex items-center justify-center h-48">
               <Loading />
@@ -437,9 +441,11 @@ const WingoDashboard = () => {
               </Card>
             </>
           )}
-        </TabsContent>
+        </div>
+      )}
 
-        <TabsContent value="history" className="space-y-4 mt-4">
+      {activeTab === 'history' && (
+        <div className="space-y-4 mt-4">
           <Card>
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
@@ -613,9 +619,10 @@ const WingoDashboard = () => {
                 </CardContent>
               )}
           </Card>
-        </TabsContent>
+        </div>
+      )}
 
-        <Dialog open={statsDialogOpen} onOpenChange={setStatsDialogOpen}>
+      <Dialog open={statsDialogOpen} onOpenChange={setStatsDialogOpen}>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader className="flex flex-row items-center justify-between pb-1">
               <div>
@@ -689,7 +696,8 @@ const WingoDashboard = () => {
           </DialogContent>
         </Dialog>
 
-        <TabsContent value="mode" className="space-y-4 mt-4">
+      {activeTab === 'mode' && (
+        <div className="space-y-4 mt-4">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -743,8 +751,8 @@ const WingoDashboard = () => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </div>
   );
 };

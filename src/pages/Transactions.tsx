@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchTransactions, setAuthToken } from '@/lib/api';
 import { toast } from 'sonner';
-import SearchBar from '@/components/SearchBar';
 import LastUpdated from '@/components/LastUpdated';
 import Loading from '@/components/Loading';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { PageContainer, SearchHeader, Pagination } from '@/components/PageContainer';
 
 const Transactions = () => {
@@ -132,16 +133,33 @@ const Transactions = () => {
   return (
     <PageContainer>
       <SearchHeader>
-        <SearchBar 
-          value={userId} 
-          onChange={setUserId} 
-          onSearch={() => load(1)} 
-          placeholder="Enter User ID" 
-          loading={loading}
-          storageKey="transaction_user_search"
-          maxHistory={10}
+        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">User ID</label>
+        <Input
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          placeholder="Enter User ID"
+          className="w-[180px] h-[26px] text-xs px-1.5"
+          onKeyDown={(e) => e.key === 'Enter' && load(1)}
         />
-        <LastUpdated timestamp={updatedAt} onRefresh={() => load(page)} loading={loading} />
+        <Button
+          onClick={() => load(1)}
+          disabled={loading || !userId.trim()}
+          size="sm"
+          className="h-[26px] px-2.5 text-xs rounded-[5px]"
+          style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+        >
+          {loading ? <Loading size={10} /> : null}
+          Search
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-[26px] px-2.5 text-xs rounded-[5px]"
+          onClick={() => setUserId('')}
+        >
+          Reset
+        </Button>
+        <LastUpdated timestamp={updatedAt} onRefresh={() => load(page)} loading={loading} compact />
       </SearchHeader>
 
       {data?.items && (

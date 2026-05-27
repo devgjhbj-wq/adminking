@@ -469,13 +469,21 @@ const Withdrawals = () => {
   return (
     <PageContainer>
       {/* Tab Bar */}
-      <div className="flex gap-4 border-b border-border">
-        <button onClick={() => setTab('orders')} className={`pb-1.5 text-xs font-medium border-b-2 transition-colors ${tab === 'orders' ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'}`}>
-          Orders
-        </button>
-        <button onClick={() => setTab('config')} className={`pb-1.5 text-xs font-medium border-b-2 transition-colors ${tab === 'config' ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'}`}>
-          Config
-        </button>
+      <div className="flex items-center gap-0 bg-card border border-border rounded px-1" style={{ height: 34 }}>
+        {(['orders', 'config'] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`px-2 text-xs font-medium rounded transition-all capitalize ${
+              tab === t
+                ? 'bg-[#42b983] text-white border border-[#42b983]'
+                : 'text-muted-foreground border border-transparent hover:text-foreground hover:border-border'
+            }`}
+            style={{ height: 26, lineHeight: '26px', marginRight: 5 }}
+          >
+            {t}
+          </button>
+        ))}
       </div>
 
       {tab === 'orders' && (

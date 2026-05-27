@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { searchUser, updateUserStatus, overrideUserBank, setAuthToken } from '@/lib/api';
 import { toast } from 'sonner';
-import SearchBar from '@/components/SearchBar';
 import LastUpdated from '@/components/LastUpdated';
 import Loading from '@/components/Loading';
 import UserTurnover from '@/components/UserTurnover';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { ShieldAlert, Smartphone, Globe, Fingerprint, Banknote } from 'lucide-react';
+import { ShieldAlert, Smartphone, Globe, Fingerprint, Banknote, Search } from 'lucide-react';
+import { SearchHeader } from '@/components/PageContainer';
 
 const UserSearch = () => {
   const { token } = useAuth();
@@ -89,20 +89,27 @@ const UserSearch = () => {
 
   return (
     <div className="space-y-1.5">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 bg-card border border-border p-2 rounded-lg shadow-sm mb-2">
-        <div className="w-full sm:w-auto">
-          <SearchBar 
-            value={userId} 
-            onChange={setUserId} 
-            onSearch={handleSearch} 
-            placeholder="Enter User ID" 
-            loading={loading}
-            storageKey="user_search_history"
-            maxHistory={10}
-          />
-        </div>
-        <LastUpdated timestamp={updatedAt} onRefresh={handleSearch} loading={loading} />
-      </div>
+      <SearchHeader>
+        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">User ID</label>
+        <Input
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          placeholder="Enter User ID"
+          className="w-[180px] h-[26px] text-xs px-1.5"
+          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+        />
+        <Button
+          onClick={handleSearch}
+          disabled={loading || !userId.trim()}
+          size="sm"
+          className="h-[26px] px-2.5 text-xs rounded-[5px] gap-1"
+          style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+        >
+          <Search className="w-3.5 h-3.5" />
+          Go
+        </Button>
+        <LastUpdated timestamp={updatedAt} onRefresh={handleSearch} loading={loading} compact />
+      </SearchHeader>
 
       {result && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">

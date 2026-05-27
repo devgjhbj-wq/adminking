@@ -5,14 +5,14 @@ import {
   fetchAgentLevel, fetchAgencyDaily, fetchAgentTeam, runMidnightBatch, setAuthToken
 } from '@/lib/api';
 import { toast } from 'sonner';
-import SearchBar from '@/components/SearchBar';
 import LastUpdated from '@/components/LastUpdated';
 import Loading from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ChevronLeft, ChevronRight, Save, RefreshCw, Play, Plus, CalendarIcon } from 'lucide-react';
+import { SearchHeader } from '@/components/PageContainer';
+import { ChevronLeft, ChevronRight, Save, RefreshCw, Play, Plus, CalendarIcon, Search } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -207,9 +207,18 @@ const AgencyDashboard = () => {
   return (
     <div className="space-y-3">
       {/* Tab Bar */}
-      <div className="flex gap-4 border-b border-border">
+      <div className="flex items-center gap-0 bg-card border border-border rounded px-1" style={{ height: 34 }}>
         {tabs.map((t) => (
-          <button key={t} onClick={() => setTab(t)} className={`pb-1.5 text-xs font-medium border-b-2 transition-colors ${tab === t ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground'}`}>
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`px-2 text-xs font-medium rounded transition-all ${
+              tab === t
+                ? 'bg-[#42b983] text-white border border-[#42b983]'
+                : 'text-muted-foreground border border-transparent hover:text-foreground hover:border-border'
+            }`}
+            style={{ height: 26, lineHeight: '26px', marginRight: 5 }}
+          >
             {t}
           </button>
         ))}
@@ -218,9 +227,26 @@ const AgencyDashboard = () => {
       {/* ── Stats Tab ── */}
       {tab === 'Stats' && (
         <div className="space-y-2">
-          <div className="bg-card border border-border rounded-lg">
-            <SearchBar value={statsUserId} onChange={setStatsUserId} onSearch={() => loadStats(1)} placeholder="Enter Agent User ID" loading={statsLoading} storageKey="agency_stats_search" maxHistory={5} />
-          </div>
+          <SearchHeader>
+            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
+            <Input
+              value={statsUserId}
+              onChange={(e) => setStatsUserId(e.target.value)}
+              placeholder="Enter Agent User ID"
+              className="w-[180px] h-[26px] text-xs px-1.5"
+              onKeyDown={(e) => e.key === 'Enter' && loadStats(1)}
+            />
+            <Button
+              onClick={() => loadStats(1)}
+              disabled={statsLoading || !statsUserId.trim()}
+              size="sm"
+              className="h-[26px] px-2.5 text-xs rounded-[5px]"
+              style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+            >
+              {statsLoading ? <Loading size={10} /> : <Search className="w-3.5 h-3.5" />}
+              Search
+            </Button>
+          </SearchHeader>
 
           {statsData?.agent && (
             <div className="grid grid-cols-1 md:grid-cols-2 ga">
@@ -316,25 +342,39 @@ const AgencyDashboard = () => {
       {/* ── Daily Tab ── */}
       {tab === 'Daily' && (
         <div className="space-y-2">
-          <div className="flex flex-col sm:flex-row sm:items-end gabg-card border border-border rounded-lg">
-            <div className="flex-1">
-              <SearchBar value={dailyUserId} onChange={setDailyUserId} onSearch={loadDaily} placeholder="Enter Agent User ID" loading={dailyLoading} storageKey="agency_daily_search" maxHistory={5} />
-            </div>
-            <div className="w-full sm:w-36">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]", !dailyDate && "text-muted-foreground")}>
-                    <CalendarIcon className="mr-1 h-3 w-3" />
-                    {dailyDate ? format(dailyDate, "MMM dd, yyyy") : "Date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={dailyDate} onSelect={setDailyDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
-                </PopoverContent>
-              </Popover>
-            </div>
+          <SearchHeader>
+            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
+            <Input
+              value={dailyUserId}
+              onChange={(e) => setDailyUserId(e.target.value)}
+              placeholder="Enter Agent User ID"
+              className="w-[180px] h-[26px] text-xs px-1.5"
+              onKeyDown={(e) => e.key === 'Enter' && loadDaily()}
+            />
+            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Date</label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className={cn("w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]", !dailyDate && "text-muted-foreground")}>
+                  <CalendarIcon className="mr-1 h-3 w-3" />
+                  {dailyDate ? format(dailyDate, "MMM dd, yyyy") : "Select"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar mode="single" selected={dailyDate} onSelect={setDailyDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
+              </PopoverContent>
+            </Popover>
+            <Button
+              onClick={loadDaily}
+              disabled={dailyLoading || !dailyUserId.trim()}
+              size="sm"
+              className="h-[26px] px-2.5 text-xs rounded-[5px]"
+              style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+            >
+              {dailyLoading ? <Loading size={10} /> : <Search className="w-3.5 h-3.5" />}
+              Search
+            </Button>
             <LastUpdated timestamp={updatedAt} onRefresh={loadDaily} loading={dailyLoading} compact />
-          </div>
+          </SearchHeader>
 
           {dailyData && (
             <div className="space-y-3">
@@ -377,10 +417,16 @@ const AgencyDashboard = () => {
       {/* ── Team Tab ── */}
       {tab === 'Team' && (
         <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-[10px] bg-card border border-border p-2.5 rounded-lg">
-            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">Agent ID</label>
-            <SearchBar value={teamAgentId} onChange={setTeamAgentId} onSearch={() => loadTeam(1)} placeholder="Agent ID" loading={teamLoading} storageKey="agency_team_search" maxHistory={5} hideButton />
-            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">To *</label>
+          <SearchHeader>
+            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
+            <Input
+              value={teamAgentId}
+              onChange={(e) => setTeamAgentId(e.target.value)}
+              placeholder="Agent ID"
+              className="w-[120px] h-[26px] text-xs px-1.5"
+              onKeyDown={(e) => e.key === 'Enter' && loadTeam(1)}
+            />
+            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">To</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className={cn("w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]", !teamToDate && "text-muted-foreground")}>
@@ -392,7 +438,7 @@ const AgencyDashboard = () => {
                 <Calendar mode="single" selected={teamToDate} onSelect={setTeamToDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
               </PopoverContent>
             </Popover>
-            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">From</label>
+            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">From</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className={cn("w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]", !teamFromDate && "text-muted-foreground")}>
@@ -404,15 +450,24 @@ const AgencyDashboard = () => {
                 <Calendar mode="single" selected={teamFromDate} onSelect={setTeamFromDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
               </PopoverContent>
             </Popover>
-            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">Tier</label>
+            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Tier</label>
             <select value={teamTier} onChange={(e) => setTeamTier(e.target.value)} className="w-[80px] h-[26px] rounded border border-input bg-background px-2 text-xs">
               <option value="">All</option>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
             </select>
-            <Button size="sm" onClick={() => loadTeam(1)} disabled={teamLoading} className="h-[26px] text-xs rounded-[5px]">Search</Button>
-          </div>
+            <Button
+              onClick={() => loadTeam(1)}
+              disabled={teamLoading}
+              size="sm"
+              className="h-[26px] px-2.5 text-xs rounded-[5px]"
+              style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+            >
+              {teamLoading ? <Loading size={10} /> : <Search className="w-3.5 h-3.5" />}
+              Search
+            </Button>
+          </SearchHeader>
 
           {teamData?.aggregation && (
             <div className="space-y-2">
