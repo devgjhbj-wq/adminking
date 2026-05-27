@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchWithdrawals, fetchWithdrawalByOrder, approveWithdrawal, cancelWithdrawal, fetchWithdrawalConfig, updateWithdrawalConfig, setAuthToken } from '@/lib/api';
 import { toast } from 'sonner';
-import SearchBar from '@/components/SearchBar';
 import LastUpdated from '@/components/LastUpdated';
 import Loading from '@/components/Loading';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { CalendarIcon, ChevronLeft, ChevronRight, CheckCircle, XCircle, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
@@ -482,15 +482,11 @@ const Withdrawals = () => {
       <>
       <SearchHeader>
         <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">User ID</label>
-        <SearchBar 
-          value={userId} 
-          onChange={setUserId} 
-          onSearch={() => loadByUserId(1)} 
-          placeholder="Ex: 123456"
-          loading={loading && lastSearchType === 'user'}
-          storageKey="withdrawal_user_search"
-          maxHistory={5}
-          hideButton={true}
+        <Input
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          placeholder="User ID"
+          className="w-[180px] h-[26px] text-xs px-1.5"
         />
         <Button 
           onClick={() => loadByUserId(1)} 
@@ -503,15 +499,11 @@ const Withdrawals = () => {
         </Button>
 
         <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Order ID</label>
-        <SearchBar 
-          value={orderId} 
-          onChange={setOrderId} 
-          onSearch={loadByOrderId} 
-          placeholder="Ex: WD..."
-          loading={loading && lastSearchType === 'order'}
-          storageKey="withdrawal_order_search"
-          maxHistory={5}
-          hideButton={true}
+        <Input
+          value={orderId}
+          onChange={(e) => setOrderId(e.target.value)}
+          placeholder="Order ID"
+          className="w-[180px] h-[26px] text-xs px-1.5"
         />
         <Button 
           onClick={loadByOrderId} 
