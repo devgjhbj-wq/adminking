@@ -10,8 +10,11 @@ import LastUpdated from '@/components/LastUpdated';
 import Loading from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ChevronLeft, ChevronRight, Save, RefreshCw, Play, Plus } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ChevronLeft, ChevronRight, Save, RefreshCw, Play, Plus, CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const tabs = ['Stats', 'Daily', 'Team', 'Config'] as const;
 type Tab = typeof tabs[number];
@@ -54,7 +57,7 @@ const AgencyDashboard = () => {
 
   // ── Daily tab ──
   const [dailyUserId, setDailyUserId] = useState('');
-  const [dailyDate, setDailyDate] = useState('');
+  const [dailyDate, setDailyDate] = useState<Date>();
   const [dailyData, setDailyData] = useState<any>(null);
   const [dailyLoading, setDailyLoading] = useState(false);
 
@@ -64,7 +67,7 @@ const AgencyDashboard = () => {
     setAuthToken(token);
     setDailyLoading(true);
     try {
-      const res = await fetchAgencyDaily(q, dailyDate || undefined);
+      const res = await fetchAgencyDaily(q, dailyDate ? format(dailyDate, 'yyyy-MM-dd') : undefined);
       setDailyData(res.data);
       setUpdatedAt(new Date());
     } catch (err: any) {
@@ -76,8 +79,8 @@ const AgencyDashboard = () => {
 
   // ── Team tab ──
   const [teamAgentId, setTeamAgentId] = useState('');
-  const [teamToDate, setTeamToDate] = useState('');
-  const [teamFromDate, setTeamFromDate] = useState('');
+  const [teamToDate, setTeamToDate] = useState<Date>();
+  const [teamFromDate, setTeamFromDate] = useState<Date>();
   const [teamTier, setTeamTier] = useState('');
   const [teamData, setTeamData] = useState<any>(null);
   const [teamLoading, setTeamLoading] = useState(false);
@@ -90,8 +93,8 @@ const AgencyDashboard = () => {
     setAuthToken(token);
     setTeamLoading(true);
     try {
-      const res = await fetchAgentTeam(q, teamToDate, {
-        fromDate: teamFromDate || undefined,
+      const res = await fetchAgentTeam(q, format(teamToDate, 'yyyy-MM-dd'), {
+        fromDate: teamFromDate ? format(teamFromDate, 'yyyy-MM-dd') : undefined,
         tier: teamTier ? Number(teamTier) : undefined,
         page: p, limit: 25,
       });
@@ -294,7 +297,17 @@ const AgencyDashboard = () => {
               <SearchBar value={dailyUserId} onChange={setDailyUserId} onSearch={loadDaily} placeholder="Enter Agent User ID" loading={dailyLoading} storageKey="agency_daily_search" maxHistory={5} />
             </div>
             <div className="w-full sm:w-36">
-              <Input type="date" value={dailyDate} onChange={(e) => setDailyDate(e.target.value)} className="w-full" />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal text-xs h-7 px-2", !dailyDate && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-1 h-3 w-3" />
+                    {dailyDate ? format(dailyDate, "MMM dd, yyyy") : "Date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={dailyDate} onSelect={setDailyDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
+                </PopoverContent>
+              </Popover>
             </div>
             <LastUpdated timestamp={updatedAt} onRefresh={loadDaily} loading={dailyLoading} compact />
           </div>
@@ -347,11 +360,31 @@ const AgencyDashboard = () => {
             </div>
             <div className="w-[130px]">
               <label className="text-[10px] font-medium text-muted-foreground uppercase mb-1 block">To Date *</label>
-              <Input type="date" value={teamToDate} onChange={(e) => setTeamToDate(e.target.value)} className="w-full" />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal text-[11px] h-7 px-2", !teamToDate && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-1 h-3 w-3" />
+                    {teamToDate ? format(teamToDate, "MMM dd, yyyy") : "Select"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={teamToDate} onSelect={setTeamToDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="w-[130px]">
               <label className="text-[10px] font-medium text-muted-foreground uppercase mb-1 block">From Date</label>
-              <Input type="date" value={teamFromDate} onChange={(e) => setTeamFromDate(e.target.value)} className="w-full" />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal text-[11px] h-7 px-2", !teamFromDate && "text-muted-foreground")}>
+                    <CalendarIcon className="mr-1 h-3 w-3" />
+                    {teamFromDate ? format(teamFromDate, "MMM dd, yyyy") : "Select"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={teamFromDate} onSelect={setTeamFromDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="w-[80px]">
               <label className="text-[10px] font-medium text-muted-foreground uppercase mb-1 block">Tier</label>
