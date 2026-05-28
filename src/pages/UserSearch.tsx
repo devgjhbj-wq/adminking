@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { searchUser, updateUserStatus, overrideUserBank, setAuthToken } from '@/lib/api';
+import { searchUser, updateUserStatus, updateUserPayment, fetchUserPaymentMethods, updateUserPaymentMethodById, setAuthToken } from '@/lib/api';
 import { toast } from 'sonner';
 import LastUpdated from '@/components/LastUpdated';
 import Loading from '@/components/Loading';
@@ -8,8 +8,35 @@ import UserTurnover from '@/components/UserTurnover';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { ShieldAlert, Smartphone, Globe, Fingerprint, Banknote, Search } from 'lucide-react';
+import { Users, Banknote, Search, ShieldAlert, Globe, Smartphone, CreditCard } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { SearchHeader } from '@/components/PageContainer';
+
+const SectionCard = ({ title, icon: TitleIcon, accentBorder, children }: {
+  title: string;
+  icon: any;
+  accentBorder: string;
+  children: React.ReactNode;
+}) => (
+  <div className={cn("bg-card border border-border rounded-lg shadow-sm overflow-hidden", accentBorder)}>
+    <div className="px-4 py-2.5 border-b border-border flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <TitleIcon className="w-4 h-4" />
+        <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">{title}</h3>
+      </div>
+    </div>
+    <div className="p-4">
+      {children}
+    </div>
+  </div>
+);
+
+const StatRow = ({ label, value }: { label: string; value: any }) => (
+  <div className="flex items-center justify-between py-1.5 border-b border-border/40 last:border-b-0">
+    <span className="text-[11px] text-muted-foreground">{label}</span>
+    <span className="text-xs font-bold text-foreground">{value}</span>
+  </div>
+);
 
 const UserSearch = () => {
   const { token } = useAuth();
@@ -23,13 +50,15 @@ const UserSearch = () => {
   const [newStatus, setNewStatus] = useState<'active' | 'suspended' | 'inactive'>('active');
   const [statusRemark, setStatusRemark] = useState('');
 
-  const [bankDialogOpen, setBankDialogOpen] = useState(false);
-  const [bankLoading, setBankLoading] = useState(false);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentType, setPaymentType] = useState<'BANK' | 'UPI' | 'UPAY'>('BANK');
   const [bankName, setBankName] = useState('');
   const [bankCode, setBankCode] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [accountHolder, setAccountHolder] = useState('');
-
+  const [upiId, setUpiId] = useState('');
+  const [rplId, setRplId] = useState('');
   const handleSearch = async () => {
     if (!userId.trim()) return;
     setAuthToken(token);
@@ -43,6 +72,8 @@ const UserSearch = () => {
       setBankCode('');
       setAccountNumber('');
       setAccountHolder('');
+      setUpiId('');
+      setRplId('');
     } catch (err: any) {
       const errorMsg = err.response?.data?.msg || err.response?.data?.message || 'User not found';
       toast.error(errorMsg);
@@ -54,6 +85,10 @@ const UserSearch = () => {
 
   const handleStatusChange = async () => {
     if (!user?.userId) return;
+    if ((newStatus === 'suspended' || newStatus === 'inactive') && !statusRemark.trim()) {
+      toast.error('Remark is required when banning or suspending');
+      return;
+    }
     setAuthToken(token);
     setStatusLoading(true);
     try {
@@ -69,28 +104,42 @@ const UserSearch = () => {
     }
   };
 
-  const handleBankOverride = async () => {
+  const handlePaymentUpdate = async () => {
     if (!user?.userId) return;
     setAuthToken(token);
-    setBankLoading(true);
+    setPaymentLoading(true);
     try {
-      const res = await overrideUserBank(user.userId, bankName, bankCode, accountNumber, accountHolder);
-      toast.success(res.data.msg || 'Bank updated');
-      setBankDialogOpen(false);
+      const data: Record<string, any> = { accountHolder };
+      if (paymentType === 'BANK') {
+        data.bankName = bankName;
+        data.ifsc = bankCode;
+        data.accountNo = accountNumber;
+      } else if (paymentType === 'UPI') {
+        data.upiId = upiId;
+      } else if (paymentType === 'UPAY') {
+        data.rplId = rplId;
+      }
+      const res = await updateUserPayment(user.userId, paymentType, data);
+      toast.success(res.data.msg || 'Payment details updated');
+      setPaymentDialogOpen(false);
       handleSearch();
     } catch (err: any) {
-      toast.error(err.response?.data?.msg || 'Failed to update bank');
+      toast.error(err.response?.data?.msg || 'Failed to update payment');
     } finally {
-      setBankLoading(false);
+      setPaymentLoading(false);
     }
   };
 
-  const { user, account, deviceRisk } = result || {};
+  const handleSearchSameIp = async () => {
+    toast.error('IP address not available from user search');
+  };
+
+  const { user, account, paymentMethods } = result || {};
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-4">
       <SearchHeader>
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">User ID</label>
+        <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">User ID</label>
         <Input
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
@@ -112,153 +161,147 @@ const UserSearch = () => {
       </SearchHeader>
 
       {result && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* User Profile */}
           {user && (
-            <div className="bg-card border border-border p-2 space-y-1">
-              <h3 className="text-sm font-semibold text-foreground">User Profile</h3>
-              <InfoRow label="User ID" value={user.userId} />
-              <InfoRow label="Mobile" value={user.mobile} />
-              <InfoRow label="Admin" value={user.admin ? 'Yes' : 'No'} />
-              <InfoRow label="Created" value={new Date(user.createdAt).toLocaleString()} />
-              <InfoRow label="Updated" value={new Date(user.updatedAt).toLocaleString()} />
-            </div>
+            <SectionCard title="User Profile" icon={Users} accentBorder="border-r-[3px] border-r-[rgb(32,143,255)]">
+              <StatRow label="User ID" value={user.userId} />
+              <StatRow label="Mobile" value={user.mobile} />
+              <StatRow label="Admin" value={user.admin ? 'Yes' : 'No'} />
+              <StatRow label="Created" value={new Date(user.createdAt).toLocaleString()} />
+              <StatRow label="Updated" value={new Date(user.updatedAt).toLocaleString()} />
+            </SectionCard>
           )}
+
+          {/* Account */}
           {account && (
-            <div className="bg-card border border-border p-2 space-y-1">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-foreground">Account</h3>
-                <Button variant="outline" size="sm" onClick={() => setStatusDialogOpen(true)}>
+            <SectionCard
+              title="Account"
+              icon={Banknote}
+              accentBorder="border-r-[3px] border-r-emerald-500"
+            >
+              <div className="flex items-center justify-end gap-2 mb-2">
+                <Button variant="outline" size="sm" className="h-7 text-[10px] px-2" onClick={() => setStatusDialogOpen(true)}>
+                  <ShieldAlert className="w-3 h-3 mr-1" />
                   Change Status
                 </Button>
               </div>
-              <InfoRow label="Account User" value={account.user} />
-              <InfoRow label="Balance" value={`₹${account.balance?.toLocaleString()}`} />
-              <InfoRow label="Withdrawable" value={`₹${account.withdrawable?.toLocaleString() || 0}`} />
-              <InfoRow label="Total Deposits" value={`₹${account.totalDeposits?.toLocaleString() || 0}`} />
-              <InfoRow label="Turnover Requirement" value={`₹${account.turnover_requirement?.toLocaleString() || 0}`} />
-              <InfoRow
+              <StatRow label="Balance" value={`₹${(account.balance ?? 0).toLocaleString()}`} />
+              <StatRow label="Withdrawable" value={`₹${(account.withdrawable ?? 0).toLocaleString()}`} />
+              <StatRow label="Total Deposits" value={`₹${(account.totalDeposits ?? 0).toLocaleString()}`} />
+              <StatRow label="Total Withdrawals" value={`₹${(account.totalWithdrawals ?? 0).toLocaleString()}`} />
+              <StatRow
                 label="Status"
                 value={
-                  <span className={`px-1.5 py-0.5 text-[10px] font-medium ${account.status === 'active' ? 'bg-green-500/20 text-green-400' :
-                      account.status === 'suspended' ? 'bg-yellow-500/20 text-yellow-400' :
-                        'bg-red-500/20 text-red-400'
-                    }`}>
+                  <span className={cn("px-1.5 py-0.5 text-[10px] font-semibold rounded",
+                    account.status === 'active' ? 'bg-emerald-500/15 text-emerald-400' :
+                    account.status === 'suspended' ? 'bg-amber-500/15 text-amber-400' :
+                    'bg-rose-500/15 text-rose-400'
+                  )}>
                     {account.status}
                   </span>
                 }
               />
-              {account.statusRemark && <InfoRow label="Remark" value={account.statusRemark} />}
-              <InfoRow label="VIP Level" value={account.vipLevel || '—'} />
-              <InfoRow label="Game Member Created" value={account.gameMemberCreated ? 'Yes' : 'No'} />
-              <InfoRow label="Withdraw Daily Limit" value={`₹${account.withdrawDailyLimit?.toLocaleString() || 0}`} />
-              <InfoRow label="Created" value={account.createdAt ? new Date(account.createdAt).toLocaleString() : '—'} />
-              <InfoRow label="Updated" value={account.updatedAt ? new Date(account.updatedAt).toLocaleString() : '—'} />
-            </div>
+              {account.statusRemark && <StatRow label="Status Remark" value={account.statusRemark} />}
+              <StatRow label="VIP Level" value={account.vipLevel || '—'} />
+              <StatRow label="Withdraw Daily Limit" value={`₹${(account.withdrawDailyLimit ?? 0).toLocaleString()}`} />
+              <StatRow label="Turnover Requirement" value={`₹${(account.turnover_requirement ?? 0).toLocaleString()}`} />
+              <StatRow label="Turnover Completed" value={`₹${(account.total_turnover_completed ?? 0).toLocaleString()}`} />
+              <StatRow label="Currency" value={account.currency || 'INR'} />
+              <StatRow label="Game Member" value={account.gameMemberCreated ? 'Created' : 'Not Created'} />
+              <StatRow label="First Deposit Bonus" value={account.firstDepositBonusGiven ? 'Given' : 'Not Given'} />
+              <StatRow label="Created" value={account.createdAt ? new Date(account.createdAt).toLocaleString() : '—'} />
+              <StatRow label="Updated" value={account.updatedAt ? new Date(account.updatedAt).toLocaleString() : '—'} />
+            </SectionCard>
           )}
         </div>
+      )}
+
+      {/* Same IP Users */}
+      {result?.sameIpUsers !== undefined && result?.sameIpUsers > 0 && (
+        <SectionCard title="Same IP Users" icon={Globe} accentBorder="border-r-[3px] border-r-amber-500">
+          <span className="text-[11px] text-muted-foreground">
+            <span className="font-bold text-foreground">{result.sameIpUsers}</span> other user{result.sameIpUsers !== 1 ? 's' : ''} sharing same IP
+          </span>
+        </SectionCard>
+      )}
+
+      {/* Payment Methods */}
+      {paymentMethods && (
+        <SectionCard title="Payment Methods" icon={Banknote} accentBorder="border-r-[3px] border-r-[rgb(32,143,255)]">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              {paymentMethods.bank?.bankName && (
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-400">BANK</span>
+              )}
+              {paymentMethods.upi?.address && (
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400">UPI</span>
+              )}
+              {paymentMethods.upay?.address && (
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-400">UPAY</span>
+              )}
+              {paymentMethods.isDefault && <span className="text-[9px] text-muted-foreground">(Default)</span>}
+            </div>
+          </div>
+
+          {paymentMethods.bank?.bankName && (
+            <div className="mb-3 pb-3 border-b border-border/60 last:border-b-0 last:mb-0 last:pb-0">
+              <div className="flex items-center gap-1.5 mb-2">
+                <Banknote className="w-3.5 h-3.5 text-[rgb(32,143,255)]" />
+                <span className="text-[10px] font-bold text-foreground uppercase">Bank</span>
+              </div>
+              <StatRow label="Bank Name" value={paymentMethods.bank.bankName} />
+              <StatRow label="IFSC" value={paymentMethods.bank.ifsc || '—'} />
+              <StatRow label="Account No" value={paymentMethods.bank.accountNo || '—'} />
+            </div>
+          )}
+
+          {paymentMethods.upi?.address && (
+            <div className="mb-3 pb-3 border-b border-border/60 last:border-b-0 last:mb-0 last:pb-0">
+              <div className="flex items-center gap-1.5 mb-2">
+                <Smartphone className="w-3.5 h-3.5 text-emerald-500" />
+                <span className="text-[10px] font-bold text-foreground uppercase">UPI</span>
+              </div>
+              <StatRow label="UPI ID" value={paymentMethods.upi.address} />
+            </div>
+          )}
+
+          {paymentMethods.upay?.address && (
+            <div className="mb-3 pb-3 border-b border-border/60 last:border-b-0 last:mb-0 last:pb-0">
+              <div className="flex items-center gap-1.5 mb-2">
+                <CreditCard className="w-3.5 h-3.5 text-purple-500" />
+                <span className="text-[10px] font-bold text-foreground uppercase">UPAY</span>
+              </div>
+              <StatRow label="RPL ID" value={paymentMethods.upay.address} />
+            </div>
+          )}
+
+          {paymentMethods.holderName && (
+            <StatRow label="Holder Name" value={paymentMethods.holderName} />
+          )}
+
+          <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/60">
+            <Button variant="outline" size="sm" className="h-7 text-[10px] px-2" onClick={() => {
+              setPaymentType('BANK');
+              setBankName(paymentMethods.bank?.bankName || '');
+              setBankCode(paymentMethods.bank?.ifsc || '');
+              setAccountNumber(paymentMethods.bank?.accountNo || '');
+              setAccountHolder(paymentMethods.holderName || '');
+              setUpiId(paymentMethods.upi?.address || '');
+              setRplId(paymentMethods.upay?.address || '');
+              setPaymentDialogOpen(true);
+            }}>
+              Edit
+            </Button>
+          </div>
+        </SectionCard>
       )}
 
       {user?.userId && (
         <UserTurnover userId={user.userId} />
       )}
 
-      {account?.bindAccount && (
-        <div className="bg-card border border-border p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-              <Banknote className="w-4 h-4" />
-              Bound Bank Account
-            </h3>
-            <Button variant="outline" size="sm" onClick={() => {
-              const b = account.bindAccount;
-              setBankName(b.bankName || '');
-              setBankCode(b.bankCode || '');
-              setAccountNumber(b.accountNumber || '');
-              setAccountHolder(b.accountHolder || '');
-              setBankDialogOpen(true);
-            }}>
-              Override Bank
-            </Button>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            <InfoRow label="Bank Name" value={account.bindAccount.bankName} />
-            <InfoRow label="IFSC Code" value={account.bindAccount.bankCode} />
-            <InfoRow label="Account Number" value={account.bindAccount.accountNumber} />
-            <InfoRow label="Holder Name" value={account.bindAccount.accountHolder} />
-            <InfoRow label="Bound At" value={account.bindAccount.boundAt ? new Date(account.bindAccount.boundAt).toLocaleString() : '—'} />
-          </div>
-        </div>
-      )}
 
-      {deviceRisk && (
-        <div className="bg-card border border-border p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-              <ShieldAlert className="w-4 h-4" />
-              Device Risk Assessment
-            </h3>
-            <div className="flex items-center gap-2">
-              <span className={`px-2 py-0.5 text-xs font-medium ${deviceRisk.flagged
-                  ? 'bg-red-500/20 text-red-400'
-                  : 'bg-green-500/20 text-green-400'
-                }`}>
-                {deviceRisk.flagged ? 'Flagged' : 'Safe'}
-              </span>
-              <span className="text-[10px] text-muted-foreground">
-                Risk: {deviceRisk.latestRisk}/100 (Max: {deviceRisk.maxRisk})
-              </span>
-            </div>
-          </div>
-
-          {deviceRisk.signals && deviceRisk.signals.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {deviceRisk.signals.map((signal: string, i: number) => (
-                <span key={i} className="px-1.5 py-0.5 bg-yellow-500/20 text-yellow-400 text-[10px]">
-                  {signal}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            <div className="bg-secondary/30 p-3 space-y-1.5">
-              <h4 className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                <Smartphone className="w-3.5 h-3.5" /> Device Info
-              </h4>
-              <InfoRow label="Device ID" value={deviceRisk.latest?.deviceId || '—'} />
-              <InfoRow label="Ad ID" value={deviceRisk.latest?.adId || '—'} />
-              <InfoRow label="Fingerprint" value={deviceRisk.latest?.fingerprint || '—'} />
-              <InfoRow label="Platform" value={deviceRisk.latest?.platform || '—'} />
-              <InfoRow label="Browser" value={deviceRisk.latest?.browser || '—'} />
-              <InfoRow label="OS" value={deviceRisk.latest?.os || '—'} />
-              <InfoRow label="Resolution" value={deviceRisk.latest?.screenResolution || '—'} />
-              <InfoRow label="Memory" value={deviceRisk.latest?.deviceMemory ? `${deviceRisk.latest.deviceMemory}GB` : '—'} />
-            </div>
-
-            <div className="bg-secondary/30 p-3 space-y-1.5">
-              <h4 className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5" /> Network Info
-              </h4>
-              <InfoRow label="IP" value={deviceRisk.latest?.ip || '—'} />
-              <InfoRow label="Country" value={deviceRisk.latest?.ipCountry || '—'} />
-              <InfoRow label="City" value={deviceRisk.latest?.ipCity || '—'} />
-              <InfoRow label="ISP" value={deviceRisk.latest?.isp || '—'} />
-              <InfoRow label="ASN" value={deviceRisk.latest?.asn || '—'} />
-              <InfoRow label="Proxy" value={deviceRisk.latest?.proxy ? 'Yes' : 'No'} />
-              <InfoRow label="VPN" value={deviceRisk.latest?.vpnDetected ? 'Yes' : 'No'} />
-            </div>
-
-            <div className="bg-secondary/30 p-3 space-y-1.5">
-              <h4 className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                <Fingerprint className="w-3.5 h-3.5" /> Payment & Stats
-              </h4>
-              <InfoRow label="Payment Hash" value={deviceRisk.latest?.paymentMethodHash || '—'} />
-              <InfoRow label="Last Seen" value={deviceRisk.latest?.at ? new Date(deviceRisk.latest.at).toLocaleString() : '—'} />
-              <InfoRow label="Total Logs" value={deviceRisk.totalLogs || 0} />
-            </div>
-          </div>
-        </div>
-      )}
 
       <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
         <DialogContent>
@@ -271,7 +314,7 @@ const UserSearch = () => {
               <select
                 value={newStatus}
                 onChange={(e) => setNewStatus(e.target.value as any)}
-                className="w-full h-8 border border-input bg-background px-2 text-xs"
+                className="w-full h-8 border border-input bg-background px-2 text-xs rounded"
               >
                 <option value="active">Active</option>
                 <option value="suspended">Suspended</option>
@@ -279,11 +322,13 @@ const UserSearch = () => {
               </select>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium">Remark (optional)</label>
+              <label className="text-xs font-medium">
+                Remark {newStatus !== 'active' ? <span className="text-rose-400">*</span> : '(optional)'}
+              </label>
               <Input
                 value={statusRemark}
                 onChange={(e) => setStatusRemark(e.target.value)}
-                placeholder="Reason for status change..."
+                placeholder={newStatus !== 'active' ? 'Required: reason for ban/suspend...' : 'Optional reason...'}
               />
             </div>
           </div>
@@ -297,33 +342,61 @@ const UserSearch = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={bankDialogOpen} onOpenChange={setBankDialogOpen}>
+      <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-sm">Override Bank Account</DialogTitle>
+            <DialogTitle className="text-sm">Edit Payment Details</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1">
-              <label className="text-xs font-medium">Bank Name</label>
-              <Input value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="e.g., HDFC" />
+              <label className="text-xs font-medium">Payment Type</label>
+              <select
+                value={paymentType}
+                onChange={(e) => setPaymentType(e.target.value as any)}
+                className="w-full h-8 border border-input bg-background px-2 text-xs rounded"
+              >
+                <option value="BANK">Bank Account</option>
+                <option value="UPI">UPI</option>
+                <option value="UPAY">UPAY</option>
+              </select>
             </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium">IFSC Code</label>
-              <Input value={bankCode} onChange={(e) => setBankCode(e.target.value)} placeholder="e.g., HDFC0001234" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium">Account Number</label>
-              <Input value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="e.g., XXXXXX4321" />
-            </div>
+            {paymentType === 'BANK' && (
+              <>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">Bank Name</label>
+                  <Input value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="e.g., SBI" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">IFSC Code</label>
+                  <Input value={bankCode} onChange={(e) => setBankCode(e.target.value)} placeholder="e.g., SBIN0001234" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">Account Number</label>
+                  <Input value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="e.g., 1234567890" />
+                </div>
+              </>
+            )}
+            {paymentType === 'UPI' && (
+              <div className="space-y-1">
+                <label className="text-xs font-medium">UPI ID</label>
+                <Input value={upiId} onChange={(e) => setUpiId(e.target.value)} placeholder="e.g., name@paytm" />
+              </div>
+            )}
+            {paymentType === 'UPAY' && (
+              <div className="space-y-1">
+                <label className="text-xs font-medium">RPL ID</label>
+                <Input value={rplId} onChange={(e) => setRplId(e.target.value)} placeholder="e.g., RPL123456" />
+              </div>
+            )}
             <div className="space-y-1">
               <label className="text-xs font-medium">Account Holder</label>
-              <Input value={accountHolder} onChange={(e) => setAccountHolder(e.target.value)} placeholder="e.g., Rahul" />
+              <Input value={accountHolder} onChange={(e) => setAccountHolder(e.target.value)} placeholder="e.g., John Doe" />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" size="sm" onClick={() => setBankDialogOpen(false)}>Cancel</Button>
-            <Button size="sm" onClick={handleBankOverride} disabled={bankLoading || !bankName || !bankCode || !accountNumber || !accountHolder}>
-              {bankLoading && <Loading size={14} />}
+            <Button variant="outline" size="sm" onClick={() => setPaymentDialogOpen(false)}>Cancel</Button>
+            <Button size="sm" onClick={handlePaymentUpdate} disabled={paymentLoading}>
+              {paymentLoading && <Loading size={14} />}
               Save
             </Button>
           </DialogFooter>
@@ -332,14 +405,5 @@ const UserSearch = () => {
     </div>
   );
 };
-
-const InfoRow = ({ label, value }: { label: string; value: any }) => (
-  <div className="flex justify-between items-center py-0.5 border-b border-border last:border-0">
-    <span className="text-xs text-muted-foreground">{label}</span>
-    <span className="text-xs font-medium text-foreground">
-      {typeof value === 'object' && value !== null && value.$$typeof ? value : (String(value ?? '—'))}
-    </span>
-  </div>
-);
 
 export default UserSearch;

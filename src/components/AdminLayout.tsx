@@ -18,13 +18,10 @@ import {
   ArrowRightLeft,
   Gift,
   Dices,
-  ChevronLeft as ChevronLeftIcon,
-  ChevronRight as ChevronRightIcon,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import TagsView from "@/components/TagsView";
 import { useAuth } from "@/contexts/AuthContext";
-import { cn } from "@/lib/utils";
 import Logo from "@/assets/logo.png";
 
 const navItems = [
@@ -46,7 +43,7 @@ const navItems = [
 
 const AdminLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [desktopOpen, setDesktopOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, isAuthenticated, isLoading, user } = useAuth();
@@ -144,39 +141,36 @@ const AdminLayout = () => {
           color: hsl(var(--foreground));
         }
         .el-table tbody { font-size: 12px; }
+        .el-table tbody tr:nth-child(even) { background-color: rgba(32, 143, 255, 0.04); }
         .el-table tbody tr { transition: background-color 0.25s ease; }
         .el-table tbody tr:hover { background-color: hsl(var(--accent) / 0.12); }
         .el-table .cell { box-sizing: border-box; padding: 0 5px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.5); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.7); }
       `}</style>
       
-      {/* Desktop Sidebar */}
-      <aside 
-        className={cn(
-          "fixed top-0 left-0 h-full z-[1001] flex-col border-r border-border bg-card transition-all duration-300 hidden lg:flex",
-          sidebarCollapsed ? "w-12" : "w-[150px]"
-        )}
+      {/* Desktop Overlay */}
+      {desktopOpen && (
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+          onClick={() => setDesktopOpen(false)}
+        />
+      )}
+
+      {/* Desktop Drawer */}
+      <aside
+        className={`fixed top-0 left-0 h-full z-50 w-48 bg-card border-r border-border flex flex-col transform transition-transform duration-300 ${
+          desktopOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
-        {/* Toggle Button */}
-        <button
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="absolute -right-3 top-[39px] z-20 bg-card border border-border rounded-full p-0.5 shadow-sm hover:bg-secondary transition-colors"
-        >
-          {sidebarCollapsed ? (
-            <ChevronRightIcon className="w-3.5 h-3.5" />
-          ) : (
-            <ChevronLeftIcon className="w-3.5 h-3.5" />
-          )}
-        </button>
-
-        {/* Logo Header */}
-        <div className="h-9 flex items-center justify-center bg-[rgb(32,143,255)] text-white overflow-hidden flex-shrink-0">
-          {sidebarCollapsed ? (
-            <img src={Logo} alt="Logo" className="w-4 h-4 object-contain brightness-0 invert" />
-          ) : (
-            <span className="text-[11px] font-bold tracking-wide">Customer Service System</span>
-          )}
+        <div className="h-9 flex items-center justify-between px-2.5 bg-[rgb(32,143,255)] text-white flex-shrink-0">
+          <span className="text-[11px] font-bold tracking-wide">System</span>
+          <button onClick={() => setDesktopOpen(false)} className="text-white/80 hover:text-white">
+            <X className="w-4 h-4" />
+          </button>
         </div>
-
         <div className="flex-1 overflow-y-auto no-scrollbar py-0">
           <nav className="flex flex-col gap-0">
             {navItems.map((item) => (
@@ -184,16 +178,11 @@ const AdminLayout = () => {
                 key={item.url}
                 to={item.url}
                 end={item.url === "/dashboard"}
-                className={cn(
-                  "flex items-center h-9 px-2.5 text-muted-foreground hover:bg-secondary/50 hover:text-foreground transition-colors text-xs font-medium",
-                  sidebarCollapsed && "justify-center px-0"
-                )}
+                className="flex items-center h-9 px-2.5 text-foreground hover:bg-secondary/50 transition-colors text-[11px] font-medium"
                 activeClassName="!text-[#208fff] !bg-[#208fff]/10"
-                onClick={() => setMobileOpen(false)}
-                title={sidebarCollapsed ? item.title : undefined}
+                onClick={() => setDesktopOpen(false)}
               >
-                <item.icon className="w-3.5 h-3.5 flex-shrink-0" />
-                {!sidebarCollapsed && <span className="ml-2 truncate">{item.title}</span>}
+                <span className="truncate">{item.title}</span>
               </NavLink>
             ))}
           </nav>
@@ -201,14 +190,10 @@ const AdminLayout = () => {
         <div className="border-t border-border">
           <button
             onClick={handleLogout}
-            className={cn(
-              "flex items-center h-9 w-full px-2.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-xs font-medium",
-              sidebarCollapsed && "justify-center px-0"
-            )}
-            title={sidebarCollapsed ? "Logout" : undefined}
+            className="flex items-center h-9 w-full px-2.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors text-xs font-medium"
           >
             <LogOut className="w-3.5 h-3.5 flex-shrink-0" />
-            {!sidebarCollapsed && <span className="ml-2">Logout</span>}
+            <span className="ml-2">Logout</span>
           </button>
         </div>
       </aside>
@@ -228,7 +213,7 @@ const AdminLayout = () => {
         }`}
       >
         <div className="h-9 flex items-center justify-between px-2.5 bg-[rgb(32,143,255)] text-white flex-shrink-0">
-          <span className="text-[11px] font-bold tracking-wide">Customer Service System</span>
+          <span className="text-[11px] font-bold tracking-wide">System</span>
           <button onClick={() => setMobileOpen(false)} className="text-white/80 hover:text-white">
             <X className="w-4 h-4" />
           </button>
@@ -240,12 +225,11 @@ const AdminLayout = () => {
                 key={item.url}
                 to={item.url}
                 end={item.url === "/dashboard"}
-                className="flex items-center h-9 px-2.5 text-muted-foreground hover:bg-secondary/50 hover:text-foreground transition-colors text-xs font-medium"
+                className="flex items-center h-9 px-2.5 text-foreground hover:bg-secondary/50 transition-colors text-[11px] font-medium"
                 activeClassName="!text-[#208fff] !bg-[#208fff]/10"
                 onClick={() => setMobileOpen(false)}
               >
-                <item.icon className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="ml-2 truncate">{item.title}</span>
+                <span className="truncate">{item.title}</span>
               </NavLink>
             ))}
           </nav>
@@ -262,9 +246,15 @@ const AdminLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <div className={cn("flex-1 flex flex-col min-w-0 transition-all duration-300", sidebarCollapsed ? "lg:ml-12" : "lg:ml-[150px]")}>
+      <div className="flex-1 flex flex-col min-w-0">
         <header className="h-10 border-b border-border bg-card flex items-center justify-between px-3 lg:px-4">
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setDesktopOpen(true)}
+              className="hidden lg:inline-flex text-muted-foreground hover:text-foreground"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
             <button
               onClick={() => setMobileOpen(true)}
               className="lg:hidden text-muted-foreground hover:text-foreground"

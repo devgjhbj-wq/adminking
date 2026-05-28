@@ -40,12 +40,22 @@ export const fetchDashboard = (params?: { period?: string; date?: string }) => {
 export const searchUser = (userId: string) => api.get(`/api/admin/user?userId=${userId}`);
 
 // Change User Status
-export const updateUserStatus = (userId: number, status: 'active' | 'suspended' | 'inactive', remark?: string) =>
+export const updateUserStatus = (userId: number, status: 'active' | 'suspended' | 'ban' | 'banned' | 'inactive', remark?: string) =>
   api.patch('/api/admin/user', { userId, status, remark });
 
-// Override User Bank
-export const overrideUserBank = (userId: number, bankName: string, bankCode: string, accountNumber: string, accountHolder: string) =>
-  api.put('/api/admin/user/bind-bank', { userId, bankName, bankCode, accountNumber, accountHolder });
+// Update User Payment (BANK, UPI, UPAY)
+export const updateUserPayment = (userId: number, type: 'BANK' | 'UPI' | 'UPAY', data: Record<string, any>) =>
+  api.put('/api/admin/user/payments', { userId, type, ...data });
+
+// Search users by IP
+export const searchUsersByIp = (ip: string) => api.get(`/api/admin/users-by-ip?ip=${ip}`);
+
+// View user payment methods (single doc)
+export const fetchUserPaymentMethods = (userId: number) => api.get(`/api/admin/user/payment-methods?userId=${userId}`);
+
+// Partially update a payment method document by ID
+export const updateUserPaymentMethodById = (id: string, data: Record<string, any>) =>
+  api.put(`/api/admin/user/payment-methods/${id}`, data);
 
 // Transactions
 /**

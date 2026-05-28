@@ -43,24 +43,35 @@ const AdminLogs = () => {
   return (
     <PageContainer>
       <SearchHeader>
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">Level</label>
-        <select
-          value={level}
-          onChange={(e) => setLevel(e.target.value as '' | 'info' | 'error')}
-          className="w-[200px] h-[26px] rounded-md border border-input bg-background px-2.5 text-xs text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        >
-          <option value="">All</option>
-          <option value="info">Info</option>
-          <option value="error">Error</option>
-        </select>
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Since</label>
-        <Input type="datetime-local" value={since} onChange={(e) => setSince(e.target.value)} className="w-[200px] h-[26px] text-xs" />
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Limit</label>
-        <Input type="number" min={1} max={1000} value={limit} onChange={(e) => setLimit(Number(e.target.value))} className="w-[200px] h-[26px] text-xs" />
-        <Button onClick={loadLogs} disabled={loading} className="h-[26px] px-2.5 rounded-[5px] gap-1 text-xs" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
-          {loading ? <Loading size={14} /> : <RefreshCw className="w-3.5 h-3.5" />}
-          Apply
-        </Button>
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Level</label>
+          <select
+            value={level}
+            onChange={(e) => setLevel(e.target.value as '' | 'info' | 'error')}
+            className="w-[200px] h-[26px] rounded-md border border-input bg-background px-2.5 text-xs text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          >
+            <option value="">All</option>
+            <option value="info">Info</option>
+            <option value="error">Error</option>
+          </select>
+        </span>
+
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Since</label>
+          <Input type="datetime-local" value={since} onChange={(e) => setSince(e.target.value)} className="w-[200px] h-[26px] text-xs" />
+        </span>
+
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Limit</label>
+          <Input type="number" min={1} max={1000} value={limit} onChange={(e) => setLimit(Number(e.target.value))} className="w-[200px] h-[26px] text-xs" />
+        </span>
+
+        <span className="inline-flex items-center shrink-0">
+          <Button onClick={loadLogs} disabled={loading} className="h-[26px] px-2.5 rounded-[5px] gap-1 text-xs" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
+            {loading ? <Loading size={14} /> : <RefreshCw className="w-3.5 h-3.5" />}
+            Apply
+          </Button>
+        </span>
       </SearchHeader>
 
       <div className="relative rounded" style={{ height: 445, border: '1px solid hsl(var(--border))' }}>

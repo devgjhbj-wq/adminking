@@ -242,67 +242,73 @@ const Deposits = () => {
   return (
     <PageContainer>
       <SearchHeader>
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">User ID</label>
-        <Input
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          placeholder="User ID"
-          className="w-[180px] h-[26px] text-xs px-1.5"
-        />
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Phone</label>
-        <Input
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder="Phone Number"
-          className="w-[180px] h-[26px] text-xs px-1.5"
-        />
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Status</label>
-        <select
-          className="w-[180px] h-[26px] rounded border border-input bg-background px-1.5 text-xs"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          <option value="">All</option>
-          <option value="PENDING">Pending</option>
-          <option value="SUCCESS">Success</option>
-          <option value="FAILED">Failed</option>
-        </select>
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Created</label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-[216px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]",
-                !createdDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-1 h-3 w-3" />
-              {createdDate ? format(createdDate, "MMM dd, yyyy") : "Created Date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={createdDate}
-              onSelect={setCreatedDate}
-              initialFocus
-              captionLayout="dropdown-buttons"
-              fromYear={2024}
-              toYear={2026}
-            />
-          </PopoverContent>
-        </Popover>
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Date Range</label>
-        <div className="flex items-center gap-[3px]">
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">User ID</label>
+          <Input
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+            placeholder="User ID"
+            className="w-[180px] h-[26px] text-xs px-1.5"
+          />
+        </span>
+
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Phone</label>
+          <Input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="Phone Number"
+            className="w-[180px] h-[26px] text-xs px-1.5"
+          />
+        </span>
+
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Status</label>
+          <select
+            className="w-[180px] h-[26px] rounded border border-input bg-background px-1.5 text-xs"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="">All</option>
+            <option value="PENDING">Pending</option>
+            <option value="SUCCESS">Success</option>
+            <option value="FAILED">Failed</option>
+          </select>
+        </span>
+
+        <span className="inline-flex items-center shrink-0 gap-[5px]">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap">Created</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className={cn(
-                  "w-[156px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]",
-                  !dateFrom && "text-muted-foreground"
-                )}
+                className="w-[216px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]"
+              >
+                <CalendarIcon className="mr-1 h-3 w-3" />
+                {createdDate ? format(createdDate, "MMM dd, yyyy") : "Created Date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={createdDate}
+                onSelect={setCreatedDate}
+                initialFocus
+                captionLayout="dropdown-buttons"
+                fromYear={2024}
+                toYear={2026}
+              />
+            </PopoverContent>
+          </Popover>
+        </span>
+
+        <span className="inline-flex items-center shrink-0 gap-[5px]">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap">Date Range</label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-[156px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]"
               >
                 <CalendarIcon className="mr-1 h-3 w-3" />
                 {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}
@@ -320,15 +326,12 @@ const Deposits = () => {
               />
             </PopoverContent>
           </Popover>
-          <span className="text-muted-foreground text-xs">to</span>
+          <span className="text-foreground text-xs">to</span>
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className={cn(
-                  "w-[156px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]",
-                  !dateTo && "text-muted-foreground"
-                )}
+                className="w-[156px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]"
               >
                 <CalendarIcon className="mr-1 h-3 w-3" />
                 {dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}
@@ -346,25 +349,28 @@ const Deposits = () => {
               />
             </PopoverContent>
           </Popover>
-        </div>
-        <Button
-          onClick={() => handleSearch(1)}
-          disabled={loading}
-          size="sm"
-          className="h-[26px] px-2.5 text-xs rounded-[5px]"
-          style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
-        >
-          {loading ? <Loading size={10} /> : null}
-          Search
-        </Button>
-        <Button
-          onClick={handleReset}
-          variant="outline"
-          size="sm"
-          className="h-[26px] px-2.5 text-xs rounded-[5px]"
-        >
-          Reset
-        </Button>
+        </span>
+
+        <span className="inline-flex items-center shrink-0">
+          <Button
+            onClick={() => handleSearch(1)}
+            disabled={loading}
+            size="sm"
+            className="h-[26px] px-2.5 text-xs rounded-[5px]"
+            style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+          >
+            {loading ? <Loading size={10} /> : null}
+            Search
+          </Button>
+          <Button
+            onClick={handleReset}
+            variant="outline"
+            size="sm"
+            className="h-[26px] px-2.5 text-xs rounded-[5px]"
+          >
+            Reset
+          </Button>
+        </span>
       </SearchHeader>
 
       {results && (

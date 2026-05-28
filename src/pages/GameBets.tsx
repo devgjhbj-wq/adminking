@@ -150,28 +150,42 @@ const GameBets = () => {
   return (
     <PageContainer>
       <SearchHeader>
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">Member</label>
-        <SearchBar 
-          value={member} 
-          onChange={setMember} 
-          onSearch={() => handleSearch(1)} 
-          placeholder="e.g., u123456" 
-          loading={loading}
-          storageKey="game_bets_member_search"
-          maxHistory={10}
-        />
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">Site</label>
-        <Input value={site} onChange={(e) => setSite(e.target.value)} placeholder="e.g., JE" className="w-[200px] h-[26px] text-xs" />
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">From</label>
-        <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-[200px] h-[26px] text-xs" />
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">To</label>
-        <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-[200px] h-[26px] text-xs" />
-        <Button onClick={() => handleSearch(1)} disabled={loading} className="h-[26px] px-2.5 rounded-[5px] gap-1 text-xs" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
-          <Search className="w-3.5 h-3.5" /> Search
-        </Button>
-        <Button onClick={handleSync} disabled={syncing} variant="secondary" className="h-8 gap-1 text-xs">
-          <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} /> Sync Bets
-        </Button>
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Member</label>
+          <SearchBar 
+            value={member} 
+            onChange={setMember} 
+            onSearch={() => handleSearch(1)} 
+            placeholder="e.g., u123456" 
+            loading={loading}
+            storageKey="game_bets_member_search"
+            maxHistory={10}
+          />
+        </span>
+
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Site</label>
+          <Input value={site} onChange={(e) => setSite(e.target.value)} placeholder="e.g., JE" className="w-[200px] h-[26px] text-xs" />
+        </span>
+
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">From</label>
+          <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-[200px] h-[26px] text-xs" />
+        </span>
+
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">To</label>
+          <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-[200px] h-[26px] text-xs" />
+        </span>
+
+        <span className="inline-flex items-center shrink-0">
+          <Button onClick={() => handleSearch(1)} disabled={loading} className="h-[26px] px-2.5 rounded-[5px] gap-1 text-xs" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
+            <Search className="w-3.5 h-3.5" /> Search
+          </Button>
+          <Button onClick={handleSync} disabled={syncing} variant="secondary" className="h-[26px] px-2.5 rounded-[5px] gap-1 text-xs ml-[3px]">
+            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} /> Sync Bets
+          </Button>
+        </span>
       </SearchHeader>
 
       {data && data.summary && (

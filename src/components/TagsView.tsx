@@ -171,13 +171,13 @@ const TagsView = () => {
           user-select: none;
           transition: all 0.15s;
         }
-        .tags-view-item:hover { color: #42b983; }
+        .tags-view-item:hover { color: rgb(32,143,255); }
         .tags-view-item.active {
-          background-color: #42b983;
+          background-color: rgb(32,143,255);
           color: #fff;
-          border-color: #42b983;
+          border-color: rgb(32,143,255);
         }
-        .tags-view-item.active .tag-close:hover { background: #fff; color: #42b983; }
+        .tags-view-item.active .tag-close:hover { background: #fff; color: rgb(32,143,255); }
         .tag-close {
           width: 16px;
           height: 16px;
@@ -209,7 +209,7 @@ const TagsView = () => {
           cursor: pointer;
           transition: background 0.15s;
         }
-        .contextmenu li:hover { background: hsl(var(--secondary)); color: #42b983; }
+        .contextmenu li:hover { background: hsl(var(--secondary)); color: rgb(32,143,255); }
         .contextmenu li.disabled { color: hsl(var(--muted-foreground)); cursor: not-allowed; }
         .contextmenu li.disabled:hover { background: transparent; color: hsl(var(--muted-foreground)); }
       `}</style>

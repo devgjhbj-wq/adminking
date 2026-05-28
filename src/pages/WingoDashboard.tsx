@@ -201,7 +201,7 @@ const WingoDashboard = () => {
             onClick={() => setActiveTab(t)}
             className={`px-2 text-xs font-medium rounded transition-all ${
               activeTab === t
-                ? 'bg-[#42b983] text-white border border-[#42b983]'
+                ? 'bg-[rgb(32,143,255)] text-white border border-[rgb(32,143,255)]'
                 : 'text-muted-foreground border border-transparent hover:text-foreground hover:border-border'
             }`}
             style={{ height: 26, lineHeight: '26px', marginRight: 5 }}

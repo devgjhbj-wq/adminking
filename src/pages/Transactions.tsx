@@ -133,7 +133,7 @@ const Transactions = () => {
   return (
     <PageContainer>
       <SearchHeader>
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">User ID</label>
+        <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">User ID</label>
         <Input
           value={userId}
           onChange={(e) => setUserId(e.target.value)}

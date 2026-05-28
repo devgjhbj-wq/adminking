@@ -8,7 +8,7 @@ const PageContainer = ({ children, className }: { children: React.ReactNode; cla
 
 const SearchHeader = ({ children, className }: { children: React.ReactNode; className?: string }) => (
   <div className={cn("bg-card border border-border rounded-lg", className)}>
-    <div className="flex flex-wrap items-center pb-[5px] pt-1 px-1.5 gap-[5px] text-xs">{children}</div>
+    <div className="flex flex-wrap items-center pb-[5px] pt-1 px-1.5 gap-[10px] text-xs">{children}</div>
   </div>
 );
 

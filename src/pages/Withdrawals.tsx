@@ -10,7 +10,7 @@ import { CalendarIcon, ChevronLeft, ChevronRight, CheckCircle, XCircle, Info } f
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+
 import type { WithdrawalResponse, WithdrawalItem, WithdrawalConfig, WithdrawalFilters } from '@/types/withdrawal';
 import { PageContainer, SearchHeader, Pagination } from '@/components/PageContainer';
 
@@ -285,21 +285,21 @@ const Withdrawals = () => {
         )}
 
         <div style={{ height: '100%', overflowX: 'auto', overflowY: 'auto' }}>
-          <table className="el-table w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', minWidth: 1200 }}>
+          <table className="el-table" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', minWidth: 1680 }}>
             <colgroup>
               <col style={{ width: 95 }} />
-              <col style={{ width: 150 }} />
-              <col />
+              <col style={{ width: 160 }} />
+              <col style={{ width: 100 }} />
+              <col style={{ width: 80 }} />
               <col style={{ width: 90 }} />
+              <col style={{ width: 250 }} />
               <col style={{ width: 90 }} />
-              <col style={{ width: 220 }} />
-              <col />
+              <col style={{ width: 140 }} />
+              <col style={{ width: 90 }} />
               <col style={{ width: 130 }} />
-              <col style={{ width: 100 }} />
-              <col style={{ width: 120 }} />
-              <col />
-              <col />
-              <col style={{ width: 100 }} />
+              <col style={{ width: 150 }} />
+              <col style={{ width: 150 }} />
+              <col style={{ width: 90 }} />
             </colgroup>
             <thead style={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'hsl(var(--card))' }}>
               <tr style={{ height: 50 }}>
@@ -313,7 +313,7 @@ const Withdrawals = () => {
             <tbody>
               {showEmpty ? (
                 <tr>
-                  <td colSpan={13} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: 50, color: 'hsl(var(--muted-foreground))' }}>
+                  <td colSpan={13} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: 50, color: 'hsl(var(--muted-foreground))', overflow: 'hidden' }}>
                     <div className="flex flex-col items-center gap-2">
                       <svg className="w-12 h-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                       <span>No Data</span>
@@ -476,7 +476,7 @@ const Withdrawals = () => {
             onClick={() => setTab(t)}
             className={`px-2 text-xs font-medium rounded transition-all capitalize ${
               tab === t
-                ? 'bg-[#42b983] text-white border border-[#42b983]'
+                ? 'bg-[rgb(32,143,255)] text-white border border-[rgb(32,143,255)]'
                 : 'text-muted-foreground border border-transparent hover:text-foreground hover:border-border'
             }`}
             style={{ height: 26, lineHeight: '26px', marginRight: 5 }}
@@ -489,147 +489,134 @@ const Withdrawals = () => {
       {tab === 'orders' && (
       <>
       <SearchHeader>
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">User ID</label>
-        <Input
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          placeholder="User ID"
-          className="w-[180px] h-[26px] text-xs px-1.5"
-        />
-        <Button 
-          onClick={() => loadByUserId(1)} 
-          disabled={loading} 
-          size="sm"
-          className="h-[26px] px-2.5 text-xs rounded-[5px]"
-          style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
-        >
-          Search
-        </Button>
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">User ID</label>
+          <Input
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+            placeholder="User ID"
+            className="w-[180px] h-[26px] text-xs px-1.5"
+            onKeyDown={(e) => e.key === 'Enter' && loadByUserId(1)}
+          />
+        </span>
 
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Order ID</label>
-        <Input
-          value={orderId}
-          onChange={(e) => setOrderId(e.target.value)}
-          placeholder="Order ID"
-          className="w-[180px] h-[26px] text-xs px-1.5"
-        />
-        <Button 
-          onClick={loadByOrderId} 
-          disabled={loading} 
-          size="sm"
-          className="h-[26px] px-2.5 text-xs rounded-[5px]"
-          style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
-        >
-          Search
-        </Button>
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Order ID</label>
+          <Input
+            value={orderId}
+            onChange={(e) => setOrderId(e.target.value)}
+            placeholder="Order ID"
+            className="w-[180px] h-[26px] text-xs px-1.5"
+            onKeyDown={(e) => e.key === 'Enter' && loadByOrderId()}
+          />
+        </span>
 
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Status</label>
-        <select
-          className="w-[200px] h-[26px] rounded border border-input bg-background px-1.5 text-xs"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          <option value="">All Status</option>
-          <option value="PENDING">PENDING</option>
-          <option value="AUDITING">AUDITING</option>
-          <option value="SUCCESS">SUCCESS</option>
-          <option value="FAILED">FAILED</option>
-          <option value="CANCELLED">CANCELLED</option>
-        </select>
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Status</label>
+          <select
+            className="w-[200px] h-[26px] rounded border border-input bg-background px-1.5 text-xs"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="">All Status</option>
+            <option value="PENDING">PENDING</option>
+            <option value="AUDITING">AUDITING</option>
+            <option value="SUCCESS">SUCCESS</option>
+            <option value="FAILED">FAILED</option>
+            <option value="CANCELLED">CANCELLED</option>
+          </select>
+        </span>
 
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Charge</label>
-        <select
-          className="w-[200px] h-[26px] rounded border border-input bg-background px-1.5 text-xs"
-          value={chargeFrom}
-          onChange={(e) => setChargeFrom(e.target.value as 'user' | 'platform')}
-        >
-          <option value="user">User</option>
-          <option value="platform">Platform</option>
-        </select>
+        <span className="inline-flex items-center shrink-0">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Charge</label>
+          <select
+            className="w-[200px] h-[26px] rounded border border-input bg-background px-1.5 text-xs"
+            value={chargeFrom}
+            onChange={(e) => setChargeFrom(e.target.value as 'user' | 'platform')}
+          >
+            <option value="user">User</option>
+            <option value="platform">Platform</option>
+          </select>
+        </span>
 
-        <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Date</label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]",
-                !dateFrom && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-1 h-3 w-3" />
-              {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar 
-              mode="single" 
-              selected={dateFrom} 
-              onSelect={setDateFrom} 
-              initialFocus 
-              captionLayout="dropdown-buttons"
-              fromYear={2024}
-              toYear={2026}
-            />
-          </PopoverContent>
-        </Popover>
-        <span className="text-muted-foreground text-xs">to</span>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]",
-                !dateTo && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-1 h-3 w-3" />
-              {dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar 
-              mode="single" 
-              selected={dateTo} 
-              onSelect={setDateTo} 
-              initialFocus 
-              captionLayout="dropdown-buttons"
-              fromYear={2024}
-              toYear={2026}
-            />
-          </PopoverContent>
-        </Popover>
-        <button 
-          onClick={handleToday}
-          className="text-xs text-primary hover:underline"
-        >
-          Today
-        </button>
+        <span className="inline-flex items-center shrink-0 gap-[5px]">
+          <label className="text-xs font-medium text-foreground whitespace-nowrap">Date</label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-[155px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]"
+              >
+                <CalendarIcon className="mr-1 h-3 w-3 shrink-0" />
+                <span className="truncate">{dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar 
+                mode="single" 
+                selected={dateFrom} 
+                onSelect={setDateFrom} 
+                initialFocus 
+                captionLayout="dropdown-buttons"
+                fromYear={2024}
+                toYear={2026}
+              />
+            </PopoverContent>
+          </Popover>
+          <span className="text-foreground text-xs">to</span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-[155px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]"
+              >
+                <CalendarIcon className="mr-1 h-3 w-3 shrink-0" />
+                <span className="truncate">{dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar 
+                mode="single" 
+                selected={dateTo} 
+                onSelect={setDateTo} 
+                initialFocus 
+                captionLayout="dropdown-buttons"
+                fromYear={2024}
+                toYear={2026}
+              />
+            </PopoverContent>
+          </Popover>
+          <div className="w-[10px]" />
+          <Button 
+            onClick={handleToday}
+            size="sm"
+            className="h-[22px] px-2 text-[10px] rounded-[5px]"
+            style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+          >
+            Today
+          </Button>
+        </span>
 
-        <Button 
-          onClick={() => loadGlobalSearch(1)} 
-          disabled={loading} 
-          size="sm"
-          className="h-[26px] px-2.5 gap-1 text-xs rounded-[5px]"
-          style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
-        >
-          {loading && lastSearchType === 'global' ? <Loading size={12} /> : null}
-          Global Search
-        </Button>
-        <Button 
-          onClick={handleClear} 
-          variant="outline" 
-          size="sm"
-          className="h-[26px] px-2.5 text-xs rounded-[5px]"
-        >
-          Reset
-        </Button>
-        <LastUpdated 
-          timestamp={updatedAt} 
-          onRefresh={handleRefresh} 
-          loading={loading} 
-          compact 
-        />
+        <span className="inline-flex items-center shrink-0">
+          <Button 
+            onClick={handleClear}
+            size="sm"
+            className="h-[22px] px-2 text-[10px] rounded-[5px]"
+            style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+          >
+            Reset
+          </Button>
+          <Button 
+            onClick={() => loadGlobalSearch(1)} 
+            disabled={loading} 
+            size="sm"
+            className="h-[26px] px-2.5 gap-1 text-xs rounded-[5px] ml-[10px]"
+            style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+          >
+            {loading && lastSearchType === 'global' ? <Loading size={12} /> : null}
+            Global Search
+          </Button>
+        </span>
       </SearchHeader>
 
       {results && (

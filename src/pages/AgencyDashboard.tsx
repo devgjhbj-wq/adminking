@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { SearchHeader } from '@/components/PageContainer';
 import { ChevronLeft, ChevronRight, Save, RefreshCw, Play, Plus, CalendarIcon, Search } from 'lucide-react';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+
 
 const tabs = ['Stats', 'Daily', 'Team', 'Config'] as const;
 type Tab = typeof tabs[number];
@@ -214,7 +214,7 @@ const AgencyDashboard = () => {
             onClick={() => setTab(t)}
             className={`px-2 text-xs font-medium rounded transition-all ${
               tab === t
-                ? 'bg-[#42b983] text-white border border-[#42b983]'
+                ? 'bg-[rgb(32,143,255)] text-white border border-[rgb(32,143,255)]'
                 : 'text-muted-foreground border border-transparent hover:text-foreground hover:border-border'
             }`}
             style={{ height: 26, lineHeight: '26px', marginRight: 5 }}
@@ -228,7 +228,7 @@ const AgencyDashboard = () => {
       {tab === 'Stats' && (
         <div className="space-y-2">
           <SearchHeader>
-            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
+            <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
             <Input
               value={statsUserId}
               onChange={(e) => setStatsUserId(e.target.value)}
@@ -343,7 +343,7 @@ const AgencyDashboard = () => {
       {tab === 'Daily' && (
         <div className="space-y-2">
           <SearchHeader>
-            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
+            <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
             <Input
               value={dailyUserId}
               onChange={(e) => setDailyUserId(e.target.value)}
@@ -351,10 +351,10 @@ const AgencyDashboard = () => {
               className="w-[180px] h-[26px] text-xs px-1.5"
               onKeyDown={(e) => e.key === 'Enter' && loadDaily()}
             />
-            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Date</label>
+            <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px] ml-[3px]">Date</label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className={cn("w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]", !dailyDate && "text-muted-foreground")}>
+                <Button variant="outline" className="w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]">
                   <CalendarIcon className="mr-1 h-3 w-3" />
                   {dailyDate ? format(dailyDate, "MMM dd, yyyy") : "Select"}
                 </Button>
@@ -418,7 +418,7 @@ const AgencyDashboard = () => {
       {tab === 'Team' && (
         <div className="space-y-2">
           <SearchHeader>
-            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
+            <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
             <Input
               value={teamAgentId}
               onChange={(e) => setTeamAgentId(e.target.value)}
@@ -426,10 +426,10 @@ const AgencyDashboard = () => {
               className="w-[120px] h-[26px] text-xs px-1.5"
               onKeyDown={(e) => e.key === 'Enter' && loadTeam(1)}
             />
-            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">To</label>
+            <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px] ml-[3px]">To</label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className={cn("w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]", !teamToDate && "text-muted-foreground")}>
+                <Button variant="outline" className="w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]">
                   <CalendarIcon className="mr-1 h-3 w-3" />
                   {teamToDate ? format(teamToDate, "MMM dd, yyyy") : "Select"}
                 </Button>
@@ -438,10 +438,10 @@ const AgencyDashboard = () => {
                 <Calendar mode="single" selected={teamToDate} onSelect={setTeamToDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
               </PopoverContent>
             </Popover>
-            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">From</label>
+            <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px] ml-[3px]">From</label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className={cn("w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]", !teamFromDate && "text-muted-foreground")}>
+                <Button variant="outline" className="w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]">
                   <CalendarIcon className="mr-1 h-3 w-3" />
                   {teamFromDate ? format(teamFromDate, "MMM dd, yyyy") : "Select"}
                 </Button>
@@ -450,7 +450,7 @@ const AgencyDashboard = () => {
                 <Calendar mode="single" selected={teamFromDate} onSelect={setTeamFromDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
               </PopoverContent>
             </Popover>
-            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap mr-[3px] ml-[3px]">Tier</label>
+            <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px] ml-[3px]">Tier</label>
             <select value={teamTier} onChange={(e) => setTeamTier(e.target.value)} className="w-[80px] h-[26px] rounded border border-input bg-background px-2 text-xs">
               <option value="">All</option>
               <option value="1">1</option>
