@@ -144,7 +144,7 @@ const AdminLayout = () => {
         .el-table tbody tr:nth-child(even) { background-color: rgba(32, 143, 255, 0.04); }
         .el-table tbody tr { transition: background-color 0.25s ease; }
         .el-table tbody tr:hover { background-color: hsl(var(--accent) / 0.12); }
-        .el-table .cell { box-sizing: border-box; padding: 0 5px; }
+        .el-table .cell { box-sizing: border-box; padding: 0 5px; word-break: break-word; overflow-wrap: break-word; overflow: hidden; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.5); border-radius: 3px; }

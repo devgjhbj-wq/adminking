@@ -204,6 +204,9 @@ const Deposits = () => {
           .el-table .cell {
             box-sizing: border-box;
             padding: 0 5px;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            overflow: hidden;
           }
         `}</style>
 
