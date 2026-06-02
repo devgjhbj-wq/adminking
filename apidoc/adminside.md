@@ -1,4 +1,4 @@
-# Transaction API - Admin Side
+# Game API - Admin Side
 
 ## Base URL
 
@@ -8,7 +8,7 @@ https://backend-ledger-0ra6.onrender.com/api
 
 ## Authentication
 
-All admin endpoints require Bearer token with admin privileges:
+All endpoints require Bearer token with admin privileges:
 
 ```
 Authorization: Bearer <admin_token>
@@ -16,185 +16,111 @@ Authorization: Bearer <admin_token>
 
 ---
 
-## Search Transactions
-
-Search the transaction ledger by userId, orderId, or transactionId with optional filters.
+## Bet Search (All Bets by Member)
 
 ```
-GET /admin/transactions
+GET /api/game/all-bets?member=u12345&site=JE&status=1&dateFrom=2026-01-01&dateTo=2026-03-20&page=1&limit=50
 ```
 
-**Search by user:**
-
-```
-GET /admin/transactions?userId=123456&page=1&limit=25
-```
-
-**Search by order ID (deposit/withdrawal order):**
-
-```
-GET /admin/transactions?orderId=DEP123456
-```
-
-**Search by MongoDB transaction ID:**
-
-```
-GET /admin/transactions?transactionId=507f1f77bcf86cd799439011
-```
-
-**Combined with type and date filters:**
-
-```
-GET /admin/transactions?userId=123456&type=DEPOSIT&dateFrom=2026-03-01&dateTo=2026-03-31&page=1&limit=50
-```
+Search provider game bet records by member (userId). Requires admin privileges.
 
 **Query Params:**
-
 | Param | Type | Required | Description |
-|-------|------|----------|-------------|
-| userId | number | No* | Filter by user ID |
-| orderId | string | No* | Search by exact order ID (DEP/WD prefix) |
-| transactionId | string | No* | Search by MongoDB _id |
-| type | string | No | Filter by transaction type |
-| dateFrom | string | No | Start date (YYYY-MM-DD or ISO) |
-| dateTo | string | No | End date (YYYY-MM-DD or ISO) |
+|-------|------|---------|-------------|
+| member | string | Yes | Member ID (format: `u` + userId, e.g. `u12345`) |
+| site | string | No | Provider code: JE, PG, JD, TU |
+| status | number | No | Bet status (1=valid) |
+| dateFrom | string | No | Start date (YYYY-MM-DD) |
+| dateTo | string | No | End date (YYYY-MM-DD) |
 | page | number | No | Page number (default: 1) |
-| limit | number | No | Items per page (default: 25, max: 100) |
+| limit | number | No | Items per page (default: 50, max: 100) |
 
-*At least one of `userId`, `orderId`, or `transactionId` is required.
-
-**Transaction Types:**
-
-| Type | Description |
-|------|-------------|
-| `DEPOSIT` | Deposit credit |
-| `WITHDRAW` | Withdrawal debit |
-| `WITHDRAW_REFUND` | Withdrawal refund |
-| `BET` | Bet placement debit |
-| `WIN` | Bet win credit |
-| `REFUND` | Bet refund |
-| `BONUS` | Bonus credit |
-| `ADMIN` | Admin adjustment |
-| `SIGNUP_BONUS` | Signup bonus |
-| `FIRST_DEPOSIT_BONUS` | First deposit bonus |
-| `GIFT_CODE` | Gift code redemption |
-| `AGENT_COMMISSION` | Agent commission |
-| `gameIn` | Transfer to game wallet |
-| `gameOut` | Transfer from game wallet |
-
-**Response (by userId):**
+**Response:**
 
 ```json
 {
-  "filter": {
-    "userId": 123456
-  },
-  "total": 50,
+  "status": "success",
+  "member": "u12345",
   "page": 1,
-  "limit": 25,
+  "limit": 50,
+  "total": 25,
+  "summary": {
+    "totalBet": 5000,
+    "totalPayout": 3000,
+    "totalTurnover": 5000,
+    "netPnl": -2000
+  },
   "items": [
     {
-      "userId": 123456,
-      "type": "DEPOSIT",
-      "amount": 1000.0,
-      "charge": 0,
-      "balanceAfter": 2000.0,
-      "status": "SUCCESS",
-      "orderId": "DEP123456",
-      "remark": "Deposit via Paysimply",
-      "createdAt": "2026-03-19T10:30:00.000Z",
-      "updatedAt": "2026-03-19T10:30:00.000Z"
-    },
-    {
-      "userId": 123456,
-      "type": "WITHDRAW",
-      "amount": 500.0,
-      "charge": 0,
-      "balanceAfter": 1500.0,
-      "status": "PENDING",
-      "orderId": "WD1234567890123",
-      "remark": "Withdrawal request",
-      "createdAt": "2026-03-19T11:00:00.000Z",
-      "updatedAt": "2026-03-19T11:00:00.000Z"
+      "_id": "...",
+      "bet": 200,
+      "payout": 100,
+      "turnover": 200,
+      "gameId": "51",
+      "betTime": "2026-03-19T10:30:00.000Z",
+      "createdAt": "2026-03-19T10:30:00.000Z"
     }
   ]
 }
 ```
 
-**Response (by orderId — single result):**
-
-```json
-{
-  "filter": {
-    "orderId": "DEP123456"
-  },
-  "total": 1,
-  "page": 1,
-  "limit": 25,
-  "items": [
-    {
-      "userId": 123456,
-      "type": "DEPOSIT",
-      "amount": 1000.0,
-      "charge": 0,
-      "balanceAfter": 2000.0,
-      "status": "SUCCESS",
-      "orderId": "DEP123456",
-      "remark": "Deposit via Paysimply",
-      "createdAt": "2026-03-19T10:30:00.000Z",
-      "updatedAt": "2026-03-19T10:30:00.000Z"
-    }
-  ]
-}
-```
-
-**Ledger Fields:**
-
-| Field | Type | Description |
-|-------|------|-------------|
-| userId | number | User ID |
-| type | string | Transaction type |
-| amount | number | Transaction amount (+ve credit, -ve debit) |
-| charge | number | Fee charged |
-| balanceAfter | number | Wallet balance after transaction |
-| status | string | PENDING, SUCCESS, FAILED |
-| orderId | string | Related order ID (deposit/withdraw orders) |
-| remark | string | Free-text note |
-| createdAt | datetime | When transaction occurred |
-| updatedAt | datetime | Last update timestamp |
+| Field | Description |
+|-------|-------------|
+| items[].bet | Bet amount |
+| items[].payout | Payout amount |
+| items[].turnover | Turnover amount |
+| items[].gameId | Game ID |
+| totalBet | Sum of all bet amounts in current page |
+| totalPayout | Sum of all payouts in current page |
+| totalTurnover | Sum of all turnover amounts |
+| netPnl | totalPayout - totalBet (negative = platform profit) |
 
 ---
 
-## Error Responses
+## Move Game Balance to Wallet
 
-### 400 Bad Request
-
-```json
-{
-  "msg": "Provide userId, orderId, or transactionId"
-}
+```
+POST /admin/move-game-to-wallet
 ```
 
-### 400 Invalid Transaction ID
+**Options:**
 
 ```json
-{
-  "msg": "Invalid transactionId"
-}
+// Single user
+{ "userId": 100001, "providerCode": "JE" }
+
+// Range of users
+{ "userId": 100001, "userIdTo": 100050, "providerCode": "ALL" }
+
+// Array of users
+{ "userIds": [100001, 100002, 100003], "providerCode": "ALL" }
 ```
 
-### 400 Invalid Type
+| Param | Type | Required | Description |
+|-------|------|---------|-------------|
+| userId | number | Yes* | Start user ID |
+| userIdTo | number | No | End user ID for range |
+| userIds | array | Yes* | Array of user IDs |
+| providerCode | string | No | PG, JE, JD, TU, or ALL (default: ALL) |
+
+**Response:**
 
 ```json
 {
-  "msg": "Invalid type. Must be one of: DEPOSIT, WITHDRAW, ..."
-}
-```
-
-### 404 Not Found
-
-```json
-{
-  "msg": "No transactions found"
+  "status": "success",
+  "msg": "Balance moved from all games to wallet",
+  "totalUsersProcessed": 50,
+  "totalAmountMoved": 5000,
+  "users": [
+    {
+      "userId": 100001,
+      "success": true,
+      "providers": [
+        { "provider": "JE", "amount": 100, "success": true, "referenceId": "GMOUT123456" }
+      ],
+      "moved": 100,
+      "walletBalance": 1100
+    }
+  ]
 }
 ```
