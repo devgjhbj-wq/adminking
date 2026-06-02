@@ -18,7 +18,7 @@ const navLookup: Record<string, string> = {
   '/dashboard/vip-config': 'VIP Config',
   '/dashboard/turnover-config': 'Turnover Config',
   '/dashboard/logs': 'Admin Logs',
-  '/dashboard/game-bets': 'Game Bets',
+  '/dashboard/bet-records': 'Bet Records',
   '/dashboard/move-game': 'Move Game Bal',
   '/dashboard/wingo': 'Wingo',
 };

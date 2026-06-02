@@ -33,7 +33,7 @@ const navItems = [
   { title: "Agency", url: "/dashboard/agency", icon: UserCheck },
   { title: "VIP Config", url: "/dashboard/vip-config", icon: Crown },
   { title: "Turnover Config", url: "/dashboard/turnover-config", icon: RefreshCcw },
-  { title: "Game Bets", url: "/dashboard/game-bets", icon: Gamepad2 },
+  { title: "Bet Records", url: "/dashboard/bet-records", icon: Gamepad2 },
   { title: "Move Game Bal", url: "/dashboard/move-game", icon: ArrowRightLeft },
   { title: "Wingo", url: "/dashboard/wingo", icon: Dices },
 ];

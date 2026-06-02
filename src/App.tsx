@@ -16,7 +16,7 @@ import AgentStats from "./pages/AgencyDashboard";
 import AdminLogs from "./pages/AdminLogs";
 import VipConfig from "./pages/VipConfig";
 import TurnoverConfig from "./pages/TurnoverConfig";
-import GameBets from "./pages/GameBets";
+import BetRecords from "./pages/BetRecords";
 import MoveGameBalance from "./pages/MoveGameBalance";
 import WingoDashboard from "./pages/WingoDashboard";
 import NotFound from "./pages/NotFound";
@@ -43,7 +43,7 @@ const App = () => (
               <Route path="logs" element={<AdminLogs />} />
               <Route path="vip-config" element={<VipConfig />} />
               <Route path="turnover-config" element={<TurnoverConfig />} />
-              <Route path="game-bets" element={<GameBets />} />
+              <Route path="bet-records" element={<BetRecords />} />
               <Route path="move-game" element={<MoveGameBalance />} />
               <Route path="wingo" element={<WingoDashboard />} />
             </Route>
