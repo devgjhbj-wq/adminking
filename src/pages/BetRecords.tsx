@@ -159,18 +159,18 @@ const BetRecords = () => {
         <div style={{ height: '100%', overflowX: 'auto', overflowY: 'auto' }}>
           <table className="el-table" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', minWidth: 1100 }}>
             <colgroup>
-              <col style={{ width: 100 }} /><col style={{ width: 120 }} /><col style={{ width: 160 }} /><col style={{ width: 180 }} /><col style={{ width: 100 }} /><col style={{ width: 70 }} /><col style={{ width: 100 }} /><col style={{ width: 90 }} /><col style={{ width: 150 }} />
+              <col style={{ width: 100 }} /><col style={{ width: 160 }} /><col style={{ width: 180 }} /><col style={{ width: 100 }} /><col style={{ width: 70 }} /><col style={{ width: 100 }} /><col style={{ width: 90 }} /><col style={{ width: 150 }} />
             </colgroup>
             <thead style={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'hsl(var(--card))' }}>
               <tr style={{ height: 50 }}>
-                {['User ID', 'Mobile', 'Issue Number', 'Order Number', 'Bet Amount', 'Fee', 'Select Type', 'Status', 'Created At'].map((label) => (
+                {['User ID', 'Issue Number', 'Order Number', 'Bet Amount', 'Fee', 'Select Type', 'Status', 'Created At'].map((label) => (
                   <th key={label} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}><div className="cell">{label}</div></th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {showEmpty ? (
-                <tr><td colSpan={9} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: 50, color: 'hsl(var(--muted-foreground))', overflow: 'hidden' }}>
+                <tr><td colSpan={8} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: 50, color: 'hsl(var(--muted-foreground))', overflow: 'hidden' }}>
                   <div className="flex flex-col items-center gap-2">
                     <svg className="w-12 h-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                     <span>No Data</span>
@@ -180,7 +180,6 @@ const BetRecords = () => {
                 d.items.map((item: any, i: number) => (
                   <tr key={i} style={{ height: 50 }}>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}><div className="cell">{item.userId || '-'}</div></td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}><div className="cell">{item.mobile || '-'}</div></td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}><div className="cell" style={{ fontSize: 11, fontFamily: 'monospace' }}>{item.issueNumber || '-'}</div></td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}><div className="cell" style={{ fontSize: 11, fontFamily: 'monospace' }}>{item.orderNumber || '-'}</div></td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}><div className="cell">₹{item.betAmount?.toLocaleString() ?? '-'}</div></td>

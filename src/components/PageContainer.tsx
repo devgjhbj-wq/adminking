@@ -68,7 +68,7 @@ const Pagination = ({ page, totalPages, total, loading, onPageChange }: Paginati
   const btnBase = 'inline-flex items-center justify-center min-w-[25px] h-[25px] leading-[25px] text-xs rounded border bg-card px-1.5 transition-colors';
 
   return (
-    <div className="flex items-center justify-end mt-2">
+    <div className="flex items-center justify-end bg-card border border-border rounded-lg p-1.5 shadow-sm mt-2">
       <div className="flex items-center gap-1 text-xs text-muted-foreground">
         {total !== undefined && <span className="mr-2">Total {total}</span>}
         <button
