@@ -251,6 +251,19 @@ export const searchBetsByMember = (member: string, params?: { page?: number; lim
   return api.get(`/api/game/all-bets?${query.toString()}`);
 };
 
+export const searchWingoBets = (params?: { userId?: string; orderNumber?: string; issueNumber?: string; status?: string; page?: number; limit?: number }) => {
+  const query = new URLSearchParams();
+  if (params?.userId) query.set('userId', params.userId);
+  if (params?.orderNumber) query.set('orderNumber', params.orderNumber);
+  if (params?.issueNumber) query.set('issueNumber', params.issueNumber);
+  if (params?.status) query.set('status', params.status);
+  const page = params?.page || 1;
+  const limit = Math.min(params?.limit || 50, 100);
+  query.set('page', String(page));
+  query.set('limit', String(limit));
+  return api.get(`/api/wingo/all-bets?${query.toString()}`);
+};
+
 // Turnover Management
 export const fetchTurnoverConfig = () => api.get('/api/admin/turnover-config');
 

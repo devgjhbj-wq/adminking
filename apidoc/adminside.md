@@ -75,4 +75,61 @@ Search provider game bet records by member (userId). Requires admin privileges.
 | totalTurnover | Sum of all turnover amounts |
 | netPnl | totalPayout - totalBet (negative = platform profit) |
 
+---
+
+## Wingo Bet Search (All Bets)
+
+```
+GET /api/wingo/all-bets?userId=123&orderNumber=WGO123...&issueNumber=...&status=...&page=1&limit=50
+```
+
+Search Wingo bets. Admins can search by userId, orderNumber, issueNumber, and status.
+
+**Query Params:**
+| Param | Type | Required | Description |
+|-------|------|---------|-------------|
+| userId | number | No | Admin only — filter by user ID |
+| orderNumber | string | No | Admin only — filter by exact order number (unique) |
+| issueNumber | string | No | Filter by issue/round number |
+| status | string | No | Filter: `pending`, `won`, `lost` |
+| page | number | No | Page number (default: 1) |
+| limit | number | No | Items per page (default: 50, max: 100) |
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "page": 1,
+  "limit": 50,
+  "total": 1,
+  "summary": { "totalBet": 100, "totalPayout": 0 },
+  "items": [
+    {
+      "_id": "...",
+      "userId": "123",
+      "mobile": "9876543210",
+      "issueNumber": "202605100000001",
+      "orderNumber": "WGO1712345678901",
+      "betAmount": 100,
+      "fee": 0,
+      "selectType": "green",
+      "status": "pending",
+      "result": null,
+      "createdAt": "2026-03-19T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| totalBet | Sum of all bet amounts in current page |
+| totalPayout | Sum of all profit amounts in current page |
+| items[].mobile | User's mobile number (joined from user model) |
+| items[].orderNumber | Unique order number for this bet |
+| items[].selectType | Bet selection: red, green, violet, big, small, or 0-9 |
+| items[].status | Bet status: pending, won, lost |
+| items[].result | Result object with profitAmount, etc., or null if pending |
+
 
