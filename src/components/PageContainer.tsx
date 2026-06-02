@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, Search, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,8 @@ interface PaginationProps {
 }
 
 const Pagination = ({ page, totalPages, total, loading, onPageChange }: PaginationProps) => {
+  const [jumpVal, setJumpVal] = useState('');
+
   if (totalPages <= 1) return null;
 
   const getPageNumbers = () => {
@@ -54,44 +57,62 @@ const Pagination = ({ page, totalPages, total, loading, onPageChange }: Paginati
     return pages;
   };
 
+  const handleJump = () => {
+    const num = parseInt(jumpVal, 10);
+    if (num >= 1 && num <= totalPages) {
+      onPageChange(num);
+      setJumpVal('');
+    }
+  };
+
+  const btnBase = 'inline-flex items-center justify-center min-w-[25px] h-[25px] leading-[25px] text-xs rounded border bg-card px-1.5 transition-colors';
+
   return (
-    <div className="flex items-center justify-end bg-card border border-border rounded-lg p-1.5 gap-2 shadow-sm">
-      {total !== undefined && (
-        <span className="text-xs text-muted-foreground">Total {total}</span>
-      )}
-      <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 w-8 p-0"
+    <div className="flex items-center justify-end mt-2">
+      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+        {total !== undefined && <span className="mr-2">Total {total}</span>}
+        <button
+          className={`${btnBase} border-border hover:border-[rgb(32,143,255)] hover:text-[rgb(32,143,255)] ${page <= 1 ? 'opacity-40 cursor-not-allowed' : ''}`}
           disabled={page <= 1 || loading}
           onClick={() => onPageChange(page - 1)}
         >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        {getPageNumbers().map((p) => (
-          <Button
-            key={p}
-            variant={page === p ? "secondary" : "ghost"}
-            size="sm"
-            className={cn(
-              "h-8 w-8 p-0 text-xs font-medium",
-              page === p ? "text-primary" : "text-foreground"
-            )}
-            onClick={() => p !== page && onPageChange(p)}
-          >
-            {p}
-          </Button>
-        ))}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 w-8 p-0"
+          <ChevronLeft className="h-3.5 w-3.5" />
+        </button>
+        <ul className="flex items-center gap-1 p-0 m-0 list-none">
+          {getPageNumbers().map((p) => (
+            <li key={p} className="m-0 p-0">
+              <button
+                className={`${btnBase} ${
+                  p === page
+                    ? 'border-[rgb(32,143,255)] bg-[rgb(32,143,255)] text-white'
+                    : 'border-border text-foreground hover:border-[rgb(32,143,255)] hover:text-[rgb(32,143,255)]'
+                }`}
+                onClick={() => p !== page && onPageChange(p)}
+              >
+                {p}
+              </button>
+            </li>
+          ))}
+        </ul>
+        <button
+          className={`${btnBase} border-border hover:border-[rgb(32,143,255)] hover:text-[rgb(32,143,255)] ${page >= totalPages ? 'opacity-40 cursor-not-allowed' : ''}`}
           disabled={page >= totalPages || loading}
           onClick={() => onPageChange(page + 1)}
         >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+          <ChevronRight className="h-3.5 w-3.5" />
+        </button>
+        <span className="flex items-center gap-1 ml-2">
+          Go to
+          <input
+            type="number"
+            className="w-[50px] h-[25px] leading-[25px] text-xs text-center border border-border rounded bg-card text-foreground outline-none focus:border-[rgb(32,143,255)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            value={jumpVal}
+            onChange={(e) => setJumpVal(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleJump()}
+            min={1}
+            max={totalPages}
+          />
+        </span>
       </div>
     </div>
   );
