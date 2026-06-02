@@ -40,7 +40,7 @@ interface PaginationProps {
 const Pagination = ({ page, totalPages, total, loading, onPageChange }: PaginationProps) => {
   const [jumpVal, setJumpVal] = useState('');
 
-  if (totalPages <= 1) return null;
+  if (!totalPages || totalPages <= 0) return null;
 
   const getPageNumbers = () => {
     const pages: number[] = [];
