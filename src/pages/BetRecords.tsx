@@ -23,10 +23,12 @@ const BetRecords = () => {
   const [page, setPage] = useState(1);
 
   const handleSearch = async (pageNum = 1) => {
-    if (!member.trim()) {
-      toast.error('Member is required (format: u + userId)');
+    const raw = member.trim();
+    if (!raw) {
+      toast.error('User ID is required');
       return;
     }
+    const memberParam = raw.startsWith('u') ? raw : `u${raw}`;
     setAuthToken(token);
     setLoading(true);
     try {
@@ -35,7 +37,7 @@ const BetRecords = () => {
       if (status) params.status = Number(status);
       if (dateFrom) params.dateFrom = format(dateFrom, 'yyyy-MM-dd');
       if (dateTo) params.dateTo = format(dateTo, 'yyyy-MM-dd');
-      const res = await searchBetsByMember(member.trim(), params);
+      const res = await searchBetsByMember(memberParam, params);
       setData(res.data);
       setPage(pageNum);
     } catch (err: any) {
@@ -141,7 +143,7 @@ const BetRecords = () => {
             <Input
               value={member}
               onChange={(e) => setMember(e.target.value)}
-              placeholder="u + userId (e.g., u123456)"
+              placeholder="User ID (e.g., 12345)"
               className="w-full h-[34px] text-sm px-2"
               onKeyDown={(e) => e.key === 'Enter' && handleSearch(1)}
             />
