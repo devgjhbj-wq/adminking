@@ -1,4 +1,4 @@
-# Game API - Admin Side
+# Bet Search - Admin API
 
 ## Base URL
 
@@ -75,52 +75,4 @@ Search provider game bet records by member (userId). Requires admin privileges.
 | totalTurnover | Sum of all turnover amounts |
 | netPnl | totalPayout - totalBet (negative = platform profit) |
 
----
 
-## Move Game Balance to Wallet
-
-```
-POST /admin/move-game-to-wallet
-```
-
-**Options:**
-
-```json
-// Single user
-{ "userId": 100001, "providerCode": "JE" }
-
-// Range of users
-{ "userId": 100001, "userIdTo": 100050, "providerCode": "ALL" }
-
-// Array of users
-{ "userIds": [100001, 100002, 100003], "providerCode": "ALL" }
-```
-
-| Param | Type | Required | Description |
-|-------|------|---------|-------------|
-| userId | number | Yes* | Start user ID |
-| userIdTo | number | No | End user ID for range |
-| userIds | array | Yes* | Array of user IDs |
-| providerCode | string | No | PG, JE, JD, TU, or ALL (default: ALL) |
-
-**Response:**
-
-```json
-{
-  "status": "success",
-  "msg": "Balance moved from all games to wallet",
-  "totalUsersProcessed": 50,
-  "totalAmountMoved": 5000,
-  "users": [
-    {
-      "userId": 100001,
-      "success": true,
-      "providers": [
-        { "provider": "JE", "amount": 100, "success": true, "referenceId": "GMOUT123456" }
-      ],
-      "moved": 100,
-      "walletBalance": 1100
-    }
-  ]
-}
-```

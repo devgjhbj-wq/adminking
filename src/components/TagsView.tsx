@@ -19,7 +19,6 @@ const navLookup: Record<string, string> = {
   '/dashboard/turnover-config': 'Turnover Config',
   '/dashboard/logs': 'Admin Logs',
   '/dashboard/bet-records': 'Bet Records',
-  '/dashboard/move-game': 'Move Game Bal',
   '/dashboard/wingo': 'Wingo',
 };
 

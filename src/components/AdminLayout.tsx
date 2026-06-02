@@ -14,7 +14,6 @@ import {
   Crown,
   Gamepad2,
   RefreshCcw,
-  ArrowRightLeft,
   Gift,
   Dices,
 } from "lucide-react";
@@ -34,7 +33,6 @@ const navItems = [
   { title: "VIP Config", url: "/dashboard/vip-config", icon: Crown },
   { title: "Turnover Config", url: "/dashboard/turnover-config", icon: RefreshCcw },
   { title: "Bet Records", url: "/dashboard/bet-records", icon: Gamepad2 },
-  { title: "Move Game Bal", url: "/dashboard/move-game", icon: ArrowRightLeft },
   { title: "Wingo", url: "/dashboard/wingo", icon: Dices },
 ];
 
