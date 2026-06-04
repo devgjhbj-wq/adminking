@@ -176,12 +176,12 @@ const AgencyDashboard = () => {
     if (!agg) return null;
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 border border-border rounded overflow-hidden divide-x divide-y divide-border text-[10px]">
-        <div className="p-1.5 bg-cyan-500/5"><span className="text-muted-foreground">Deposit Count: </span><span className="font-medium">{agg.depositCount ?? 0}</span></div>
-        <div className="p-1.5 bg-cyan-500/10"><span className="text-muted-foreground">Deposit Amt: </span><span className="font-medium">₹{(agg.depositAmount ?? 0).toLocaleString()}</span></div>
-        <div className="p-1.5 bg-cyan-500/5"><span className="text-muted-foreground">Bettor Count: </span><span className="font-medium">{agg.bettorCount ?? 0}</span></div>
-        <div className="p-1.5 bg-cyan-500/10"><span className="text-muted-foreground">Bet Amount: </span><span className="font-medium">₹{(agg.betAmount ?? 0).toLocaleString()}</span></div>
-        <div className="p-1.5 bg-cyan-500/5"><span className="text-muted-foreground">1st Deposit Count: </span><span className="font-medium">{agg.firstDepositCount ?? 0}</span></div>
-        <div className="p-1.5 bg-cyan-500/10"><span className="text-muted-foreground">1st Deposit Amt: </span><span className="font-medium">₹{(agg.firstDepositAmount ?? 0).toLocaleString()}</span></div>
+        <div className="p-2 bg-cyan-500/5"><span className="text-muted-foreground">Deposit Count: </span><span className="font-medium">{agg.depositCount ?? 0}</span></div>
+        <div className="p-2 bg-cyan-500/10"><span className="text-muted-foreground">Deposit Amt: </span><span className="font-medium">₹{(agg.depositAmount ?? 0).toLocaleString()}</span></div>
+        <div className="p-2 bg-cyan-500/5"><span className="text-muted-foreground">Bettor Count: </span><span className="font-medium">{agg.bettorCount ?? 0}</span></div>
+        <div className="p-2 bg-cyan-500/10"><span className="text-muted-foreground">Bet Amount: </span><span className="font-medium">₹{(agg.betAmount ?? 0).toLocaleString()}</span></div>
+        <div className="p-2 bg-cyan-500/5"><span className="text-muted-foreground">1st Deposit Count: </span><span className="font-medium">{agg.firstDepositCount ?? 0}</span></div>
+        <div className="p-2 bg-cyan-500/10"><span className="text-muted-foreground">1st Deposit Amt: </span><span className="font-medium">₹{(agg.firstDepositAmount ?? 0).toLocaleString()}</span></div>
       </div>
     );
   };
@@ -208,7 +208,7 @@ const AgencyDashboard = () => {
 
       {/* ── Level Tab ── */}
       {tab === 'Level' && (
-        <div className="space-y-2">
+        <div className="space-y-4">
           <SearchHeader>
             <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
             <SearchInputWithHistory
@@ -295,7 +295,7 @@ const AgencyDashboard = () => {
 
       {/* ── Team Tab ── */}
       {tab === 'Team' && (
-        <div className="space-y-2">
+        <div className="space-y-4">
           <SearchHeader>
             <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
             <SearchInputWithHistory
@@ -373,13 +373,13 @@ const AgencyDashboard = () => {
           )}
 
           {teamData?.aggregation && (
-            <div className="space-y-2">
-              <h3 className="text-xs font-semibold text-foreground">Aggregation</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 ga">
+            <div className="space-y-3">
+              <label className="text-[11px] font-semibold text-foreground">Aggregation</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {['level1', 'level2', 'level3', 'total'].map((key) => {
                   const agg = teamData.aggregation[key];
                   return agg ? (
-                    <div key={key} className="bg-card border border-border p-3 rounded-lg space-y-2">
+                    <div key={key} className="bg-card border border-border p-4 rounded-lg space-y-3">
                       <label className="text-[11px] font-semibold text-foreground capitalize">{key.replace('level', 'Level ')}</label>
                       {renderAggregation(agg)}
                     </div>
@@ -391,6 +391,7 @@ const AgencyDashboard = () => {
 
           {teamData?.items && (
             <>
+              <label className="text-[11px] font-semibold text-foreground">Team Members</label>
               <div className="relative rounded" style={{ height: 445, border: '1px solid hsl(var(--border))' }}>
                 <div style={{ height: '100%', overflowX: 'auto', overflowY: 'auto' }}>
                   <table className="el-table w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', minWidth: 800 }}>
@@ -405,7 +406,7 @@ const AgencyDashboard = () => {
                     <thead style={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'hsl(var(--card))' }}>
                       <tr style={{ height: 50 }}>
                         {['User ID', 'Mobile', 'Tier', 'Total Deposit', 'Total Withdrawal', 'Registered'].map((label) => (
-                          <th key={label} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
+                          <th key={label} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '8px 4px', fontWeight: 400, fontSize: 14 }}>
                             <div className="cell">{label}</div>
                           </th>
                         ))}
@@ -423,23 +424,23 @@ const AgencyDashboard = () => {
                         </tr>
                       ) : (
                         teamData.items.map((item: any, i: number) => (
-                          <tr key={i} style={{ height: 50 }}>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                          <tr key={i} style={{ height: 56 }}>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '6px 4px', textAlign: 'center' }}>
                               <div className="cell">{item.userId}</div>
                             </td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '6px 4px', textAlign: 'center' }}>
                               <div className="cell">{item.mobile || '—'}</div>
                             </td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '6px 4px', textAlign: 'center' }}>
                               <div className="cell"><span className="px-1.5 py-0.5 text-[10px] font-medium rounded-sm bg-secondary text-foreground">L{item.tier}</span></div>
                             </td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '6px 4px', textAlign: 'center' }}>
                               <div className="cell">₹{(item.totalDeposit ?? 0).toLocaleString()}</div>
                             </td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '6px 4px', textAlign: 'center' }}>
                               <div className="cell">₹{(item.totalWithdrawal ?? 0).toLocaleString()}</div>
                             </td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '6px 4px', textAlign: 'center' }}>
                               <div className="cell">{new Date(item.registeredAt).toLocaleString()}</div>
                             </td>
                           </tr>
