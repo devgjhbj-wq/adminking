@@ -9,7 +9,7 @@ import LastUpdated from '@/components/LastUpdated';
 import Loading from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { SearchInputWithHistory } from '@/components/SearchInputWithHistory';
+import { SearchInputWithHistory, addToHistory } from '@/components/SearchInputWithHistory';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { SearchHeader } from '@/components/PageContainer';
@@ -42,6 +42,7 @@ const AgencyDashboard = () => {
   const loadStats = useCallback(async (p = 1) => {
     const q = statsUserId.trim();
     if (!q) return;
+    addToHistory(q);
     setAuthToken(token);
     setStatsLoading(true);
     try {
@@ -65,6 +66,7 @@ const AgencyDashboard = () => {
   const loadLevel = useCallback(async () => {
     const q = levelUserId.trim();
     if (!q) return;
+    addToHistory(q);
     setAuthToken(token);
     setLevelLoading(true);
     try {
@@ -91,6 +93,7 @@ const AgencyDashboard = () => {
   const loadTeam = useCallback(async (p = 1) => {
     const q = teamAgentId.trim();
     if (!q || !teamToDate) { toast.error('Enter Agent ID and To Date'); return; }
+    addToHistory(q);
     setAuthToken(token);
     setTeamLoading(true);
     try {
