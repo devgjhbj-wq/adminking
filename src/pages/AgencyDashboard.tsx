@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
-  fetchAgentStats, fetchAgencyConfigs, updateAgencyConfigLevel, seedAgencyConfigs,
+  fetchAgencyConfigs, updateAgencyConfigLevel, seedAgencyConfigs,
   fetchAgentLevel, fetchAgentTeam, runMidnightBatch, setAuthToken
 } from '@/lib/api';
 import { toast } from 'sonner';
@@ -17,7 +17,7 @@ import { ChevronLeft, ChevronRight, Save, RefreshCw, Play, Plus, CalendarIcon, S
 import { format } from 'date-fns';
 
 
-const tabs = ['Stats', 'Level', 'Team', 'Config'] as const;
+const tabs = ['Level', 'Team', 'Config'] as const;
 type Tab = typeof tabs[number];
 
 const InfoRow = ({ label, value }: { label: string; value: any }) => (
@@ -29,33 +29,8 @@ const InfoRow = ({ label, value }: { label: string; value: any }) => (
 
 const AgencyDashboard = () => {
   const { token } = useAuth();
-  const [tab, setTab] = useState<Tab>('Stats');
+  const [tab, setTab] = useState<Tab>('Level');
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
-
-  // ── Stats tab ──
-  const [statsUserId, setStatsUserId] = useState('');
-  const [statsData, setStatsData] = useState<any>(null);
-  const [statsLoading, setStatsLoading] = useState(false);
-  const [statsPage, setStatsPage] = useState(1);
-  const statsTotalPages = statsData?.totalInvitees ? Math.ceil(statsData.totalInvitees / (statsData.limit || 50)) : 0;
-
-  const loadStats = useCallback(async (p = 1) => {
-    const q = statsUserId.trim();
-    if (!q) return;
-    addToHistory(q);
-    setAuthToken(token);
-    setStatsLoading(true);
-    try {
-      const res = await fetchAgentStats(q, p);
-      setStatsData(res.data);
-      setStatsPage(p);
-      setUpdatedAt(new Date());
-    } catch (err: any) {
-      toast.error(err.response?.data?.msg || 'Failed to load agent stats');
-    } finally {
-      setStatsLoading(false);
-    }
-  }, [token, statsUserId]);
 
   // ── Level tab ──
   const [levelUserId, setLevelUserId] = useState('');
@@ -228,120 +203,6 @@ const AgencyDashboard = () => {
         ))}
       </div>
 
-      {/* ── Stats Tab ── */}
-      {tab === 'Stats' && (
-        <div className="space-y-2">
-          <SearchHeader>
-            <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
-            <SearchInputWithHistory
-              value={statsUserId}
-              onChange={setStatsUserId}
-              placeholder="Enter Agent User ID"
-              className="w-[180px] h-[26px] text-xs px-1.5"
-            />
-            <Button
-              onClick={() => loadStats(1)}
-              disabled={statsLoading || !statsUserId.trim()}
-              size="sm"
-              className="h-[26px] px-2.5 text-xs rounded-[5px]"
-              style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
-            >
-              {statsLoading ? <Loading size={10} /> : <Search className="w-3.5 h-3.5" />}
-              Search
-            </Button>
-          </SearchHeader>
-
-          {statsData?.agent && (
-            <div className="grid grid-cols-1 md:grid-cols-2 ga">
-              <div className="bg-card border border-border p-3 rounded-lg space-y-1">
-                <h3 className="text-xs font-semibold text-foreground">Agent Info</h3>
-                <InfoRow label="User ID" value={statsData.agent.userId} />
-                <InfoRow label="Mobile" value={statsData.agent.mobile} />
-                <InfoRow label="Admin" value={statsData.agent.admin ? 'Yes' : 'No'} />
-                <InfoRow label="Referred By" value={statsData.agent.referredBy} />
-                <InfoRow label="Created" value={new Date(statsData.agent.createdAt).toLocaleString()} />
-              </div>
-              <div className="bg-card border border-border p-3 rounded-lg space-y-1">
-                <h3 className="text-xs font-semibold text-foreground">Inviter</h3>
-                {statsData.inviter ? (
-                  <>
-                    <InfoRow label="User ID" value={statsData.inviter.userId} />
-                    <InfoRow label="Mobile" value={statsData.inviter.mobile} />
-                    <InfoRow label="Created" value={new Date(statsData.inviter.createdAt).toLocaleString()} />
-                  </>
-                ) : <p className="text-xs text-muted-foreground">No inviter</p>}
-                <div className="pt-2 border-t border-border"><InfoRow label="Total Invitees" value={statsData.totalInvitees} /></div>
-              </div>
-            </div>
-          )}
-
-          {statsData?.invitees && (
-            <>
-              <div className="relative rounded" style={{ height: 445, border: '1px solid hsl(var(--border))' }}>
-                <div style={{ height: '100%', overflowX: 'auto', overflowY: 'auto' }}>
-                  <table className="el-table w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', minWidth: 800 }}>
-                    <colgroup>
-                      <col />
-                      <col />
-                      <col />
-                      <col />
-                    </colgroup>
-                    <thead style={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'hsl(var(--card))' }}>
-                      <tr style={{ height: 50 }}>
-                        {['User ID', 'Username', 'Direct Invitees', 'Team Size'].map((label) => (
-                          <th key={label} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
-                            <div className="cell">{label}</div>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {statsData?.invitees?.length === 0 ? (
-                        <tr>
-                          <td colSpan={4} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: 50, color: 'hsl(var(--muted-foreground))' }}>
-                            <div className="flex flex-col items-center gap-2">
-                              <svg className="w-12 h-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
-                              <span>No Data</span>
-                            </div>
-                          </td>
-                        </tr>
-                      ) : (
-                        statsData?.invitees?.map((item: any, i: number) => (
-                          <tr key={i} style={{ height: 50 }}>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                              <div className="cell">{item.userId}</div>
-                            </td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                              <div className="cell">{item.username}</div>
-                            </td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                              <div className="cell">{item.directInvitees || 0}</div>
-                            </td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                              <div className="cell">{item.teamSize || item.totalInvitees || 0}</div>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              {statsTotalPages > 1 && (
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Total: {statsData.totalInvitees} — Page {statsPage}/{statsTotalPages}</span>
-                  <div className="flex gap-1">
-                    <Button variant="outline" size="sm" disabled={statsPage <= 1} onClick={() => loadStats(statsPage - 1)}><ChevronLeft className="w-3.5 h-3.5" /></Button>
-                    <Button variant="outline" size="sm" disabled={statsPage >= statsTotalPages} onClick={() => loadStats(statsPage + 1)}><ChevronRight className="w-3.5 h-3.5" /></Button>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-          <LastUpdated timestamp={updatedAt} onRefresh={() => loadStats(statsPage)} loading={statsLoading} compact />
-        </div>
-      )}
-
       {/* ── Level Tab ── */}
       {tab === 'Level' && (
         <div className="space-y-2">
@@ -480,6 +341,29 @@ const AgencyDashboard = () => {
             </Button>
           </SearchHeader>
 
+          {teamData?.agent && (
+            <div className="grid grid-cols-1 md:grid-cols-2 ga">
+              <div className="bg-card border border-border p-3 rounded-lg space-y-1">
+                <h3 className="text-xs font-semibold text-foreground">Agent Info</h3>
+                <InfoRow label="User ID" value={teamData.agent.userId} />
+                <InfoRow label="Mobile" value={teamData.agent.mobile} />
+                <InfoRow label="Admin" value={teamData.agent.admin ? 'Yes' : 'No'} />
+                <InfoRow label="Referred By" value={teamData.agent.referredBy} />
+                <InfoRow label="Created" value={new Date(teamData.agent.createdAt).toLocaleString()} />
+              </div>
+              <div className="bg-card border border-border p-3 rounded-lg space-y-1">
+                <h3 className="text-xs font-semibold text-foreground">Inviter</h3>
+                {teamData.inviter ? (
+                  <>
+                    <InfoRow label="User ID" value={teamData.inviter.userId} />
+                    <InfoRow label="Mobile" value={teamData.inviter.mobile} />
+                    <InfoRow label="Created" value={new Date(teamData.inviter.createdAt).toLocaleString()} />
+                  </>
+                ) : <p className="text-xs text-muted-foreground">No inviter</p>}
+              </div>
+            </div>
+          )}
+
           {teamData?.aggregation && (
             <div className="space-y-2">
               <h3 className="text-xs font-semibold text-foreground">Aggregation</h3>
@@ -508,10 +392,11 @@ const AgencyDashboard = () => {
                       <col />
                       <col />
                       <col />
+                      <col />
                     </colgroup>
                     <thead style={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'hsl(var(--card))' }}>
                       <tr style={{ height: 50 }}>
-                        {['User ID', 'Mobile', 'Tier', 'Total Deposit', 'Registered'].map((label) => (
+                        {['User ID', 'Mobile', 'Tier', 'Total Deposit', 'Total Withdrawal', 'Registered'].map((label) => (
                           <th key={label} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
                             <div className="cell">{label}</div>
                           </th>
@@ -521,7 +406,7 @@ const AgencyDashboard = () => {
                     <tbody>
                       {teamData?.items?.length === 0 ? (
                         <tr>
-                          <td colSpan={5} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: 50, color: 'hsl(var(--muted-foreground))' }}>
+                          <td colSpan={6} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: 50, color: 'hsl(var(--muted-foreground))' }}>
                             <div className="flex flex-col items-center gap-2">
                               <svg className="w-12 h-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                               <span>No Data</span>
@@ -542,6 +427,9 @@ const AgencyDashboard = () => {
                             </td>
                             <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
                               <div className="cell">₹{(item.totalDeposit ?? 0).toLocaleString()}</div>
+                            </td>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                              <div className="cell">₹{(item.totalWithdrawal ?? 0).toLocaleString()}</div>
                             </td>
                             <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
                               <div className="cell">{new Date(item.registeredAt).toLocaleString()}</div>
