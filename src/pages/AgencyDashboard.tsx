@@ -175,13 +175,13 @@ const AgencyDashboard = () => {
   const renderAggregation = (agg: any) => {
     if (!agg) return null;
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 gatext-[10px]">
-        <div><span className="text-muted-foreground">Deposit Count: </span><span className="font-medium">{agg.depositCount ?? 0}</span></div>
-        <div><span className="text-muted-foreground">Deposit Amt: </span><span className="font-medium">₹{(agg.depositAmount ?? 0).toLocaleString()}</span></div>
-        <div><span className="text-muted-foreground">Bettor Count: </span><span className="font-medium">{agg.bettorCount ?? 0}</span></div>
-        <div><span className="text-muted-foreground">Bet Amount: </span><span className="font-medium">₹{(agg.betAmount ?? 0).toLocaleString()}</span></div>
-        <div><span className="text-muted-foreground">1st Deposit Count: </span><span className="font-medium">{agg.firstDepositCount ?? 0}</span></div>
-        <div><span className="text-muted-foreground">1st Deposit Amt: </span><span className="font-medium">₹{(agg.firstDepositAmount ?? 0).toLocaleString()}</span></div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 border border-border rounded overflow-hidden divide-x divide-y divide-border text-[10px]">
+        <div className="p-1.5 bg-cyan-500/5"><span className="text-muted-foreground">Deposit Count: </span><span className="font-medium">{agg.depositCount ?? 0}</span></div>
+        <div className="p-1.5 bg-cyan-500/10"><span className="text-muted-foreground">Deposit Amt: </span><span className="font-medium">₹{(agg.depositAmount ?? 0).toLocaleString()}</span></div>
+        <div className="p-1.5 bg-cyan-500/5"><span className="text-muted-foreground">Bettor Count: </span><span className="font-medium">{agg.bettorCount ?? 0}</span></div>
+        <div className="p-1.5 bg-cyan-500/10"><span className="text-muted-foreground">Bet Amount: </span><span className="font-medium">₹{(agg.betAmount ?? 0).toLocaleString()}</span></div>
+        <div className="p-1.5 bg-cyan-500/5"><span className="text-muted-foreground">1st Deposit Count: </span><span className="font-medium">{agg.firstDepositCount ?? 0}</span></div>
+        <div className="p-1.5 bg-cyan-500/10"><span className="text-muted-foreground">1st Deposit Amt: </span><span className="font-medium">₹{(agg.firstDepositAmount ?? 0).toLocaleString()}</span></div>
       </div>
     );
   };
@@ -248,18 +248,18 @@ const AgencyDashboard = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="bg-card border border-border p-4 rounded-lg space-y-3">
                   <label className="text-[11px] font-semibold text-foreground">Rebate Level</label>
-                  <div className="grid grid-cols-2 gap-x-4">
-                    <FormField label="Current Level" value={levelData.rebate_level} />
-                    {levelData.date && <FormField label="Date" value={new Date(levelData.date).toLocaleDateString()} />}
+                  <div className="grid grid-cols-2 border border-border rounded overflow-hidden divide-x divide-y divide-border">
+                    <div className="p-2 bg-blue-500/5"><FormField label="Current Level" value={levelData.rebate_level} /></div>
+                    {levelData.date && <div className="p-2 bg-blue-500/10"><FormField label="Date" value={new Date(levelData.date).toLocaleDateString()} /></div>}
                   </div>
                 </div>
                 {levelData.commission && (
                   <div className="bg-card border border-border p-4 rounded-lg space-y-3">
                     <label className="text-[11px] font-semibold text-foreground">Commission</label>
-                    <div className="grid grid-cols-2 gap-x-4">
-                      <FormField label="This Week" value={`₹${(levelData.commission.thisWeek ?? 0).toLocaleString()}`} />
-                      <FormField label="Total" value={`₹${(levelData.commission.total ?? 0).toLocaleString()}`} />
-                      <FormField label="Today" value={`₹${(levelData.commission.today ?? 0).toLocaleString()}`} />
+                    <div className="grid grid-cols-2 border border-border rounded overflow-hidden divide-x divide-y divide-border">
+                      <div className="p-2 bg-emerald-500/5"><FormField label="This Week" value={`₹${(levelData.commission.thisWeek ?? 0).toLocaleString()}`} /></div>
+                      <div className="p-2 bg-emerald-500/10"><FormField label="Total" value={`₹${(levelData.commission.total ?? 0).toLocaleString()}`} /></div>
+                      <div className="p-2 bg-emerald-500/5"><FormField label="Today" value={`₹${(levelData.commission.today ?? 0).toLocaleString()}`} /></div>
                     </div>
                   </div>
                 )}
@@ -272,17 +272,17 @@ const AgencyDashboard = () => {
                   return (
                     <div key={key} className="bg-card border border-border p-4 rounded-lg space-y-3">
                       <label className="text-[11px] font-semibold text-foreground capitalize">{key.replace('level', 'Level ')}</label>
-                      <div className="grid grid-cols-2 gap-x-4">
-                        <FormField label="Members" value={s.members ?? 0} />
-                        <FormField label="Today Members" value={s.todayMembers ?? 0} />
-                        <FormField label="Total Bets" value={`₹${(s.totalBets ?? 0).toLocaleString()}`} />
-                        <FormField label="Today Bets" value={`₹${(s.todayBets ?? 0).toLocaleString()}`} />
-                        <FormField label="Total Deposit" value={`₹${(s.totalDeposit ?? 0).toLocaleString()}`} />
-                        <FormField label="Today Deposit" value={`₹${(s.todayDeposit ?? 0).toLocaleString()}`} />
-                        <FormField label="Deposit Count" value={s.depositCount ?? 0} />
-                        <FormField label="1st Deposit" value={s.firstDepositCount ?? 0} />
-                        <FormField label="Total Withdrawal" value={`₹${(s.totalWithdrawal ?? 0).toLocaleString()}`} />
-                        <FormField label="Today Withdrawal" value={`₹${(s.todayWithdrawal ?? 0).toLocaleString()}`} />
+                      <div className="grid grid-cols-2 border border-border rounded overflow-hidden divide-x divide-y divide-border">
+                        <div className="p-2 bg-violet-500/5"><FormField label="Members" value={s.members ?? 0} /></div>
+                        <div className="p-2 bg-violet-500/10"><FormField label="Today Members" value={s.todayMembers ?? 0} /></div>
+                        <div className="p-2 bg-violet-500/5"><FormField label="Total Bets" value={`₹${(s.totalBets ?? 0).toLocaleString()}`} /></div>
+                        <div className="p-2 bg-violet-500/10"><FormField label="Today Bets" value={`₹${(s.todayBets ?? 0).toLocaleString()}`} /></div>
+                        <div className="p-2 bg-violet-500/5"><FormField label="Total Deposit" value={`₹${(s.totalDeposit ?? 0).toLocaleString()}`} /></div>
+                        <div className="p-2 bg-violet-500/10"><FormField label="Today Deposit" value={`₹${(s.todayDeposit ?? 0).toLocaleString()}`} /></div>
+                        <div className="p-2 bg-violet-500/5"><FormField label="Deposit Count" value={s.depositCount ?? 0} /></div>
+                        <div className="p-2 bg-violet-500/10"><FormField label="1st Deposit" value={s.firstDepositCount ?? 0} /></div>
+                        <div className="p-2 bg-violet-500/5"><FormField label="Total Withdrawal" value={`₹${(s.totalWithdrawal ?? 0).toLocaleString()}`} /></div>
+                        <div className="p-2 bg-violet-500/10"><FormField label="Today Withdrawal" value={`₹${(s.todayWithdrawal ?? 0).toLocaleString()}`} /></div>
                       </div>
                     </div>
                   );
@@ -351,21 +351,21 @@ const AgencyDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="bg-card border border-border p-4 rounded-lg space-y-3">
                 <label className="text-[11px] font-semibold text-foreground">Agent Info</label>
-                <div className="grid grid-cols-2 gap-x-4">
-                  <FormField label="User ID" value={teamData.agent.userId} />
-                  <FormField label="Mobile" value={teamData.agent.mobile} />
-                  <FormField label="Admin" value={teamData.agent.admin ? 'Yes' : 'No'} />
-                  <FormField label="Referred By" value={teamData.agent.referredBy} />
-                  <FormField label="Created" value={new Date(teamData.agent.createdAt).toLocaleString()} />
+                <div className="grid grid-cols-2 border border-border rounded overflow-hidden divide-x divide-y divide-border">
+                  <div className="p-2 bg-amber-500/5"><FormField label="User ID" value={teamData.agent.userId} /></div>
+                  <div className="p-2 bg-amber-500/10"><FormField label="Mobile" value={teamData.agent.mobile} /></div>
+                  <div className="p-2 bg-amber-500/5"><FormField label="Admin" value={teamData.agent.admin ? 'Yes' : 'No'} /></div>
+                  <div className="p-2 bg-amber-500/10"><FormField label="Referred By" value={teamData.agent.referredBy} /></div>
+                  <div className="p-2 bg-amber-500/5"><FormField label="Created" value={new Date(teamData.agent.createdAt).toLocaleString()} /></div>
                 </div>
               </div>
               <div className="bg-card border border-border p-4 rounded-lg space-y-3">
                 <label className="text-[11px] font-semibold text-foreground">Inviter</label>
                 {teamData.inviter ? (
-                  <div className="grid grid-cols-2 gap-x-4">
-                    <FormField label="User ID" value={teamData.inviter.userId} />
-                    <FormField label="Mobile" value={teamData.inviter.mobile} />
-                    <FormField label="Created" value={new Date(teamData.inviter.createdAt).toLocaleString()} />
+                  <div className="grid grid-cols-2 border border-border rounded overflow-hidden divide-x divide-y divide-border">
+                    <div className="p-2 bg-amber-500/5"><FormField label="User ID" value={teamData.inviter.userId} /></div>
+                    <div className="p-2 bg-amber-500/10"><FormField label="Mobile" value={teamData.inviter.mobile} /></div>
+                    <div className="p-2 bg-amber-500/5"><FormField label="Created" value={new Date(teamData.inviter.createdAt).toLocaleString()} /></div>
                   </div>
                 ) : <p className="text-xs text-muted-foreground">No inviter</p>}
               </div>
@@ -379,8 +379,8 @@ const AgencyDashboard = () => {
                 {['level1', 'level2', 'level3', 'total'].map((key) => {
                   const agg = teamData.aggregation[key];
                   return agg ? (
-                    <div key={key} className="bg-card border border-border rounded-lg">
-                      <h4 className="text-[10px] font-semibold text-foreground uppercase mb-1">{key.replace('level', 'Level ')}</h4>
+                    <div key={key} className="bg-card border border-border p-3 rounded-lg space-y-2">
+                      <label className="text-[11px] font-semibold text-foreground capitalize">{key.replace('level', 'Level ')}</label>
                       {renderAggregation(agg)}
                     </div>
                   ) : null;
