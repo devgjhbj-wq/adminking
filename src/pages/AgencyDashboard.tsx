@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   fetchAgencyConfigs, updateAgencyConfigLevel, seedAgencyConfigs,
-  fetchAgentLevel, fetchAgentTeam, runMidnightBatch, setAuthToken
+  fetchAgentLevel, fetchAgentTeam, fetchTeamMembers, runMidnightBatch, setAuthToken
 } from '@/lib/api';
 import { toast } from 'sonner';
 import LastUpdated from '@/components/LastUpdated';
@@ -13,7 +13,8 @@ import { SearchInputWithHistory, addToHistory } from '@/components/SearchInputWi
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { SearchHeader } from '@/components/PageContainer';
-import { ChevronLeft, ChevronRight, Save, RefreshCw, Play, Plus, CalendarIcon, Search } from 'lucide-react';
+import { Drawer } from '@/components/Drawer';
+import { ChevronLeft, ChevronRight, Save, RefreshCw, Play, Plus, CalendarIcon, Search, Users } from 'lucide-react';
 import { format } from 'date-fns';
 
 
@@ -89,6 +90,39 @@ const AgencyDashboard = () => {
       setTeamLoading(false);
     }
   }, [token, teamAgentId, teamToDate, teamFromDate, teamTier]);
+
+  // ── Team Members drawer ──
+  const [tmOpen, setTmOpen] = useState(false);
+  const [tmTier, setTmTier] = useState('');
+  const [tmUserId, setTmUserId] = useState('');
+  const [tmFromDate, setTmFromDate] = useState<Date>();
+  const [tmToDate, setTmToDate] = useState<Date>();
+  const [tmData, setTmData] = useState<any>(null);
+  const [tmLoading, setTmLoading] = useState(false);
+  const [tmPage, setTmPage] = useState(1);
+  const tmTotalPages = tmData?.total ? Math.ceil(tmData.total / (tmData.limit || 25)) : 0;
+
+  const loadTeamMembers = useCallback(async (p = 1) => {
+    setAuthToken(token);
+    setTmLoading(true);
+    try {
+      const q = teamAgentId.trim();
+      if (!q) { toast.error('Enter Agent ID first'); setTmLoading(false); return; }
+      const res = await fetchTeamMembers(q, {
+        tier: tmTier ? Number(tmTier) : undefined,
+        userId: tmUserId.trim() || undefined,
+        fromDate: tmFromDate ? format(tmFromDate, 'yyyy-MM-dd') : undefined,
+        toDate: tmToDate ? format(tmToDate, 'yyyy-MM-dd') : undefined,
+        page: p, limit: 25,
+      });
+      setTmData(res.data);
+      setTmPage(p);
+    } catch (err: any) {
+      toast.error(err.response?.data?.msg || 'Failed to load team members');
+    } finally {
+      setTmLoading(false);
+    }
+  }, [token, teamAgentId, tmTier, tmUserId, tmFromDate, tmToDate]);
 
   // ── Config tab ──
   const [configs, setConfigs] = useState<any[]>([]);
@@ -389,14 +423,74 @@ const AgencyDashboard = () => {
             </div>
           )}
 
-          {teamData?.items && (
-            <>
-              <label className="text-[11px] font-semibold text-foreground">Team Members</label>
-              <div className="relative rounded" style={{ height: 445, border: '1px solid hsl(var(--border))' }}>
-                <div style={{ height: '100%', overflowX: 'auto', overflowY: 'auto' }}>
-                  <table className="el-table w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', minWidth: 800 }}>
+          {teamData?.aggregation && (
+            <div className="flex justify-end">
+              <Button size="sm" onClick={() => { setTmOpen(true); setTmData(null); setTmPage(1); }} className="h-7 text-xs">
+                <Users className="w-3.5 h-3.5 mr-1" /> Team Members
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Team Members Drawer ── */}
+      <Drawer open={tmOpen} onClose={() => setTmOpen(false)} title="Team Members" width="700px">
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[11px] text-muted-foreground block mb-1">Tier</label>
+              <select value={tmTier} onChange={(e) => setTmTier(e.target.value)} className="w-full h-[30px] rounded border border-input bg-background px-2 text-xs">
+                <option value="">All</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-[11px] text-muted-foreground block mb-1">User ID</label>
+              <Input value={tmUserId} onChange={(e) => setTmUserId(e.target.value)} placeholder="Search by userId" className="h-[30px] text-xs" />
+            </div>
+            <div>
+              <label className="text-[11px] text-muted-foreground block mb-1">From Date</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal text-xs h-[30px] px-2 rounded-[5px]">
+                    <CalendarIcon className="mr-1 h-3 w-3" />
+                    {tmFromDate ? format(tmFromDate, "MMM dd, yyyy") : "Select"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={tmFromDate} onSelect={setTmFromDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div>
+              <label className="text-[11px] text-muted-foreground block mb-1">To Date</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal text-xs h-[30px] px-2 rounded-[5px]">
+                    <CalendarIcon className="mr-1 h-3 w-3" />
+                    {tmToDate ? format(tmToDate, "MMM dd, yyyy") : "Select"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={tmToDate} onSelect={setTmToDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+          <Button onClick={() => loadTeamMembers(1)} disabled={tmLoading} size="sm" className="w-full h-[30px] text-xs" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
+            {tmLoading ? <Loading size={10} className="mr-1" /> : <Search className="w-3.5 h-3.5 mr-1" />}
+            Search
+          </Button>
+
+          {tmData?.items && (
+            <div className="space-y-2">
+              <div className="relative rounded" style={{ border: '1px solid hsl(var(--border))' }}>
+                <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 400 }}>
+                  <table className="el-table w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', minWidth: 650 }}>
                     <colgroup>
-                      <col />
+                      <col style={{ width: 80 }} />
                       <col />
                       <col />
                       <col />
@@ -404,45 +498,30 @@ const AgencyDashboard = () => {
                       <col />
                     </colgroup>
                     <thead style={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'hsl(var(--card))' }}>
-                      <tr style={{ height: 50 }}>
-                        {['User ID', 'Mobile', 'Tier', 'Total Deposit', 'Total Withdrawal', 'Registered'].map((label) => (
-                          <th key={label} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '8px 4px', fontWeight: 400, fontSize: 14 }}>
+                      <tr style={{ height: 40 }}>
+                        {['User ID', 'Mobile', 'Tier', 'Total Deposit', 'Total Withdrawal', 'Total Bet'].map((label) => (
+                          <th key={label} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '6px 4px', fontWeight: 400, fontSize: 13 }}>
                             <div className="cell">{label}</div>
                           </th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {teamData?.items?.length === 0 ? (
+                      {tmData.items.length === 0 ? (
                         <tr>
-                          <td colSpan={6} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: 50, color: 'hsl(var(--muted-foreground))' }}>
-                            <div className="flex flex-col items-center gap-2">
-                              <svg className="w-12 h-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
-                              <span>No Data</span>
-                            </div>
+                          <td colSpan={6} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: 30, color: 'hsl(var(--muted-foreground))' }}>
+                            <span className="text-xs">No Data</span>
                           </td>
                         </tr>
                       ) : (
-                        teamData.items.map((item: any, i: number) => (
-                          <tr key={i} style={{ height: 56 }}>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '6px 4px', textAlign: 'center' }}>
-                              <div className="cell">{item.userId}</div>
-                            </td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '6px 4px', textAlign: 'center' }}>
-                              <div className="cell">{item.mobile || '—'}</div>
-                            </td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '6px 4px', textAlign: 'center' }}>
-                              <div className="cell"><span className="px-1.5 py-0.5 text-[10px] font-medium rounded-sm bg-secondary text-foreground">L{item.tier}</span></div>
-                            </td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '6px 4px', textAlign: 'center' }}>
-                              <div className="cell">₹{(item.totalDeposit ?? 0).toLocaleString()}</div>
-                            </td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '6px 4px', textAlign: 'center' }}>
-                              <div className="cell">₹{(item.totalWithdrawal ?? 0).toLocaleString()}</div>
-                            </td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '6px 4px', textAlign: 'center' }}>
-                              <div className="cell">{new Date(item.registeredAt).toLocaleString()}</div>
-                            </td>
+                        tmData.items.map((item: any, i: number) => (
+                          <tr key={i} style={{ height: 44 }}>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '4px', textAlign: 'center' }}><div className="cell text-xs">{item.userId}</div></td>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '4px', textAlign: 'center' }}><div className="cell text-xs">{item.mobile}</div></td>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '4px', textAlign: 'center' }}><div className="cell"><span className="px-1.5 py-0.5 text-[10px] font-medium rounded-sm bg-secondary text-foreground">L{item.tier}</span></div></td>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '4px', textAlign: 'center' }}><div className="cell text-xs">₹{(item.totalDeposit ?? 0).toLocaleString()}</div></td>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '4px', textAlign: 'center' }}><div className="cell text-xs">₹{(item.totalWithdrawal ?? 0).toLocaleString()}</div></td>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '4px', textAlign: 'center' }}><div className="cell text-xs">₹{(item.totalBet ?? 0).toLocaleString()}</div></td>
                           </tr>
                         ))
                       )}
@@ -450,19 +529,19 @@ const AgencyDashboard = () => {
                   </table>
                 </div>
               </div>
-              {teamTotalPages > 1 && (
+              {tmTotalPages > 1 && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Total: {teamData.total} — Page {teamPage}/{teamTotalPages}</span>
+                  <span className="text-xs text-muted-foreground">Total: {tmData.total} — Page {tmPage}/{tmTotalPages}</span>
                   <div className="flex gap-1">
-                    <Button variant="outline" size="sm" disabled={teamPage <= 1} onClick={() => loadTeam(teamPage - 1)}><ChevronLeft className="w-3.5 h-3.5" /></Button>
-                    <Button variant="outline" size="sm" disabled={teamPage >= teamTotalPages} onClick={() => loadTeam(teamPage + 1)}><ChevronRight className="w-3.5 h-3.5" /></Button>
+                    <Button variant="outline" size="sm" disabled={tmPage <= 1} onClick={() => loadTeamMembers(tmPage - 1)}><ChevronLeft className="w-3.5 h-3.5" /></Button>
+                    <Button variant="outline" size="sm" disabled={tmPage >= tmTotalPages} onClick={() => loadTeamMembers(tmPage + 1)}><ChevronRight className="w-3.5 h-3.5" /></Button>
                   </div>
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
-      )}
+      </Drawer>
 
       {/* ── Config Tab ── */}
       {tab === 'Config' && (

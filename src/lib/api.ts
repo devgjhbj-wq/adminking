@@ -230,6 +230,17 @@ export const fetchAgentTeam = (agentId: string, toDate: string, params?: { fromD
 
 export const runMidnightBatch = () => api.post('/api/agency/admin/run-midnight');
 
+export const fetchTeamMembers = (agentId: string, params?: { tier?: number; userId?: string; fromDate?: string; toDate?: string; page?: number; limit?: number }) => {
+  const query = new URLSearchParams({ agentId });
+  if (params?.tier) query.set('tier', String(params.tier));
+  if (params?.userId) query.set('userId', params.userId);
+  if (params?.fromDate) query.set('fromDate', params.fromDate);
+  if (params?.toDate) query.set('toDate', params.toDate);
+  if (params?.page) query.set('page', String(params.page));
+  if (params?.limit) query.set('limit', String(params.limit));
+  return api.get(`/api/agency/admin/team-members?${query.toString()}`);
+};
+
 // Admin Logs
 export const fetchAdminLogs = (params?: { level?: 'info' | 'error'; since?: string; limit?: number }) => {
   const query = new URLSearchParams();
