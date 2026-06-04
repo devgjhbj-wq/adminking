@@ -16,47 +16,6 @@ Authorization: Bearer <admin_token>
 
 ---
 
-## Get Agent Stats
-
-```
-GET /admin/agent-stats?userId=123456&page=1&limit=50
-```
-
-**Response:**
-
-```json
-{
-  "agent": {
-    "userId": 123456,
-    "mobile": "9876543210",
-    "admin": false,
-    "referredBy": 100001,
-    "createdAt": "2026-01-01T00:00:00.000Z"
-  },
-  "inviter": {
-    "userId": 100001,
-    "mobile": "9876543100",
-    "createdAt": "2025-12-01T00:00:00.000Z"
-  },
-  "totalInvitees": 25,
-  "page": 1,
-  "limit": 50,
-  "invitees": [
-    {
-      "userId": 123457,
-      "mobile": "9876543211",
-      "createdAt": "2026-02-01T00:00:00.000Z",
-      "totals": {
-        "deposit": 5000.0,
-        "withdraw": 1000.0
-      }
-    }
-  ]
-}
-```
-
----
-
 ## Level Config Management
 
 ### Get All Level Configs
@@ -197,22 +156,18 @@ GET /agency/admin/level?userId=32545513&date=2026-06-03
 
 ---
 
-### Get Agent Daily Stats (Admin) — Deprecated
+### View Agent Team (Admin) — Unified
 
-```
-GET /agency/admin/daily?userId=32545513&date=2026-05-24
-```
-
-**Deprecated.** Use `/agency/admin/level` instead (same data merged).
-
-### View Agent Team (Admin)
+Replaces the old `/admin/agent-stats` endpoint — now includes agent info, inviter info, and per-user withdrawal totals.
 
 ```
 GET /agency/admin/team?agentId=32545513&toDate=2026-05-26&page=1&limit=25
 GET /agency/admin/team?agentId=32545513&fromDate=2026-05-01&toDate=2026-05-26&tier=1&page=1&limit=25
 ```
 
-`toDate` is **required** and must be yesterday or earlier. Returns same shape as `/agency/team` with `aggregation`:
+`toDate` is **required** and must be yesterday or earlier.
+
+**Response:**
 
 ```json
 {
@@ -220,13 +175,26 @@ GET /agency/admin/team?agentId=32545513&fromDate=2026-05-01&toDate=2026-05-26&ti
   "total": 50,
   "page": 1,
   "limit": 25,
+  "agent": {
+    "userId": 32545513,
+    "mobile": "98***13",
+    "admin": false,
+    "referredBy": 100001,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  "inviter": {
+    "userId": 100001,
+    "mobile": "98***00",
+    "createdAt": "2025-12-01T00:00:00.000Z"
+  },
   "items": [
     {
       "userId": 32545514,
       "mobile": "98***10",
       "registeredAt": "2026-01-15T10:30:00.000Z",
       "tier": 1,
-      "totalDeposit": 15000
+      "totalDeposit": 15000,
+      "totalWithdrawal": 3000
     }
   ],
   "aggregation": {
