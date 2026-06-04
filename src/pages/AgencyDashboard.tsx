@@ -9,6 +9,7 @@ import LastUpdated from '@/components/LastUpdated';
 import Loading from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { SearchInputWithHistory } from '@/components/SearchInputWithHistory';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { SearchHeader } from '@/components/PageContainer';
@@ -229,12 +230,12 @@ const AgencyDashboard = () => {
         <div className="space-y-2">
           <SearchHeader>
             <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
-            <Input
+            <SearchInputWithHistory
               value={statsUserId}
-              onChange={(e) => setStatsUserId(e.target.value)}
+              onChange={setStatsUserId}
+              onSearch={() => loadStats(1)}
               placeholder="Enter Agent User ID"
               className="w-[180px] h-[26px] text-xs px-1.5"
-              onKeyDown={(e) => e.key === 'Enter' && loadStats(1)}
             />
             <Button
               onClick={() => loadStats(1)}
@@ -344,12 +345,12 @@ const AgencyDashboard = () => {
         <div className="space-y-2">
           <SearchHeader>
             <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
-            <Input
+            <SearchInputWithHistory
               value={levelUserId}
-              onChange={(e) => setLevelUserId(e.target.value)}
+              onChange={setLevelUserId}
+              onSearch={loadLevel}
               placeholder="Enter Agent User ID"
               className="w-[180px] h-[26px] text-xs px-1.5"
-              onKeyDown={(e) => e.key === 'Enter' && loadLevel()}
             />
             <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px] ml-[3px]">Date</label>
             <Popover>
@@ -429,12 +430,12 @@ const AgencyDashboard = () => {
         <div className="space-y-2">
           <SearchHeader>
             <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
-            <Input
+            <SearchInputWithHistory
               value={teamAgentId}
-              onChange={(e) => setTeamAgentId(e.target.value)}
+              onChange={setTeamAgentId}
+              onSearch={() => loadTeam(1)}
               placeholder="Agent ID"
               className="w-[120px] h-[26px] text-xs px-1.5"
-              onKeyDown={(e) => e.key === 'Enter' && loadTeam(1)}
             />
             <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px] ml-[3px]">To</label>
             <Popover>
