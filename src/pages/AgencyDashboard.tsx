@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   fetchAgentStats, fetchAgencyConfigs, updateAgencyConfigLevel, seedAgencyConfigs,
-  fetchAgentLevel, fetchAgencyDaily, fetchAgentTeam, runMidnightBatch, setAuthToken
+  fetchAgentLevel, fetchAgentTeam, runMidnightBatch, setAuthToken
 } from '@/lib/api';
 import { toast } from 'sonner';
 import LastUpdated from '@/components/LastUpdated';
@@ -16,7 +16,7 @@ import { ChevronLeft, ChevronRight, Save, RefreshCw, Play, Plus, CalendarIcon, S
 import { format } from 'date-fns';
 
 
-const tabs = ['Stats', 'Daily', 'Team', 'Config'] as const;
+const tabs = ['Stats', 'Level', 'Team', 'Config'] as const;
 type Tab = typeof tabs[number];
 
 const InfoRow = ({ label, value }: { label: string; value: any }) => (
@@ -55,27 +55,27 @@ const AgencyDashboard = () => {
     }
   }, [token, statsUserId]);
 
-  // ── Daily tab ──
-  const [dailyUserId, setDailyUserId] = useState('');
-  const [dailyDate, setDailyDate] = useState<Date>();
-  const [dailyData, setDailyData] = useState<any>(null);
-  const [dailyLoading, setDailyLoading] = useState(false);
+  // ── Level tab ──
+  const [levelUserId, setLevelUserId] = useState('');
+  const [levelDate, setLevelDate] = useState<Date>();
+  const [levelData, setLevelData] = useState<any>(null);
+  const [levelLoading, setLevelLoading] = useState(false);
 
-  const loadDaily = useCallback(async () => {
-    const q = dailyUserId.trim();
+  const loadLevel = useCallback(async () => {
+    const q = levelUserId.trim();
     if (!q) return;
     setAuthToken(token);
-    setDailyLoading(true);
+    setLevelLoading(true);
     try {
-      const res = await fetchAgencyDaily(q, dailyDate ? format(dailyDate, 'yyyy-MM-dd') : undefined);
-      setDailyData(res.data);
+      const res = await fetchAgentLevel(q, levelDate ? format(levelDate, 'yyyy-MM-dd') : undefined);
+      setLevelData(res.data);
       setUpdatedAt(new Date());
     } catch (err: any) {
-      toast.error(err.response?.data?.msg || 'Failed to load daily stats');
+      toast.error(err.response?.data?.msg || 'Failed to load agent level');
     } finally {
-      setDailyLoading(false);
+      setLevelLoading(false);
     }
-  }, [token, dailyUserId, dailyDate]);
+  }, [token, levelUserId, levelDate]);
 
   // ── Team tab ──
   const [teamAgentId, setTeamAgentId] = useState('');
@@ -339,76 +339,86 @@ const AgencyDashboard = () => {
         </div>
       )}
 
-      {/* ── Daily Tab ── */}
-      {tab === 'Daily' && (
+      {/* ── Level Tab ── */}
+      {tab === 'Level' && (
         <div className="space-y-2">
           <SearchHeader>
             <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px]">Agent ID</label>
             <Input
-              value={dailyUserId}
-              onChange={(e) => setDailyUserId(e.target.value)}
+              value={levelUserId}
+              onChange={(e) => setLevelUserId(e.target.value)}
               placeholder="Enter Agent User ID"
               className="w-[180px] h-[26px] text-xs px-1.5"
-              onKeyDown={(e) => e.key === 'Enter' && loadDaily()}
+              onKeyDown={(e) => e.key === 'Enter' && loadLevel()}
             />
             <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px] ml-[3px]">Date</label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]">
                   <CalendarIcon className="mr-1 h-3 w-3" />
-                  {dailyDate ? format(dailyDate, "MMM dd, yyyy") : "Select"}
+                  {levelDate ? format(levelDate, "MMM dd, yyyy") : "Today"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={dailyDate} onSelect={setDailyDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
+                <Calendar mode="single" selected={levelDate} onSelect={setLevelDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
               </PopoverContent>
             </Popover>
             <Button
-              onClick={loadDaily}
-              disabled={dailyLoading || !dailyUserId.trim()}
+              onClick={loadLevel}
+              disabled={levelLoading || !levelUserId.trim()}
               size="sm"
               className="h-[26px] px-2.5 text-xs rounded-[5px]"
               style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
             >
-              {dailyLoading ? <Loading size={10} /> : <Search className="w-3.5 h-3.5" />}
+              {levelLoading ? <Loading size={10} /> : <Search className="w-3.5 h-3.5" />}
               Search
             </Button>
-            <LastUpdated timestamp={updatedAt} onRefresh={loadDaily} loading={dailyLoading} compact />
+            <LastUpdated timestamp={updatedAt} onRefresh={loadLevel} loading={levelLoading} compact />
           </SearchHeader>
 
-          {dailyData && (
+          {levelData && levelData.rebate_level !== undefined && (
             <div className="space-y-3">
+              {/* Header: Rebate Level + Date + Commission */}
               <div className="bg-card border border-border p-3 rounded-lg">
-                <div className="flex flex-wrap gap-4 text-xs">
-                  <span><span className="text-muted-foreground">Date: </span><span className="font-medium">{new Date(dailyData.date).toLocaleDateString()}</span></span>
-                  <span><span className="text-muted-foreground">This Week Commission: </span><span className="font-medium text-primary">₹{dailyData.thisWeekCommission?.toLocaleString()}</span></span>
-                  <span><span className="text-muted-foreground">Total Commission: </span><span className="font-medium text-primary">₹{dailyData.totalCommission?.toLocaleString()}</span></span>
-                  <span><span className="text-muted-foreground">Yesterday: </span><span className="font-medium">₹{dailyData.yesterdayTotalCommission?.toLocaleString()}</span></span>
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">Rebate Level</span>
+                    <span className="text-lg font-bold text-primary">{levelData.rebate_level}</span>
+                  </div>
+                  {levelData.date && (
+                    <span className="text-xs text-muted-foreground">Date: {new Date(levelData.date).toLocaleDateString()}</span>
+                  )}
                 </div>
-                {dailyData.totalRegister && (
-                  <div className="flex gap-4 text-xs mt-2 pt-2 border-t border-border">
-                    <span><span className="text-muted-foreground">L1 Reg: </span><span className="font-medium">{dailyData.totalRegister.level1 ?? 0}</span></span>
-                    <span><span className="text-muted-foreground">L2 Reg: </span><span className="font-medium">{dailyData.totalRegister.level2 ?? 0}</span></span>
-                    <span><span className="text-muted-foreground">L3 Reg: </span><span className="font-medium">{dailyData.totalRegister.level3 ?? 0}</span></span>
+                {levelData.commission && (
+                  <div className="flex flex-wrap gap-4 text-xs mt-2 pt-2 border-t border-border">
+                    <span><span className="text-muted-foreground">This Week Commission: </span><span className="font-medium text-primary">₹{levelData.commission.thisWeek?.toLocaleString()}</span></span>
+                    <span><span className="text-muted-foreground">Total Commission: </span><span className="font-medium text-primary">₹{levelData.commission.total?.toLocaleString()}</span></span>
+                    <span><span className="text-muted-foreground">Today Commission: </span><span className="font-medium">₹{levelData.commission.today?.toLocaleString()}</span></span>
                   </div>
                 )}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 ga">
-                {['level1', 'level2', 'level3'].map((lvl) => {
-                  const s = dailyData[lvl];
-                  return s ? (
-                    <div key={lvl} className="bg-card border border-border p-3 rounded-lg space-y-1">
-                      <h4 className="text-xs font-semibold text-foreground capitalize">{lvl.replace('level', 'Level ')}</h4>
-                      <div className="grid grid-cols-2 gap-1 text-[10px]">
-                        <div><span className="text-muted-foreground">Deposit: </span><span className="font-medium">₹{(s.deposit ?? 0).toLocaleString()}</span></div>
-                        <div><span className="text-muted-foreground">Reg Count: </span><span className="font-medium">{s.regCount ?? 0}</span></div>
-                        <div><span className="text-muted-foreground">Deposit Count: </span><span className="font-medium">{s.depositCount ?? 0}</span></div>
-                        <div><span className="text-muted-foreground">1st Deposit: </span><span className="font-medium">{s.firstDepositCount ?? 0}</span></div>
-                      </div>
+
+              {['level1', 'level2', 'level3', 'total'].map((key) => {
+                const s = levelData[key];
+                if (!s) return null;
+                return (
+                  <div key={key} className="bg-card border border-border p-3 rounded-lg space-y-1">
+                    <h4 className="text-xs font-semibold text-foreground capitalize">{key.replace('level', 'Level ')}</h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 text-[10px]">
+                      <div><span className="text-muted-foreground">Members: </span><span className="font-medium">{s.members ?? 0}</span></div>
+                      <div><span className="text-muted-foreground">Today Members: </span><span className="font-medium">{s.todayMembers ?? 0}</span></div>
+                      <div><span className="text-muted-foreground">Total Bets: </span><span className="font-medium">₹{(s.totalBets ?? 0).toLocaleString()}</span></div>
+                      <div><span className="text-muted-foreground">Today Bets: </span><span className="font-medium">₹{(s.todayBets ?? 0).toLocaleString()}</span></div>
+                      <div><span className="text-muted-foreground">Total Deposit: </span><span className="font-medium">₹{(s.totalDeposit ?? 0).toLocaleString()}</span></div>
+                      <div><span className="text-muted-foreground">Today Deposit: </span><span className="font-medium">₹{(s.todayDeposit ?? 0).toLocaleString()}</span></div>
+                      <div><span className="text-muted-foreground">Deposit Count: </span><span className="font-medium">{s.depositCount ?? 0}</span></div>
+                      <div><span className="text-muted-foreground">1st Deposit: </span><span className="font-medium">{s.firstDepositCount ?? 0}</span></div>
+                      <div><span className="text-muted-foreground">Total Withdrawal: </span><span className="font-medium">₹{(s.totalWithdrawal ?? 0).toLocaleString()}</span></div>
+                      <div><span className="text-muted-foreground">Today Withdrawal: </span><span className="font-medium">₹{(s.todayWithdrawal ?? 0).toLocaleString()}</span></div>
                     </div>
-                  ) : null;
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

@@ -1,4 +1,4 @@
-# Bet Search - Admin API
+# Agency API - Admin Side
 
 ## Base URL
 
@@ -16,120 +16,242 @@ Authorization: Bearer <admin_token>
 
 ---
 
-## Bet Search (All Bets by Member)
+## Get Agent Stats
 
 ```
-GET /api/game/all-bets?member=u12345&site=JE&status=1&dateFrom=2026-01-01&dateTo=2026-03-20&page=1&limit=50
+GET /admin/agent-stats?userId=123456&page=1&limit=50
 ```
-
-Search provider game bet records by member (userId). Requires admin privileges.
-
-**Query Params:**
-| Param | Type | Required | Description |
-|-------|------|---------|-------------|
-| member | string | Yes | Member ID (format: `u` + userId, e.g. `u12345`) |
-| site | string | No | Provider code: JE, PG, JD, TU |
-| status | number | No | Bet status (1=valid) |
-| dateFrom | string | No | Start date (YYYY-MM-DD) |
-| dateTo | string | No | End date (YYYY-MM-DD) |
-| page | number | No | Page number (default: 1) |
-| limit | number | No | Items per page (default: 50, max: 100) |
 
 **Response:**
 
 ```json
 {
-  "status": "success",
-  "member": "u12345",
+  "agent": {
+    "userId": 123456,
+    "mobile": "9876543210",
+    "admin": false,
+    "referredBy": 100001,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  "inviter": {
+    "userId": 100001,
+    "mobile": "9876543100",
+    "createdAt": "2025-12-01T00:00:00.000Z"
+  },
+  "totalInvitees": 25,
   "page": 1,
   "limit": 50,
-  "total": 25,
-  "summary": {
-    "totalBet": 5000,
-    "totalPayout": 3000,
-    "totalTurnover": 5000,
-    "netPnl": -2000
-  },
-  "items": [
+  "invitees": [
     {
-      "_id": "...",
-      "bet": 200,
-      "payout": 100,
-      "turnover": 200,
-      "gameId": "51",
-      "betTime": "2026-03-19T10:30:00.000Z",
-      "createdAt": "2026-03-19T10:30:00.000Z"
+      "userId": 123457,
+      "mobile": "9876543211",
+      "createdAt": "2026-02-01T00:00:00.000Z",
+      "totals": {
+        "deposit": 5000.0,
+        "withdraw": 1000.0
+      }
     }
   ]
 }
 ```
-
-| Field | Description |
-|-------|-------------|
-| items[].bet | Bet amount |
-| items[].payout | Payout amount |
-| items[].turnover | Turnover amount |
-| items[].gameId | Game ID |
-| totalBet | Sum of all bet amounts in current page |
-| totalPayout | Sum of all payouts in current page |
-| totalTurnover | Sum of all turnover amounts |
-| netPnl | totalPayout - totalBet (negative = platform profit) |
 
 ---
 
-## Wingo Bet Search (All Bets)
+## Level Config Management
+
+### Get All Level Configs
 
 ```
-GET /api/wingo/all-bets?userId=123&orderNumber=WGO123...&issueNumber=...&status=...&page=1&limit=50
+GET /agency/configs
 ```
-
-Search Wingo bets. Admins can search by userId, orderNumber, issueNumber, and status.
-
-**Query Params:**
-| Param | Type | Required | Description |
-|-------|------|---------|-------------|
-| userId | number | No | Admin only — filter by user ID |
-| orderNumber | string | No | Admin only — filter by exact order number (unique) |
-| issueNumber | string | No | Filter by issue/round number |
-| status | string | No | Filter: `pending`, `won`, `lost` |
-| page | number | No | Page number (default: 1) |
-| limit | number | No | Items per page (default: 50, max: 100) |
 
 **Response:**
 
 ```json
 {
   "status": "success",
-  "page": 1,
-  "limit": 50,
-  "total": 1,
-  "summary": { "totalBet": 100, "totalPayout": 0 },
-  "items": [
-    {
-      "_id": "...",
-      "userId": "123",
-      "mobile": "9876543210",
-      "issueNumber": "202605100000001",
-      "orderNumber": "WGO1712345678901",
-      "betAmount": 100,
-      "fee": 0,
-      "selectType": "green",
-      "status": "pending",
-      "result": null,
-      "createdAt": "2026-03-19T10:30:00.000Z"
-    }
+  "configs": [
+    { "level": 0, "minMembers": 0, "minBets": 0, "minDeposit": 0, "l1Rate": 0.006, "l2Rate": 0.0018, "l3Rate": 0.00054 }
   ]
 }
 ```
 
+### Update a Level Config
+
+```
+PUT /agency/configs/:level
+```
+
+**Body:**
+
+```json
+{
+  "minMembers": 10,
+  "minBets": 1000000,
+  "minDeposit": 200000,
+  "l1Rate": 0.0075,
+  "l2Rate": 0.0028125,
+  "l3Rate": 0.00105469
+}
+```
+
+### Seed Default Configs
+
+```
+POST /agency/configs/seed
+```
+
+---
+
+## Admin Agency Endpoints
+
+### Get Agent Level (Admin) — Unified
+
+```
+GET /agency/admin/level?userId=32545513
+GET /agency/admin/level?userId=32545513&date=2026-06-03
+```
+
+`date` is optional, defaults to today. Returns per-tier lifetime + daily stats, and commission data — replaces the old `/daily` endpoint.
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "rebate_level": 1,
+  "date": "2026-06-03T00:00:00.000Z",
+  "level1": {
+    "members": 5,
+    "todayMembers": 1,
+    "totalBets": 200000,
+    "todayBets": 20000,
+    "totalDeposit": 50000,
+    "todayDeposit": 4000,
+    "depositCount": 1,
+    "firstDepositCount": 1,
+    "totalWithdrawal": 10000,
+    "todayWithdrawal": 500
+  },
+  "level2": {
+    "members": 4,
+    "todayMembers": 1,
+    "totalBets": 150000,
+    "todayBets": 15000,
+    "totalDeposit": 40000,
+    "todayDeposit": 3000,
+    "depositCount": 1,
+    "firstDepositCount": 1,
+    "totalWithdrawal": 8000,
+    "todayWithdrawal": 600
+  },
+  "level3": {
+    "members": 3,
+    "todayMembers": 0,
+    "totalBets": 150000,
+    "todayBets": 7417,
+    "totalDeposit": 30000,
+    "todayDeposit": 1000,
+    "depositCount": 0,
+    "firstDepositCount": 0,
+    "totalWithdrawal": 7000,
+    "todayWithdrawal": 400
+  },
+  "total": {
+    "members": 12,
+    "todayMembers": 2,
+    "totalBets": 500000,
+    "todayBets": 42417,
+    "totalDeposit": 120000,
+    "todayDeposit": 8000,
+    "depositCount": 2,
+    "firstDepositCount": 2,
+    "totalWithdrawal": 25000,
+    "todayWithdrawal": 1500
+  },
+  "commission": {
+    "thisWeek": 1234.56,
+    "total": 56789.01,
+    "today": 456.78
+  }
+}
+```
+
 | Field | Description |
-|-------|-------------|
-| totalBet | Sum of all bet amounts in current page |
-| totalPayout | Sum of all profit amounts in current page |
-| items[].mobile | User's mobile number (joined from user model) |
-| items[].orderNumber | Unique order number for this bet |
-| items[].selectType | Bet selection: red, green, violet, big, small, or 0-9 |
-| items[].status | Bet status: pending, won, lost |
-| items[].result | Result object with profitAmount, etc., or null if pending |
+|---|---|
+| `rebate_level` | Current commission rebate level (0–10) |
+| `date` | The date the daily tally is for |
+| `level1/2/3.members` | Lifetime unique team members at that tier |
+| `level1/2/3.todayMembers` | New members registered for that date at that tier |
+| `level1/2/3.totalBets` | Lifetime bet amount from that tier |
+| `level1/2/3.todayBets` | Bet amount for that date from that tier |
+| `level1/2/3.totalDeposit` | Lifetime deposit amount from that tier |
+| `level1/2/3.todayDeposit` | Deposit amount for that date from that tier |
+| `level1/2/3.depositCount` | Number of deposit transactions for that date from that tier |
+| `level1/2/3.firstDepositCount` | First-time depositors for that date from that tier |
+| `level1/2/3.totalWithdrawal` | Lifetime withdrawal amount from that tier |
+| `level1/2/3.todayWithdrawal` | Withdrawal amount for that date from that tier |
+| `commission.thisWeek` | Total commission earned this week (Mon–Sun) |
+| `commission.total` | Lifetime total commission earned |
+| `commission.today` | Commission earned on that date |
 
+---
 
+### Get Agent Daily Stats (Admin) — Deprecated
+
+```
+GET /agency/admin/daily?userId=32545513&date=2026-05-24
+```
+
+**Deprecated.** Use `/agency/admin/level` instead (same data merged).
+
+### View Agent Team (Admin)
+
+```
+GET /agency/admin/team?agentId=32545513&toDate=2026-05-26&page=1&limit=25
+GET /agency/admin/team?agentId=32545513&fromDate=2026-05-01&toDate=2026-05-26&tier=1&page=1&limit=25
+```
+
+`toDate` is **required** and must be yesterday or earlier. Returns same shape as `/agency/team` with `aggregation`:
+
+```json
+{
+  "status": "success",
+  "total": 50,
+  "page": 1,
+  "limit": 25,
+  "items": [
+    {
+      "userId": 32545514,
+      "mobile": "98***10",
+      "registeredAt": "2026-01-15T10:30:00.000Z",
+      "tier": 1,
+      "totalDeposit": 15000
+    }
+  ],
+  "aggregation": {
+    "level1": { "depositCount": 120, "depositAmount": 450000, "bettorCount": 45, "betAmount": 1200000, "firstDepositCount": 30, "firstDepositAmount": 75000 },
+    "level2": { "depositCount": 60, "depositAmount": 200000, "bettorCount": 25, "betAmount": 600000, "firstDepositCount": 15, "firstDepositAmount": 35000 },
+    "level3": { "depositCount": 20, "depositAmount": 50000, "bettorCount": 10, "betAmount": 150000, "firstDepositCount": 5, "firstDepositAmount": 10000 },
+    "total": { "depositCount": 200, "depositAmount": 700000, "bettorCount": 80, "betAmount": 1950000, "firstDepositCount": 50, "firstDepositAmount": 120000 }
+  }
+}
+```
+
+---
+
+### Run Midnight Batch Manually
+
+```
+POST /agency/admin/run-midnight
+```
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "processed": 150,
+  "totalCommission": 4523.5
+}
+```

@@ -207,7 +207,11 @@ export const updateAgencyConfigLevel = (level: number, data: { minMembers?: numb
 
 export const seedAgencyConfigs = () => api.post('/api/agency/configs/seed');
 
-export const fetchAgentLevel = (userId: string) => api.get(`/api/agency/admin/level?userId=${userId}`);
+export const fetchAgentLevel = (userId: string, date?: string) => {
+  const params = new URLSearchParams({ userId });
+  if (date) params.set('date', date);
+  return api.get(`/api/agency/admin/level?${params.toString()}`);
+};
 
 export const fetchAgencyDaily = (userId: string, date?: string) => {
   const params = new URLSearchParams({ userId });
