@@ -233,7 +233,6 @@ const AgencyDashboard = () => {
             <SearchInputWithHistory
               value={statsUserId}
               onChange={setStatsUserId}
-              onSearch={() => loadStats(1)}
               placeholder="Enter Agent User ID"
               className="w-[180px] h-[26px] text-xs px-1.5"
             />
@@ -348,7 +347,6 @@ const AgencyDashboard = () => {
             <SearchInputWithHistory
               value={levelUserId}
               onChange={setLevelUserId}
-              onSearch={loadLevel}
               placeholder="Enter Agent User ID"
               className="w-[180px] h-[26px] text-xs px-1.5"
             />
@@ -433,7 +431,6 @@ const AgencyDashboard = () => {
             <SearchInputWithHistory
               value={teamAgentId}
               onChange={setTeamAgentId}
-              onSearch={() => loadTeam(1)}
               placeholder="Agent ID"
               className="w-[120px] h-[26px] text-xs px-1.5"
             />

@@ -20,12 +20,11 @@ function addToHistory(value: string) {
 interface Props {
   value: string;
   onChange: (v: string) => void;
-  onSearch: () => void;
   placeholder?: string;
   className?: string;
 }
 
-const SearchInputWithHistory = ({ value, onChange, onSearch, placeholder, className }: Props) => {
+const SearchInputWithHistory = ({ value, onChange, placeholder, className }: Props) => {
   const [open, setOpen] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
   const ref = useRef<HTMLDivElement>(null);
@@ -47,14 +46,12 @@ const SearchInputWithHistory = ({ value, onChange, onSearch, placeholder, classN
     onChange(id);
     setOpen(false);
     addToHistory(id);
-    setTimeout(() => onSearch(), 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       const trimmed = value.trim();
       if (trimmed) addToHistory(trimmed);
-      onSearch();
       setOpen(false);
     }
   };
