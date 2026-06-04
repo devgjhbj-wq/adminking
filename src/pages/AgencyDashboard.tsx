@@ -386,20 +386,20 @@ const AgencyDashboard = () => {
               <div className="bg-card border border-border p-4 rounded-lg space-y-3">
                 <label className="text-[11px] font-semibold text-foreground">Agent Info</label>
                 <div className="grid grid-cols-2 border border-border rounded overflow-hidden divide-x divide-y divide-border">
-                  <div className="p-2 bg-amber-500/5"><FormField label="User ID" value={teamData.agent.userId} /></div>
-                  <div className="p-2 bg-amber-500/10"><FormField label="Mobile" value={teamData.agent.mobile} /></div>
-                  <div className="p-2 bg-amber-500/5"><FormField label="Admin" value={teamData.agent.admin ? 'Yes' : 'No'} /></div>
-                  <div className="p-2 bg-amber-500/10"><FormField label="Referred By" value={teamData.agent.referredBy} /></div>
-                  <div className="p-2 bg-amber-500/5"><FormField label="Created" value={new Date(teamData.agent.createdAt).toLocaleString()} /></div>
+                  <div className="p-2 bg-blue-500/5"><FormField label="User ID" value={teamData.agent.userId} /></div>
+                  <div className="p-2 bg-blue-500/10"><FormField label="Mobile" value={teamData.agent.mobile} /></div>
+                  <div className="p-2 bg-blue-500/5"><FormField label="Admin" value={teamData.agent.admin ? 'Yes' : 'No'} /></div>
+                  <div className="p-2 bg-blue-500/10"><FormField label="Referred By" value={teamData.agent.referredBy} /></div>
+                  <div className="p-2 bg-blue-500/5"><FormField label="Created" value={new Date(teamData.agent.createdAt).toLocaleString()} /></div>
                 </div>
               </div>
               <div className="bg-card border border-border p-4 rounded-lg space-y-3">
                 <label className="text-[11px] font-semibold text-foreground">Inviter</label>
                 {teamData.inviter ? (
                   <div className="grid grid-cols-2 border border-border rounded overflow-hidden divide-x divide-y divide-border">
-                    <div className="p-2 bg-amber-500/5"><FormField label="User ID" value={teamData.inviter.userId} /></div>
-                    <div className="p-2 bg-amber-500/10"><FormField label="Mobile" value={teamData.inviter.mobile} /></div>
-                    <div className="p-2 bg-amber-500/5"><FormField label="Created" value={new Date(teamData.inviter.createdAt).toLocaleString()} /></div>
+                    <div className="p-2 bg-emerald-500/5"><FormField label="User ID" value={teamData.inviter.userId} /></div>
+                    <div className="p-2 bg-emerald-500/10"><FormField label="Mobile" value={teamData.inviter.mobile} /></div>
+                    <div className="p-2 bg-emerald-500/5"><FormField label="Created" value={new Date(teamData.inviter.createdAt).toLocaleString()} /></div>
                   </div>
                 ) : <p className="text-xs text-muted-foreground">No inviter</p>}
               </div>
