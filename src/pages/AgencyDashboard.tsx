@@ -248,15 +248,19 @@ const AgencyDashboard = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="bg-card border border-border p-4 rounded-lg space-y-3">
                   <label className="text-[11px] font-semibold text-foreground">Rebate Level</label>
-                  <FormField label="Current Level" value={levelData.rebate_level} />
-                  {levelData.date && <FormField label="Date" value={new Date(levelData.date).toLocaleDateString()} />}
+                  <div className="grid grid-cols-2 gap-x-4">
+                    <FormField label="Current Level" value={levelData.rebate_level} />
+                    {levelData.date && <FormField label="Date" value={new Date(levelData.date).toLocaleDateString()} />}
+                  </div>
                 </div>
                 {levelData.commission && (
                   <div className="bg-card border border-border p-4 rounded-lg space-y-3">
                     <label className="text-[11px] font-semibold text-foreground">Commission</label>
-                    <FormField label="This Week" value={`₹${(levelData.commission.thisWeek ?? 0).toLocaleString()}`} />
-                    <FormField label="Total" value={`₹${(levelData.commission.total ?? 0).toLocaleString()}`} />
-                    <FormField label="Today" value={`₹${(levelData.commission.today ?? 0).toLocaleString()}`} />
+                    <div className="grid grid-cols-2 gap-x-4">
+                      <FormField label="This Week" value={`₹${(levelData.commission.thisWeek ?? 0).toLocaleString()}`} />
+                      <FormField label="Total" value={`₹${(levelData.commission.total ?? 0).toLocaleString()}`} />
+                      <FormField label="Today" value={`₹${(levelData.commission.today ?? 0).toLocaleString()}`} />
+                    </div>
                   </div>
                 )}
               </div>
@@ -268,16 +272,18 @@ const AgencyDashboard = () => {
                   return (
                     <div key={key} className="bg-card border border-border p-4 rounded-lg space-y-3">
                       <label className="text-[11px] font-semibold text-foreground capitalize">{key.replace('level', 'Level ')}</label>
-                      <FormField label="Members" value={s.members ?? 0} />
-                      <FormField label="Today Members" value={s.todayMembers ?? 0} />
-                      <FormField label="Total Bets" value={`₹${(s.totalBets ?? 0).toLocaleString()}`} />
-                      <FormField label="Today Bets" value={`₹${(s.todayBets ?? 0).toLocaleString()}`} />
-                      <FormField label="Total Deposit" value={`₹${(s.totalDeposit ?? 0).toLocaleString()}`} />
-                      <FormField label="Today Deposit" value={`₹${(s.todayDeposit ?? 0).toLocaleString()}`} />
-                      <FormField label="Deposit Count" value={s.depositCount ?? 0} />
-                      <FormField label="1st Deposit" value={s.firstDepositCount ?? 0} />
-                      <FormField label="Total Withdrawal" value={`₹${(s.totalWithdrawal ?? 0).toLocaleString()}`} />
-                      <FormField label="Today Withdrawal" value={`₹${(s.todayWithdrawal ?? 0).toLocaleString()}`} />
+                      <div className="grid grid-cols-2 gap-x-4">
+                        <FormField label="Members" value={s.members ?? 0} />
+                        <FormField label="Today Members" value={s.todayMembers ?? 0} />
+                        <FormField label="Total Bets" value={`₹${(s.totalBets ?? 0).toLocaleString()}`} />
+                        <FormField label="Today Bets" value={`₹${(s.todayBets ?? 0).toLocaleString()}`} />
+                        <FormField label="Total Deposit" value={`₹${(s.totalDeposit ?? 0).toLocaleString()}`} />
+                        <FormField label="Today Deposit" value={`₹${(s.todayDeposit ?? 0).toLocaleString()}`} />
+                        <FormField label="Deposit Count" value={s.depositCount ?? 0} />
+                        <FormField label="1st Deposit" value={s.firstDepositCount ?? 0} />
+                        <FormField label="Total Withdrawal" value={`₹${(s.totalWithdrawal ?? 0).toLocaleString()}`} />
+                        <FormField label="Today Withdrawal" value={`₹${(s.todayWithdrawal ?? 0).toLocaleString()}`} />
+                      </div>
                     </div>
                   );
                 })}
@@ -345,16 +351,18 @@ const AgencyDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="bg-card border border-border p-4 rounded-lg space-y-3">
                 <label className="text-[11px] font-semibold text-foreground">Agent Info</label>
-                <FormField label="User ID" value={teamData.agent.userId} />
-                <FormField label="Mobile" value={teamData.agent.mobile} />
-                <FormField label="Admin" value={teamData.agent.admin ? 'Yes' : 'No'} />
-                <FormField label="Referred By" value={teamData.agent.referredBy} />
-                <FormField label="Created" value={new Date(teamData.agent.createdAt).toLocaleString()} />
+                <div className="grid grid-cols-2 gap-x-4">
+                  <FormField label="User ID" value={teamData.agent.userId} />
+                  <FormField label="Mobile" value={teamData.agent.mobile} />
+                  <FormField label="Admin" value={teamData.agent.admin ? 'Yes' : 'No'} />
+                  <FormField label="Referred By" value={teamData.agent.referredBy} />
+                  <FormField label="Created" value={new Date(teamData.agent.createdAt).toLocaleString()} />
+                </div>
               </div>
               <div className="bg-card border border-border p-4 rounded-lg space-y-3">
                 <label className="text-[11px] font-semibold text-foreground">Inviter</label>
                 {teamData.inviter ? (
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-x-4">
                     <FormField label="User ID" value={teamData.inviter.userId} />
                     <FormField label="Mobile" value={teamData.inviter.mobile} />
                     <FormField label="Created" value={new Date(teamData.inviter.createdAt).toLocaleString()} />
