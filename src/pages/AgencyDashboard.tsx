@@ -20,10 +20,13 @@ import { format } from 'date-fns';
 const tabs = ['Level', 'Team', 'Config'] as const;
 type Tab = typeof tabs[number];
 
-const InfoRow = ({ label, value }: { label: string; value: any }) => (
-  <div className="flex justify-between items-center py-0.5 border-b border-border last:border-0">
-    <span className="text-xs text-muted-foreground">{label}</span>
-    <span className="text-xs font-medium text-foreground">{String(value ?? '—')}</span>
+const FormField = ({ label, value, sub }: { label: string; value: any; sub?: string }) => (
+  <div>
+    <label className="text-[11px] text-muted-foreground block mb-1">{label}</label>
+    <div className="text-xs font-bold text-foreground">
+      {value}
+      {sub && <span className="text-[10px] text-muted-foreground ml-1.5">{sub}</span>}
+    </div>
   </div>
 );
 
@@ -240,48 +243,45 @@ const AgencyDashboard = () => {
           </SearchHeader>
 
           {levelData && levelData.rebate_level !== undefined && (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {/* Header: Rebate Level + Date + Commission */}
-              <div className="bg-card border border-border p-3 rounded-lg">
-                <div className="flex flex-wrap items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">Rebate Level</span>
-                    <span className="text-lg font-bold text-primary">{levelData.rebate_level}</span>
-                  </div>
-                  {levelData.date && (
-                    <span className="text-xs text-muted-foreground">Date: {new Date(levelData.date).toLocaleDateString()}</span>
-                  )}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="bg-card border border-border p-4 rounded-lg space-y-3">
+                  <label className="text-[11px] font-semibold text-foreground">Rebate Level</label>
+                  <FormField label="Current Level" value={levelData.rebate_level} />
+                  {levelData.date && <FormField label="Date" value={new Date(levelData.date).toLocaleDateString()} />}
                 </div>
                 {levelData.commission && (
-                  <div className="flex flex-wrap gap-4 text-xs mt-2 pt-2 border-t border-border">
-                    <span><span className="text-muted-foreground">This Week Commission: </span><span className="font-medium text-primary">₹{levelData.commission.thisWeek?.toLocaleString()}</span></span>
-                    <span><span className="text-muted-foreground">Total Commission: </span><span className="font-medium text-primary">₹{levelData.commission.total?.toLocaleString()}</span></span>
-                    <span><span className="text-muted-foreground">Today Commission: </span><span className="font-medium">₹{levelData.commission.today?.toLocaleString()}</span></span>
+                  <div className="bg-card border border-border p-4 rounded-lg space-y-3">
+                    <label className="text-[11px] font-semibold text-foreground">Commission</label>
+                    <FormField label="This Week" value={`₹${(levelData.commission.thisWeek ?? 0).toLocaleString()}`} />
+                    <FormField label="Total" value={`₹${(levelData.commission.total ?? 0).toLocaleString()}`} />
+                    <FormField label="Today" value={`₹${(levelData.commission.today ?? 0).toLocaleString()}`} />
                   </div>
                 )}
               </div>
 
-              {['level1', 'level2', 'level3', 'total'].map((key) => {
-                const s = levelData[key];
-                if (!s) return null;
-                return (
-                  <div key={key} className="bg-card border border-border p-3 rounded-lg space-y-1">
-                    <h4 className="text-xs font-semibold text-foreground capitalize">{key.replace('level', 'Level ')}</h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 text-[10px]">
-                      <div><span className="text-muted-foreground">Members: </span><span className="font-medium">{s.members ?? 0}</span></div>
-                      <div><span className="text-muted-foreground">Today Members: </span><span className="font-medium">{s.todayMembers ?? 0}</span></div>
-                      <div><span className="text-muted-foreground">Total Bets: </span><span className="font-medium">₹{(s.totalBets ?? 0).toLocaleString()}</span></div>
-                      <div><span className="text-muted-foreground">Today Bets: </span><span className="font-medium">₹{(s.todayBets ?? 0).toLocaleString()}</span></div>
-                      <div><span className="text-muted-foreground">Total Deposit: </span><span className="font-medium">₹{(s.totalDeposit ?? 0).toLocaleString()}</span></div>
-                      <div><span className="text-muted-foreground">Today Deposit: </span><span className="font-medium">₹{(s.todayDeposit ?? 0).toLocaleString()}</span></div>
-                      <div><span className="text-muted-foreground">Deposit Count: </span><span className="font-medium">{s.depositCount ?? 0}</span></div>
-                      <div><span className="text-muted-foreground">1st Deposit: </span><span className="font-medium">{s.firstDepositCount ?? 0}</span></div>
-                      <div><span className="text-muted-foreground">Total Withdrawal: </span><span className="font-medium">₹{(s.totalWithdrawal ?? 0).toLocaleString()}</span></div>
-                      <div><span className="text-muted-foreground">Today Withdrawal: </span><span className="font-medium">₹{(s.todayWithdrawal ?? 0).toLocaleString()}</span></div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {['level1', 'level2', 'level3', 'total'].map((key) => {
+                  const s = levelData[key];
+                  if (!s) return null;
+                  return (
+                    <div key={key} className="bg-card border border-border p-4 rounded-lg space-y-3">
+                      <label className="text-[11px] font-semibold text-foreground capitalize">{key.replace('level', 'Level ')}</label>
+                      <FormField label="Members" value={s.members ?? 0} />
+                      <FormField label="Today Members" value={s.todayMembers ?? 0} />
+                      <FormField label="Total Bets" value={`₹${(s.totalBets ?? 0).toLocaleString()}`} />
+                      <FormField label="Today Bets" value={`₹${(s.todayBets ?? 0).toLocaleString()}`} />
+                      <FormField label="Total Deposit" value={`₹${(s.totalDeposit ?? 0).toLocaleString()}`} />
+                      <FormField label="Today Deposit" value={`₹${(s.todayDeposit ?? 0).toLocaleString()}`} />
+                      <FormField label="Deposit Count" value={s.depositCount ?? 0} />
+                      <FormField label="1st Deposit" value={s.firstDepositCount ?? 0} />
+                      <FormField label="Total Withdrawal" value={`₹${(s.totalWithdrawal ?? 0).toLocaleString()}`} />
+                      <FormField label="Today Withdrawal" value={`₹${(s.todayWithdrawal ?? 0).toLocaleString()}`} />
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -342,23 +342,23 @@ const AgencyDashboard = () => {
           </SearchHeader>
 
           {teamData?.agent && (
-            <div className="grid grid-cols-1 md:grid-cols-2 ga">
-              <div className="bg-card border border-border p-3 rounded-lg space-y-1">
-                <h3 className="text-xs font-semibold text-foreground">Agent Info</h3>
-                <InfoRow label="User ID" value={teamData.agent.userId} />
-                <InfoRow label="Mobile" value={teamData.agent.mobile} />
-                <InfoRow label="Admin" value={teamData.agent.admin ? 'Yes' : 'No'} />
-                <InfoRow label="Referred By" value={teamData.agent.referredBy} />
-                <InfoRow label="Created" value={new Date(teamData.agent.createdAt).toLocaleString()} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="bg-card border border-border p-4 rounded-lg space-y-3">
+                <label className="text-[11px] font-semibold text-foreground">Agent Info</label>
+                <FormField label="User ID" value={teamData.agent.userId} />
+                <FormField label="Mobile" value={teamData.agent.mobile} />
+                <FormField label="Admin" value={teamData.agent.admin ? 'Yes' : 'No'} />
+                <FormField label="Referred By" value={teamData.agent.referredBy} />
+                <FormField label="Created" value={new Date(teamData.agent.createdAt).toLocaleString()} />
               </div>
-              <div className="bg-card border border-border p-3 rounded-lg space-y-1">
-                <h3 className="text-xs font-semibold text-foreground">Inviter</h3>
+              <div className="bg-card border border-border p-4 rounded-lg space-y-3">
+                <label className="text-[11px] font-semibold text-foreground">Inviter</label>
                 {teamData.inviter ? (
-                  <>
-                    <InfoRow label="User ID" value={teamData.inviter.userId} />
-                    <InfoRow label="Mobile" value={teamData.inviter.mobile} />
-                    <InfoRow label="Created" value={new Date(teamData.inviter.createdAt).toLocaleString()} />
-                  </>
+                  <div className="space-y-3">
+                    <FormField label="User ID" value={teamData.inviter.userId} />
+                    <FormField label="Mobile" value={teamData.inviter.mobile} />
+                    <FormField label="Created" value={new Date(teamData.inviter.createdAt).toLocaleString()} />
+                  </div>
                 ) : <p className="text-xs text-muted-foreground">No inviter</p>}
               </div>
             </div>
