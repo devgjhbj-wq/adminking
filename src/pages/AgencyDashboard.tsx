@@ -408,7 +408,17 @@ const AgencyDashboard = () => {
 
           {teamData?.aggregation && (
             <div className="space-y-3">
-              <label className="text-[11px] font-semibold text-foreground">Aggregation</label>
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-semibold text-foreground">Aggregation</label>
+                <Button
+                  size="sm"
+                  onClick={() => { setTmOpen(true); setTmData(null); setTmPage(1); }}
+                  className="h-[26px] px-2.5 text-xs rounded-[5px]"
+                  style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+                >
+                  <Users className="w-3.5 h-3.5 mr-1" /> Team Members
+                </Button>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {['level1', 'level2', 'level3', 'total'].map((key) => {
                   const agg = teamData.aggregation[key];
@@ -420,14 +430,6 @@ const AgencyDashboard = () => {
                   ) : null;
                 })}
               </div>
-            </div>
-          )}
-
-          {teamData?.aggregation && (
-            <div className="flex justify-end">
-              <Button size="sm" onClick={() => { setTmOpen(true); setTmData(null); setTmPage(1); }} className="h-7 text-xs">
-                <Users className="w-3.5 h-3.5 mr-1" /> Team Members
-              </Button>
             </div>
           )}
         </div>
