@@ -209,13 +209,13 @@ const AgencyDashboard = () => {
   const renderAggregation = (agg: any) => {
     if (!agg) return null;
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 border border-border rounded overflow-hidden divide-x divide-y divide-border text-[10px]">
-        <div className="p-2 bg-cyan-500/5"><span className="text-muted-foreground">Deposit Count: </span><span className="font-medium">{agg.depositCount ?? 0}</span></div>
-        <div className="p-2 bg-cyan-500/10"><span className="text-muted-foreground">Deposit Amt: </span><span className="font-medium">₹{(agg.depositAmount ?? 0).toLocaleString()}</span></div>
-        <div className="p-2 bg-cyan-500/5"><span className="text-muted-foreground">Bettor Count: </span><span className="font-medium">{agg.bettorCount ?? 0}</span></div>
-        <div className="p-2 bg-cyan-500/10"><span className="text-muted-foreground">Bet Amount: </span><span className="font-medium">₹{(agg.betAmount ?? 0).toLocaleString()}</span></div>
-        <div className="p-2 bg-cyan-500/5"><span className="text-muted-foreground">1st Deposit Count: </span><span className="font-medium">{agg.firstDepositCount ?? 0}</span></div>
-        <div className="p-2 bg-cyan-500/10"><span className="text-muted-foreground">1st Deposit Amt: </span><span className="font-medium">₹{(agg.firstDepositAmount ?? 0).toLocaleString()}</span></div>
+      <div className="grid grid-cols-2 border border-border rounded overflow-hidden divide-x divide-y divide-border">
+        <div className="p-2 bg-cyan-500/5"><FormField label="Deposit Count" value={agg.depositCount ?? 0} /></div>
+        <div className="p-2 bg-cyan-500/10"><FormField label="Deposit Amt" value={`₹${(agg.depositAmount ?? 0).toLocaleString()}`} /></div>
+        <div className="p-2 bg-cyan-500/5"><FormField label="Bettor Count" value={agg.bettorCount ?? 0} /></div>
+        <div className="p-2 bg-cyan-500/10"><FormField label="Bet Amount" value={`₹${(agg.betAmount ?? 0).toLocaleString()}`} /></div>
+        <div className="p-2 bg-cyan-500/5"><FormField label="1st Deposit Count" value={agg.firstDepositCount ?? 0} /></div>
+        <div className="p-2 bg-cyan-500/10"><FormField label="1st Deposit Amt" value={`₹${(agg.firstDepositAmount ?? 0).toLocaleString()}`} /></div>
       </div>
     );
   };
