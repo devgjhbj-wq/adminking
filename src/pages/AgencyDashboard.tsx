@@ -313,10 +313,10 @@ const AgencyDashboard = () => {
                         <div className="p-2 bg-gradient-to-br from-violet-500/10 to-violet-500/5"><FormField label="Today Bets" value={`₹${(s.todayBets ?? 0).toLocaleString()}`} /></div>
                         <div className="p-2 bg-gradient-to-br from-violet-500/5 to-violet-500/10"><FormField label="Total Deposit" value={`₹${(s.totalDeposit ?? 0).toLocaleString()}`} /></div>
                         <div className="p-2 bg-gradient-to-br from-violet-500/10 to-violet-500/5"><FormField label="Today Deposit" value={`₹${(s.todayDeposit ?? 0).toLocaleString()}`} /></div>
-                        <div className="p-2 bg-gradient-to-br from-violet-500/5 to-violet-500/10"><FormField label="Deposit Count" value={s.depositCount ?? 0} /></div>
-                        <div className="p-2 bg-gradient-to-br from-violet-500/10 to-violet-500/5"><FormField label="1st Deposit" value={s.firstDepositCount ?? 0} /></div>
                         <div className="p-2 bg-gradient-to-br from-violet-500/5 to-violet-500/10"><FormField label="Total Withdrawal" value={`₹${(s.totalWithdrawal ?? 0).toLocaleString()}`} /></div>
                         <div className="p-2 bg-gradient-to-br from-violet-500/10 to-violet-500/5"><FormField label="Today Withdrawal" value={`₹${(s.todayWithdrawal ?? 0).toLocaleString()}`} /></div>
+                        <div className="p-2 bg-gradient-to-br from-violet-500/5 to-violet-500/10"><FormField label="Today Deposit Count" value={s.depositCount ?? 0} /></div>
+                        <div className="p-2 bg-gradient-to-br from-violet-500/10 to-violet-500/5"><FormField label="Today 1st Deposit" value={s.firstDepositCount ?? 0} /></div>
                       </div>
                     </div>
                   );
