@@ -437,59 +437,61 @@ const AgencyDashboard = () => {
 
       {/* ── Team Members Drawer ── */}
       <Drawer open={tmOpen} onClose={() => setTmOpen(false)} title="Team Members" width="700px">
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[11px] text-muted-foreground block mb-1">Tier</label>
-              <select value={tmTier} onChange={(e) => setTmTier(e.target.value)} className="w-full h-[30px] rounded border border-input bg-background px-2 text-xs">
-                <option value="">All</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-              </select>
+        <div className="h-full flex flex-col">
+          <div className="sticky top-0 z-10 bg-card pb-3 space-y-3 border-b border-border mb-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] text-muted-foreground block mb-1">Tier</label>
+                <select value={tmTier} onChange={(e) => setTmTier(e.target.value)} className="w-full h-[30px] rounded border border-input bg-background px-2 text-xs">
+                  <option value="">All</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-[11px] text-muted-foreground block mb-1">User ID</label>
+                <Input value={tmUserId} onChange={(e) => setTmUserId(e.target.value)} placeholder="Search by userId" className="h-[30px] text-xs" />
+              </div>
+              <div>
+                <label className="text-[11px] text-muted-foreground block mb-1">From Date</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start text-left font-normal text-xs h-[30px] px-2 rounded-[5px]">
+                      <CalendarIcon className="mr-1 h-3 w-3" />
+                      {tmFromDate ? format(tmFromDate, "MMM dd, yyyy") : "Select"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={tmFromDate} onSelect={setTmFromDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div>
+                <label className="text-[11px] text-muted-foreground block mb-1">To Date</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start text-left font-normal text-xs h-[30px] px-2 rounded-[5px]">
+                      <CalendarIcon className="mr-1 h-3 w-3" />
+                      {tmToDate ? format(tmToDate, "MMM dd, yyyy") : "Select"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={tmToDate} onSelect={setTmToDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
-            <div>
-              <label className="text-[11px] text-muted-foreground block mb-1">User ID</label>
-              <Input value={tmUserId} onChange={(e) => setTmUserId(e.target.value)} placeholder="Search by userId" className="h-[30px] text-xs" />
-            </div>
-            <div>
-              <label className="text-[11px] text-muted-foreground block mb-1">From Date</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal text-xs h-[30px] px-2 rounded-[5px]">
-                    <CalendarIcon className="mr-1 h-3 w-3" />
-                    {tmFromDate ? format(tmFromDate, "MMM dd, yyyy") : "Select"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={tmFromDate} onSelect={setTmFromDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
-                </PopoverContent>
-              </Popover>
-            </div>
-            <div>
-              <label className="text-[11px] text-muted-foreground block mb-1">To Date</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal text-xs h-[30px] px-2 rounded-[5px]">
-                    <CalendarIcon className="mr-1 h-3 w-3" />
-                    {tmToDate ? format(tmToDate, "MMM dd, yyyy") : "Select"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={tmToDate} onSelect={setTmToDate} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
-                </PopoverContent>
-              </Popover>
-            </div>
+            <Button onClick={() => loadTeamMembers(1)} disabled={tmLoading} size="sm" className="w-full h-[30px] text-xs" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
+              {tmLoading ? <Loading size={10} className="mr-1" /> : <Search className="w-3.5 h-3.5 mr-1" />}
+              Search
+            </Button>
           </div>
-          <Button onClick={() => loadTeamMembers(1)} disabled={tmLoading} size="sm" className="w-full h-[30px] text-xs" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
-            {tmLoading ? <Loading size={10} className="mr-1" /> : <Search className="w-3.5 h-3.5 mr-1" />}
-            Search
-          </Button>
 
-          {tmData?.items && (
-            <div className="space-y-2">
-              <div className="relative rounded" style={{ border: '1px solid hsl(var(--border))' }}>
-                <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 400 }}>
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            {tmData?.items && (
+              <div className="space-y-2">
+                <div className="relative rounded" style={{ border: '1px solid hsl(var(--border))' }}>
                   <table className="el-table w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', minWidth: 650 }}>
                     <colgroup>
                       <col style={{ width: 80 }} />
@@ -542,6 +544,7 @@ const AgencyDashboard = () => {
               )}
             </div>
           )}
+        </div>
         </div>
       </Drawer>
 
