@@ -532,19 +532,18 @@ const AgencyDashboard = () => {
                     </tbody>
                   </table>
                 </div>
-              </div>
-              {tmTotalPages > 1 && (
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Total: {tmData.total} — Page {tmPage}/{tmTotalPages}</span>
-                  <div className="flex gap-1">
-                    <Button variant="outline" size="sm" disabled={tmPage <= 1} onClick={() => loadTeamMembers(tmPage - 1)}><ChevronLeft className="w-3.5 h-3.5" /></Button>
-                    <Button variant="outline" size="sm" disabled={tmPage >= tmTotalPages} onClick={() => loadTeamMembers(tmPage + 1)}><ChevronRight className="w-3.5 h-3.5" /></Button>
+                {tmTotalPages > 1 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Total: {tmData.total} — Page {tmPage}/{tmTotalPages}</span>
+                    <div className="flex gap-1">
+                      <Button variant="outline" size="sm" disabled={tmPage <= 1} onClick={() => loadTeamMembers(tmPage - 1)}><ChevronLeft className="w-3.5 h-3.5" /></Button>
+                      <Button variant="outline" size="sm" disabled={tmPage >= tmTotalPages} onClick={() => loadTeamMembers(tmPage + 1)}><ChevronRight className="w-3.5 h-3.5" /></Button>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </Drawer>
 
