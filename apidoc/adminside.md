@@ -158,7 +158,7 @@ GET /agency/admin/level?userId=32545513&date=2026-06-03
 
 ### View Agent Team (Admin) — Unified
 
-Replaces the old `/admin/agent-stats` endpoint — now includes agent info, inviter info, and per-user withdrawal totals.
+Returns team aggregation stats plus agent and inviter info. Individual member details are available via a separate endpoint (see below).
 
 ```
 GET /agency/admin/team?agentId=32545513&toDate=2026-05-26&page=1&limit=25
@@ -187,16 +187,6 @@ GET /agency/admin/team?agentId=32545513&fromDate=2026-05-01&toDate=2026-05-26&ti
     "mobile": "98***00",
     "createdAt": "2025-12-01T00:00:00.000Z"
   },
-  "items": [
-    {
-      "userId": 32545514,
-      "mobile": "98***10",
-      "registeredAt": "2026-01-15T10:30:00.000Z",
-      "tier": 1,
-      "totalDeposit": 15000,
-      "totalWithdrawal": 3000
-    }
-  ],
   "aggregation": {
     "level1": { "depositCount": 120, "depositAmount": 450000, "bettorCount": 45, "betAmount": 1200000, "firstDepositCount": 30, "firstDepositAmount": 75000 },
     "level2": { "depositCount": 60, "depositAmount": 200000, "bettorCount": 25, "betAmount": 600000, "firstDepositCount": 15, "firstDepositAmount": 35000 },
@@ -205,6 +195,62 @@ GET /agency/admin/team?agentId=32545513&fromDate=2026-05-01&toDate=2026-05-26&ti
   }
 }
 ```
+
+---
+
+### View Team Members (Admin) — Full Details
+
+Returns individual team member details with unmasked mobile numbers and total bet amount. Filterable by tier.
+
+```
+GET /agency/admin/team-members?agentId=32545513&toDate=2026-05-26&page=1&limit=25
+GET /agency/admin/team-members?agentId=32545513&fromDate=2026-05-01&toDate=2026-05-26&tier=1&page=1&limit=25
+GET /agency/admin/team-members?agentId=32545513&toDate=2026-05-26&tier=2&page=1&limit=25
+```
+
+**Parameters:**
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `agentId` | Yes | Agent's userId whose team members to view |
+| `tier` | No | Filter by downline level (1=direct, 2=indirect, 3=3rd level) |
+| `userId` | No | Search specific user by userId |
+| `fromDate` | No | Registration start date (YYYY-MM-DD) |
+| `toDate` | No | Registration end date (YYYY-MM-DD) |
+| `page` | No | Page number (default: 1) |
+| `limit` | No | Items per page (default: 25, max: 100) |
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "total": 50,
+  "page": 1,
+  "limit": 25,
+  "items": [
+    {
+      "userId": 32545514,
+      "mobile": "9876543210",
+      "registeredAt": "2026-01-15T10:30:00.000Z",
+      "tier": 1,
+      "totalDeposit": 15000,
+      "totalWithdrawal": 3000,
+      "totalBet": 120000
+    }
+  ]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `userId` | User ID of the team member |
+| `mobile` | Full mobile number (unmasked) |
+| `registeredAt` | Registration timestamp |
+| `tier` | Downline level (1, 2, or 3) |
+| `totalDeposit` | Lifetime deposit amount |
+| `totalWithdrawal` | Lifetime withdrawal amount |
+| `totalBet` | Total bet amount placed (all games) |
 
 ---
 
