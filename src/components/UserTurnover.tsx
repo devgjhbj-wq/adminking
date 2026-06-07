@@ -27,7 +27,7 @@ const UserTurnover = ({ userId }: { userId: string | number }) => {
     setLoading(true);
     try {
       const res = await fetchTurnoverStatus(userId);
-      setData(res.data);
+      setData(res.data?.data || res.data);
     } catch (err: any) {
       console.error(err);
     } finally {
