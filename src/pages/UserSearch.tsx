@@ -12,15 +12,19 @@ import { Search, ShieldAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SearchHeader } from '@/components/PageContainer';
 
-const SectionCard = ({ title, color, children, rightAction }: {
+const SectionCard = ({ title, titleExtra, color, children, rightAction }: {
   title: string;
+  titleExtra?: React.ReactNode;
   color: string;
   children: React.ReactNode;
   rightAction?: React.ReactNode;
 }) => (
-  <div className={`bg-card border border-border rounded-xl shadow-sm border-l-4 ${color}`}>
+  <div className={`bg-card border border-border rounded-xl shadow-sm border-l-4 overflow-hidden ${color}`}>
     <div className="px-4 py-2.5 border-b border-border flex items-center justify-between">
-      <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">{title}</h3>
+      <div className="flex items-center gap-3">
+        <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">{title}</h3>
+        {titleExtra && <span className="text-xs text-muted-foreground">{titleExtra}</span>}
+      </div>
       {rightAction && <div className="flex items-center gap-2">{rightAction}</div>}
     </div>
     <div className="p-4">
@@ -259,6 +263,7 @@ const UserSearch = () => {
           {/* Same IP Users */}
           <SectionCard
             title="Same IP Users"
+            titleExtra={<span className="font-semibold text-foreground">Users Sharing IP: {result?.sameIpUsers ?? 0}</span>}
             color="border-l-purple-500"
             rightAction={
               <Sheet>
@@ -310,7 +315,6 @@ const UserSearch = () => {
           >
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
               <FormField label="IP Address" value={lastIp || '—'} />
-              <FormField label="Users Sharing IP" value={result?.sameIpUsers ?? '—'} />
               {deviceInfo?.city && <FormField label="City" value={deviceInfo.city} />}
               {deviceInfo?.region && <FormField label="Region" value={deviceInfo.region} />}
               {deviceInfo?.country_name && <FormField label="Country" value={deviceInfo.country_name} />}

@@ -43,7 +43,7 @@ const SectionCard = ({ title, color, children }: {
   color: string;
   children: React.ReactNode;
 }) => (
-  <div className={`bg-card border border-border rounded-xl shadow-sm border-l-4 ${color}`}>
+  <div className={`bg-card border border-border rounded-xl shadow-sm border-l-4 overflow-hidden ${color}`}>
     <div className="px-4 py-2.5 border-b border-border">
       <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">{title}</h3>
     </div>
