@@ -128,6 +128,12 @@ export const fetchDepositConfig = () => api.get('/api/admin/deposit-config');
 export const updateDepositConfig = (channel: string, data: { isActive?: boolean; minAmount?: number; maxAmount?: number; name?: string; description?: string; sortOrder?: number }) =>
   api.put(`/api/admin/deposit-config/${channel}`, data);
 
+// Deposit Bonus Config
+export const fetchDepositBonusConfig = () => api.get('/api/admin/deposit-bonus-config');
+
+export const updateDepositBonusConfig = (data: { depositCount: number; bonusRate: number; active?: boolean }) =>
+  api.put('/api/admin/deposit-bonus-config', data);
+
 // Withdrawals
 /**
  * Fetch withdrawal orders with filters

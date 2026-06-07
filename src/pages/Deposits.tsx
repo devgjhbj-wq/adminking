@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { fetchDeposits, approveDeposit, fetchDepositConfig, updateDepositConfig, setAuthToken } from '@/lib/api';
+import { fetchDeposits, approveDeposit, fetchDepositConfig, updateDepositConfig, fetchDepositBonusConfig, updateDepositBonusConfig, setAuthToken } from '@/lib/api';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import Loading from '@/components/Loading';
@@ -41,13 +41,19 @@ const Deposits = () => {
   const [approvingId, setApprovingId] = useState<string | null>(null);
 
   // Tab state
-  const [tab, setTab] = useState<'orders' | 'config'>('orders');
+  const [tab, setTab] = useState<'orders' | 'config' | 'bonus'>('orders');
 
   // Config state
   const [config, setConfig] = useState<any[]>([]);
   const [configLoading, setConfigLoading] = useState(false);
   const [configSaving, setConfigSaving] = useState(false);
   const [editConfig, setEditConfig] = useState<Record<string, { isActive: boolean; minAmount: number; maxAmount: number; exchangeRate: number }>>({});
+
+  // Bonus config state
+  const [bonusConfig, setBonusConfig] = useState<any[]>([]);
+  const [bonusLoading, setBonusLoading] = useState(false);
+  const [bonusSaving, setBonusSaving] = useState(false);
+  const [editBonus, setEditBonus] = useState<Record<number, { bonusRate: number; active: boolean }>>({});
 
   const loadConfig = useCallback(async () => {
     setAuthToken(token);
@@ -88,8 +94,43 @@ const Deposits = () => {
     }
   };
 
+  const loadBonusConfig = useCallback(async () => {
+    setAuthToken(token);
+    setBonusLoading(true);
+    try {
+      const res = await fetchDepositBonusConfig();
+      const data = res.data?.configs || [];
+      setBonusConfig(data);
+      const edits: Record<number, any> = {};
+      data.forEach((c: any) => {
+        edits[c.depositCount] = { bonusRate: c.bonusRate, active: c.active };
+      });
+      setEditBonus(edits);
+    } catch (err: any) {
+      toast.error(err.response?.data?.msg || 'Failed to load bonus config');
+    } finally {
+      setBonusLoading(false);
+    }
+  }, [token]);
+
+  const handleSaveBonusConfig = async (depositCount: number) => {
+    setAuthToken(token);
+    setBonusSaving(true);
+    try {
+      const data = editBonus[depositCount];
+      const res = await updateDepositBonusConfig({ depositCount, bonusRate: data.bonusRate, active: data.active });
+      setBonusConfig(prev => prev.map(c => c.depositCount === depositCount ? res.data?.config : c));
+      toast.success('Bonus tier updated');
+    } catch (err: any) {
+      toast.error(err.response?.data?.msg || 'Failed to update bonus tier');
+    } finally {
+      setBonusSaving(false);
+    }
+  };
+
   useEffect(() => {
     if (tab === 'config') loadConfig();
+    if (tab === 'bonus') loadBonusConfig();
   }, [tab]);
 
   const handleApprove = async (orderIdToApprove: string) => {
@@ -327,7 +368,7 @@ const Deposits = () => {
     <PageContainer>
       {/* Tab Bar */}
       <div className="flex items-center gap-0 bg-card border border-border rounded px-1" style={{ height: 34 }}>
-        {(['orders', 'config'] as const).map((t) => (
+        {(['orders', 'config', 'bonus'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -487,6 +528,89 @@ const Deposits = () => {
         </>
       )}
       </>
+      )}
+
+      {tab === 'bonus' && (
+        <div className="bg-card border border-border p-4 rounded-lg space-y-4">
+          <h3 className="text-sm font-semibold">Deposit Bonus Configuration</h3>
+          {bonusLoading ? (
+            <div className="flex justify-center py-8"><Loading size={20} /></div>
+          ) : (
+            <div className="space-y-4">
+              {bonusConfig.map((c: any) => (
+                <div key={c.depositCount} className="border border-border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold text-foreground uppercase">
+                      {c.depositCount === 1 ? '1st' : c.depositCount === 2 ? '2nd' : '3rd'} Deposit Bonus
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 mb-3">
+                    <div>
+                      <label className="text-[10px] text-muted-foreground">Bonus Rate (%)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="10"
+                        className="flex h-7 w-full rounded border border-input bg-background px-2 py-0.5 text-xs mt-0.5"
+                        value={editBonus[c.depositCount]?.bonusRate ?? 0}
+                        onChange={(e) => setEditBonus(prev => ({
+                          ...prev,
+                          [c.depositCount]: { ...prev[c.depositCount], bonusRate: Number(e.target.value) }
+                        }))}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-muted-foreground">Active</label>
+                      <div className="flex bg-secondary/30 p-0.5 rounded-md border border-border h-[26px] w-fit mt-0.5">
+                        <button
+                          onClick={() => setEditBonus(prev => ({
+                            ...prev,
+                            [c.depositCount]: { ...prev[c.depositCount], active: true }
+                          }))}
+                          className={`px-2.5 text-[11px] font-medium rounded transition-colors h-full ${
+                            editBonus[c.depositCount]?.active
+                              ? 'bg-[rgb(32,143,255)] text-white shadow-sm'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          Enabled
+                        </button>
+                        <button
+                          onClick={() => setEditBonus(prev => ({
+                            ...prev,
+                            [c.depositCount]: { ...prev[c.depositCount], active: false }
+                          }))}
+                          className={`px-2.5 text-[11px] font-medium rounded transition-colors h-full ${
+                            !editBonus[c.depositCount]?.active
+                              ? 'bg-[rgb(32,143,255)] text-white shadow-sm'
+                              : 'text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          Disabled
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                    <span>Current rate: <strong>{(c.bonusRate * 100).toFixed(0)}%</strong></span>
+                    {c.createdAt && <span>| Created: {new Date(c.createdAt).toLocaleDateString()}</span>}
+                    {c.updatedAt && <span>| Updated: {new Date(c.updatedAt).toLocaleDateString()}</span>}
+                  </div>
+                  <Button
+                    onClick={() => handleSaveBonusConfig(c.depositCount)}
+                    disabled={bonusSaving}
+                    size="sm"
+                    className="h-7 text-xs mt-3"
+                  >
+                    {bonusSaving && <Loading size={12} className="mr-1" />}
+                    Save
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       {tab === 'config' && (
