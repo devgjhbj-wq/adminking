@@ -12,12 +12,13 @@ import { Search, ShieldAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SearchHeader } from '@/components/PageContainer';
 
-const SectionCard = ({ title, children, rightAction }: {
+const SectionCard = ({ title, color, children, rightAction }: {
   title: string;
+  color: string;
   children: React.ReactNode;
   rightAction?: React.ReactNode;
 }) => (
-  <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
+  <div className={`bg-card border border-border rounded-xl shadow-sm border-l-4 ${color}`}>
     <div className="px-4 py-2.5 border-b border-border flex items-center justify-between">
       <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">{title}</h3>
       {rightAction && <div className="flex items-center gap-2">{rightAction}</div>}
@@ -197,7 +198,7 @@ const UserSearch = () => {
       {result && (
         <div className="space-y-4">
           {/* User Profile */}
-          <SectionCard title="User Profile">
+          <SectionCard title="User Profile" color="border-l-blue-500">
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
               <FormField label="User ID" value={user?.userId ?? '—'} />
               <FormField label="Mobile" value={user?.mobile ?? '—'} />
@@ -210,6 +211,7 @@ const UserSearch = () => {
           {/* Account */}
           <SectionCard
             title="Account"
+            color="border-l-emerald-500"
             rightAction={
               <Button
                 size="sm"
@@ -257,6 +259,7 @@ const UserSearch = () => {
           {/* Same IP Users */}
           <SectionCard
             title="Same IP Users"
+            color="border-l-purple-500"
             rightAction={
               <Sheet>
                 <SheetTrigger asChild>
@@ -314,6 +317,7 @@ const UserSearch = () => {
           {/* Payment Methods */}
           <SectionCard
             title="Payment Methods"
+            color="border-l-amber-500"
             rightAction={
               <Button
                 size="sm"
