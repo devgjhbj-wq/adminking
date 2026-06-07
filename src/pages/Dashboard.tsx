@@ -38,11 +38,12 @@ interface DashboardStats {
   };
 }
 
-const SectionCard = ({ title, children }: {
+const SectionCard = ({ title, color, children }: {
   title: string;
+  color: string;
   children: React.ReactNode;
 }) => (
-  <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
+  <div className={`bg-card border border-border rounded-xl shadow-sm border-l-4 ${color}`}>
     <div className="px-4 py-2.5 border-b border-border">
       <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">{title}</h3>
     </div>
@@ -133,7 +134,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
           {/* Overview Card */}
-          <SectionCard title="Overview">
+          <SectionCard title="Overview" color="border-l-blue-500">
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
               <FormField label="Total Users" value={(stats?.overview?.totalUsers ?? 0).toLocaleString()} />
               <FormField label="New Users" value={(stats?.overview?.newUsers ?? 0).toLocaleString()} sub={`in ${stats?.period === 'all' ? 'all time' : stats?.period}`} />
@@ -141,7 +142,7 @@ const Dashboard = () => {
           </SectionCard>
 
           {/* Deposits Card */}
-          <SectionCard title="Deposits">
+          <SectionCard title="Deposits" color="border-l-emerald-500">
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
               <FormField label="Total Success Deposit Amount" value={`₹${(stats?.deposits?.total ?? 0).toLocaleString()}`} />
               <FormField label="Number of Success Order" value={(stats?.deposits?.count ?? 0).toLocaleString()} />
@@ -150,7 +151,7 @@ const Dashboard = () => {
           </SectionCard>
 
           {/* Withdrawals Card */}
-          <SectionCard title="Withdrawals">
+          <SectionCard title="Withdrawals" color="border-l-purple-500">
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
               <FormField label="Total Withdrawal Amount (All Statuses)" value={`₹${(stats?.withdrawals?.total ?? 0).toLocaleString()}`} />
               <FormField label="Total Charges (All Orders)" value={`₹${(stats?.withdrawals?.chargeTotal ?? 0).toLocaleString()}`} sub={`${(stats?.withdrawals?.count ?? 0).toLocaleString()} orders`} />
@@ -162,7 +163,7 @@ const Dashboard = () => {
           </SectionCard>
 
           {/* Agent Commission Card */}
-          <SectionCard title="Agent Commission">
+          <SectionCard title="Agent Commission" color="border-l-amber-500">
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
               <FormField label="Total Agent Commission Amount" value={stats?.agentCommission ? `₹${stats.agentCommission.total.toLocaleString()}` : '—'} />
               <FormField label="Commission Transactions" value={stats?.agentCommission ? stats.agentCommission.count.toLocaleString() : '—'} />
