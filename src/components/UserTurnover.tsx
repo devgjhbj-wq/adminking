@@ -83,7 +83,7 @@ const UserTurnover = ({ userId }: { userId: string | number }) => {
 
   if (loading && !data) {
     return (
-      <div className="bg-card border border-border p-4 rounded-md flex justify-center py-6">
+      <div className="bg-card border border-border rounded-xl shadow-sm border-l-4 border-l-blue-500 p-4 flex justify-center py-6">
         <Loading />
       </div>
     );
@@ -92,7 +92,7 @@ const UserTurnover = ({ userId }: { userId: string | number }) => {
   if (!data) return null;
 
   return (
-    <div className="bg-card border border-border p-4 space-y-4 rounded-md">
+    <div className="bg-card border border-border rounded-xl shadow-sm border-l-4 border-l-blue-500 p-4 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
         <div>
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
@@ -103,37 +103,41 @@ const UserTurnover = ({ userId }: { userId: string | number }) => {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" size="sm" onClick={loadData} disabled={loading} className="h-7 text-[10px]">
+          <Button size="sm" onClick={loadData} disabled={loading} className="h-7 text-[10px] rounded-[5px]" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
             <RefreshCw className={`w-3 h-3 mr-1 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setAddDialogOpen(true)} className="h-7 text-[10px]">
+          <Button size="sm" onClick={() => setAddDialogOpen(true)} className="h-7 text-[10px] rounded-[5px]" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
             <Plus className="w-3 h-3 mr-1" /> Add
           </Button>
-          <Button variant="destructive" size="sm" onClick={() => setClearDialogOpen(true)} className="h-7 text-[10px] bg-red-500/10 text-red-500 hover:bg-red-500/20">
+          <Button size="sm" onClick={() => setClearDialogOpen(true)} className="h-7 text-[10px] rounded-[5px]" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
             <Trash2 className="w-3 h-3 mr-1" /> Clear
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="p-3 bg-secondary/30 rounded border border-border space-y-1">
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Requirement</div>
-          <div className="text-lg font-bold text-foreground">₹{data.turnover_requirement?.toFixed(2) || 0}</div>
-        </div>
-        <div className="p-3 bg-secondary/30 rounded border border-border space-y-1">
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Completed</div>
-          <div className="text-lg font-bold text-foreground">₹{data.total_turnover_completed?.toFixed(2) || 0}</div>
-        </div>
-        <div className="p-3 bg-secondary/30 rounded border border-border space-y-1">
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Progress</div>
-          <div className="text-lg font-bold text-foreground">{data.progress || 0}%</div>
-        </div>
-        <div className="p-3 bg-secondary/30 rounded border border-border space-y-1">
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Status</div>
-          <div className={`text-sm font-bold mt-1 inline-flex items-center px-2 py-0.5 rounded ${data.canWithdraw ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
-            {data.canWithdraw ? 'Can Withdraw' : 'Cannot Withdraw'}
-          </div>
-        </div>
+      <div className="border border-border rounded overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-[10px] text-muted-foreground uppercase">Requirement</TableHead>
+              <TableHead className="text-[10px] text-muted-foreground uppercase">Completed</TableHead>
+              <TableHead className="text-[10px] text-muted-foreground uppercase">Progress</TableHead>
+              <TableHead className="text-[10px] text-muted-foreground uppercase">Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell className="text-sm font-bold">₹{data.turnover_requirement?.toFixed(2) || 0}</TableCell>
+              <TableCell className="text-sm font-bold">₹{data.total_turnover_completed?.toFixed(2) || 0}</TableCell>
+              <TableCell className="text-sm font-bold">{data.progress || 0}%</TableCell>
+              <TableCell>
+                <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${data.canWithdraw ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
+                  {data.canWithdraw ? 'Can Withdraw' : 'Cannot Withdraw'}
+                </span>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </div>
 
       {data.batches && data.batches.length > 0 && (
