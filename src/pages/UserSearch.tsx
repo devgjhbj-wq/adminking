@@ -163,7 +163,7 @@ const UserSearch = () => {
     }
   };
 
-  const { user, account, paymentMethods, lastIp } = result || {};
+  const { user, account, paymentMethods, lastIp, deviceInfo } = result || {};
 
   return (
     <div className="space-y-4">
@@ -308,9 +308,79 @@ const UserSearch = () => {
               </Sheet>
             }
           >
-            <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-              <FormField label="IP Address" value={lastIp || '—'} />
-              <FormField label="Users Sharing IP" value={result?.sameIpUsers ?? '—'} />
+            <div className="border border-border rounded overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-[10px] text-muted-foreground uppercase w-1/4">Field</TableHead>
+                    <TableHead className="text-[10px] text-muted-foreground uppercase">Value</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="text-xs text-muted-foreground font-medium">IP Address</TableCell>
+                    <TableCell className="text-xs font-mono">{lastIp || '—'}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="text-xs text-muted-foreground font-medium">Users Sharing IP</TableCell>
+                    <TableCell className="text-xs font-bold">{result?.sameIpUsers ?? '—'}</TableCell>
+                  </TableRow>
+                  {deviceInfo?.city && (
+                    <TableRow>
+                      <TableCell className="text-xs text-muted-foreground font-medium">City</TableCell>
+                      <TableCell className="text-xs">{deviceInfo.city}</TableCell>
+                    </TableRow>
+                  )}
+                  {deviceInfo?.region && (
+                    <TableRow>
+                      <TableCell className="text-xs text-muted-foreground font-medium">Region</TableCell>
+                      <TableCell className="text-xs">{deviceInfo.region}</TableCell>
+                    </TableRow>
+                  )}
+                  {deviceInfo?.country_name && (
+                    <TableRow>
+                      <TableCell className="text-xs text-muted-foreground font-medium">Country</TableCell>
+                      <TableCell className="text-xs">{deviceInfo.country_name}</TableCell>
+                    </TableRow>
+                  )}
+                  {deviceInfo?.asn && (
+                    <TableRow>
+                      <TableCell className="text-xs text-muted-foreground font-medium">ASN</TableCell>
+                      <TableCell className="text-xs font-mono">{deviceInfo.asn}</TableCell>
+                    </TableRow>
+                  )}
+                  {deviceInfo?.org && (
+                    <TableRow>
+                      <TableCell className="text-xs text-muted-foreground font-medium">Organization</TableCell>
+                      <TableCell className="text-xs">{deviceInfo.org}</TableCell>
+                    </TableRow>
+                  )}
+                  {deviceInfo?.isp && (
+                    <TableRow>
+                      <TableCell className="text-xs text-muted-foreground font-medium">ISP</TableCell>
+                      <TableCell className="text-xs">{deviceInfo.isp}</TableCell>
+                    </TableRow>
+                  )}
+                  {deviceInfo?.latitude != null && deviceInfo?.longitude != null && (
+                    <TableRow>
+                      <TableCell className="text-xs text-muted-foreground font-medium">Location</TableCell>
+                      <TableCell className="text-xs font-mono">{deviceInfo.latitude}, {deviceInfo.longitude}</TableCell>
+                    </TableRow>
+                  )}
+                  {deviceInfo?.timezone && (
+                    <TableRow>
+                      <TableCell className="text-xs text-muted-foreground font-medium">Timezone</TableCell>
+                      <TableCell className="text-xs">{deviceInfo.timezone}</TableCell>
+                    </TableRow>
+                  )}
+                  {deviceInfo?.postal && (
+                    <TableRow>
+                      <TableCell className="text-xs text-muted-foreground font-medium">Postal Code</TableCell>
+                      <TableCell className="text-xs">{deviceInfo.postal}</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
             </div>
           </SectionCard>
 
