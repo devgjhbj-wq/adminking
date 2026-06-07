@@ -541,7 +541,7 @@ const Deposits = () => {
               {bonusConfig.map((c: any) => {
                 const borderColors: Record<number, string> = { 1: 'border-l-amber-400', 2: 'border-l-slate-400', 3: 'border-l-orange-600' };
                 return (
-                <div key={c.depositCount} className={`border border-border rounded-lg p-4 border-l-4 ${borderColors[c.depositCount] || 'border-l-blue-500'}`}>
+                <div key={c.depositCount} className={`border border-border rounded-xl p-4 border-l-4 shadow-sm ${borderColors[c.depositCount] || 'border-l-blue-500'}`}>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold text-foreground uppercase">
                       {c.depositCount === 1 ? '1st' : c.depositCount === 2 ? '2nd' : '3rd'} Deposit Bonus
@@ -609,7 +609,7 @@ const Deposits = () => {
               {config.map((ch: any, idx: number) => {
                 const borderColors = ['border-l-blue-500', 'border-l-emerald-500', 'border-l-purple-500', 'border-l-rose-500', 'border-l-cyan-500'];
                 return (
-                <div key={ch.channel} className={`border border-border rounded-lg p-4 border-l-4 ${borderColors[idx % borderColors.length]}`}>
+                <div key={ch.channel} className={`border border-border rounded-xl p-4 border-l-4 shadow-sm ${borderColors[idx % borderColors.length]}`}>
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <span className="text-xs font-bold text-foreground uppercase">{ch.name}</span>
