@@ -537,13 +537,23 @@ const Deposits = () => {
           {bonusLoading ? (
             <div className="flex justify-center py-8"><Loading size={20} /></div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
               {bonusConfig.map((c: any) => (
                 <div key={c.depositCount} className="border border-border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold text-foreground uppercase">
                       {c.depositCount === 1 ? '1st' : c.depositCount === 2 ? '2nd' : '3rd'} Deposit Bonus
                     </span>
+                    <Button
+                      onClick={() => handleSaveBonusConfig(c.depositCount)}
+                      disabled={bonusSaving}
+                      size="sm"
+                      className="h-7 text-xs"
+                      style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+                    >
+                      {bonusSaving && <Loading size={12} className="mr-1" />}
+                      Save
+                    </Button>
                   </div>
                   <div className="grid grid-cols-2 gap-4 mb-3">
                     <div>
@@ -579,15 +589,6 @@ const Deposits = () => {
                     {c.createdAt && <span>| Created: {new Date(c.createdAt).toLocaleDateString()}</span>}
                     {c.updatedAt && <span>| Updated: {new Date(c.updatedAt).toLocaleDateString()}</span>}
                   </div>
-                  <Button
-                    onClick={() => handleSaveBonusConfig(c.depositCount)}
-                    disabled={bonusSaving}
-                    size="sm"
-                    className="h-7 text-xs mt-3"
-                  >
-                    {bonusSaving && <Loading size={12} className="mr-1" />}
-                    Save
-                  </Button>
                 </div>
               ))}
             </div>
@@ -601,17 +602,25 @@ const Deposits = () => {
           {configLoading ? (
             <div className="flex justify-center py-8"><Loading size={20} /></div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
               {config.map((ch: any) => (
                 <div key={ch.channel} className="border border-border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <span className="text-xs font-bold text-foreground uppercase">{ch.name}</span>
                       <span className="text-[10px] text-muted-foreground ml-2">({ch.channel})</span>
+                      <span className="text-[10px] text-muted-foreground ml-2">{ch.description}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-muted-foreground">{ch.description}</span>
-                    </div>
+                    <Button
+                      onClick={() => handleSaveConfig(ch.channel)}
+                      disabled={configSaving}
+                      size="sm"
+                      className="h-7 text-xs"
+                      style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+                    >
+                      {configSaving && <Loading size={12} className="mr-1" />}
+                      Save
+                    </Button>
                   </div>
                   <div className="grid grid-cols-4 gap-4 mb-3">
                     <div>
@@ -664,15 +673,6 @@ const Deposits = () => {
                       />
                     </div>
                   </div>
-                  <Button
-                    onClick={() => handleSaveConfig(ch.channel)}
-                    disabled={configSaving}
-                    size="sm"
-                    className="h-7 text-xs"
-                  >
-                    {configSaving && <Loading size={12} className="mr-1" />}
-                    Save
-                  </Button>
                 </div>
               ))}
             </div>
