@@ -308,79 +308,147 @@ const UserSearch = () => {
               </Sheet>
             }
           >
-            <div className="border border-border rounded overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-[10px] text-muted-foreground uppercase w-1/4">Field</TableHead>
-                    <TableHead className="text-[10px] text-muted-foreground uppercase">Value</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="text-xs text-muted-foreground font-medium">IP Address</TableCell>
-                    <TableCell className="text-xs font-mono">{lastIp || '—'}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="text-xs text-muted-foreground font-medium">Users Sharing IP</TableCell>
-                    <TableCell className="text-xs font-bold">{result?.sameIpUsers ?? '—'}</TableCell>
-                  </TableRow>
+            <style>{`
+              .el-table {
+                font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+                font-size: 14px;
+                line-height: 1.15;
+                color: hsl(var(--foreground));
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+              }
+              .el-table tbody { font-size: 12px; }
+              .el-table tbody tr { transition: background-color 0.25s ease; }
+              .el-table tbody tr:hover { background-color: hsl(var(--accent) / 0.12); }
+              .el-table .cell {
+                box-sizing: border-box;
+                padding: 0 5px;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                overflow: hidden;
+              }
+            `}</style>
+            <div style={{ overflowX: 'auto' }}>
+              <table className="el-table w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse' }}>
+                <thead style={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'hsl(var(--card))' }}>
+                  <tr style={{ height: 40 }}>
+                    <th style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14, width: '25%' }}>
+                      <div className="cell">Field</div>
+                    </th>
+                    <th style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
+                      <div className="cell">Value</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ height: 40 }}>
+                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                      <div className="cell text-xs text-muted-foreground font-medium">IP Address</div>
+                    </td>
+                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                      <div className="cell text-xs font-mono">{lastIp || '—'}</div>
+                    </td>
+                  </tr>
+                  <tr style={{ height: 40 }}>
+                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                      <div className="cell text-xs text-muted-foreground font-medium">Users Sharing IP</div>
+                    </td>
+                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                      <div className="cell text-xs font-bold">{result?.sameIpUsers ?? '—'}</div>
+                    </td>
+                  </tr>
                   {deviceInfo?.city && (
-                    <TableRow>
-                      <TableCell className="text-xs text-muted-foreground font-medium">City</TableCell>
-                      <TableCell className="text-xs">{deviceInfo.city}</TableCell>
-                    </TableRow>
+                    <tr style={{ height: 40 }}>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs text-muted-foreground font-medium">City</div>
+                      </td>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs">{deviceInfo.city}</div>
+                      </td>
+                    </tr>
                   )}
                   {deviceInfo?.region && (
-                    <TableRow>
-                      <TableCell className="text-xs text-muted-foreground font-medium">Region</TableCell>
-                      <TableCell className="text-xs">{deviceInfo.region}</TableCell>
-                    </TableRow>
+                    <tr style={{ height: 40 }}>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs text-muted-foreground font-medium">Region</div>
+                      </td>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs">{deviceInfo.region}</div>
+                      </td>
+                    </tr>
                   )}
                   {deviceInfo?.country_name && (
-                    <TableRow>
-                      <TableCell className="text-xs text-muted-foreground font-medium">Country</TableCell>
-                      <TableCell className="text-xs">{deviceInfo.country_name}</TableCell>
-                    </TableRow>
+                    <tr style={{ height: 40 }}>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs text-muted-foreground font-medium">Country</div>
+                      </td>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs">{deviceInfo.country_name}</div>
+                      </td>
+                    </tr>
                   )}
                   {deviceInfo?.asn && (
-                    <TableRow>
-                      <TableCell className="text-xs text-muted-foreground font-medium">ASN</TableCell>
-                      <TableCell className="text-xs font-mono">{deviceInfo.asn}</TableCell>
-                    </TableRow>
+                    <tr style={{ height: 40 }}>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs text-muted-foreground font-medium">ASN</div>
+                      </td>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs font-mono">{deviceInfo.asn}</div>
+                      </td>
+                    </tr>
                   )}
                   {deviceInfo?.org && (
-                    <TableRow>
-                      <TableCell className="text-xs text-muted-foreground font-medium">Organization</TableCell>
-                      <TableCell className="text-xs">{deviceInfo.org}</TableCell>
-                    </TableRow>
+                    <tr style={{ height: 40 }}>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs text-muted-foreground font-medium">Organization</div>
+                      </td>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs">{deviceInfo.org}</div>
+                      </td>
+                    </tr>
                   )}
                   {deviceInfo?.isp && (
-                    <TableRow>
-                      <TableCell className="text-xs text-muted-foreground font-medium">ISP</TableCell>
-                      <TableCell className="text-xs">{deviceInfo.isp}</TableCell>
-                    </TableRow>
+                    <tr style={{ height: 40 }}>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs text-muted-foreground font-medium">ISP</div>
+                      </td>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs">{deviceInfo.isp}</div>
+                      </td>
+                    </tr>
                   )}
                   {deviceInfo?.latitude != null && deviceInfo?.longitude != null && (
-                    <TableRow>
-                      <TableCell className="text-xs text-muted-foreground font-medium">Location</TableCell>
-                      <TableCell className="text-xs font-mono">{deviceInfo.latitude}, {deviceInfo.longitude}</TableCell>
-                    </TableRow>
+                    <tr style={{ height: 40 }}>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs text-muted-foreground font-medium">Location</div>
+                      </td>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs font-mono">{deviceInfo.latitude}, {deviceInfo.longitude}</div>
+                      </td>
+                    </tr>
                   )}
                   {deviceInfo?.timezone && (
-                    <TableRow>
-                      <TableCell className="text-xs text-muted-foreground font-medium">Timezone</TableCell>
-                      <TableCell className="text-xs">{deviceInfo.timezone}</TableCell>
-                    </TableRow>
+                    <tr style={{ height: 40 }}>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs text-muted-foreground font-medium">Timezone</div>
+                      </td>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs">{deviceInfo.timezone}</div>
+                      </td>
+                    </tr>
                   )}
                   {deviceInfo?.postal && (
-                    <TableRow>
-                      <TableCell className="text-xs text-muted-foreground font-medium">Postal Code</TableCell>
-                      <TableCell className="text-xs">{deviceInfo.postal}</TableCell>
-                    </TableRow>
+                    <tr style={{ height: 40 }}>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs text-muted-foreground font-medium">Postal Code</div>
+                      </td>
+                      <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                        <div className="cell text-xs">{deviceInfo.postal}</div>
+                      </td>
+                    </tr>
                   )}
-                </TableBody>
-              </Table>
+                </tbody>
+              </table>
             </div>
           </SectionCard>
 

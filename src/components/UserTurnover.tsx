@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import Loading from '@/components/Loading';
 import { RefreshCw, Plus, Trash2, ShieldAlert } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const UserTurnover = ({ userId }: { userId: string | number }) => {
   const { token } = useAuth();
@@ -115,63 +114,109 @@ const UserTurnover = ({ userId }: { userId: string | number }) => {
         </div>
       </div>
 
-      <div className="border border-border rounded overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-[10px] text-muted-foreground uppercase">Requirement</TableHead>
-              <TableHead className="text-[10px] text-muted-foreground uppercase">Completed</TableHead>
-              <TableHead className="text-[10px] text-muted-foreground uppercase">Progress</TableHead>
-              <TableHead className="text-[10px] text-muted-foreground uppercase">Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell className="text-sm font-bold">₹{data.turnover_requirement?.toFixed(2) || 0}</TableCell>
-              <TableCell className="text-sm font-bold">₹{data.total_turnover_completed?.toFixed(2) || 0}</TableCell>
-              <TableCell className="text-sm font-bold">{data.progress || 0}%</TableCell>
-              <TableCell>
-                <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${data.canWithdraw ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
-                  {data.canWithdraw ? 'Can Withdraw' : 'Cannot Withdraw'}
-                </span>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+      <style>{`
+        .el-table {
+          font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+          font-size: 14px;
+          line-height: 1.15;
+          color: hsl(var(--foreground));
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+        .el-table tbody { font-size: 12px; }
+        .el-table tbody tr { transition: background-color 0.25s ease; }
+        .el-table tbody tr:hover { background-color: hsl(var(--accent) / 0.12); }
+        .el-table .cell {
+          box-sizing: border-box;
+          padding: 0 5px;
+          word-break: break-word;
+          overflow-wrap: break-word;
+          overflow: hidden;
+        }
+      `}</style>
+
+      <div style={{ overflowX: 'auto' }}>
+        <table className="el-table w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse' }}>
+          <thead style={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'hsl(var(--card))' }}>
+            <tr style={{ height: 40 }}>
+              <th style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
+                <div className="cell">Requirement</div>
+              </th>
+              <th style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
+                <div className="cell">Completed</div>
+              </th>
+              <th style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
+                <div className="cell">Progress</div>
+              </th>
+              <th style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
+                <div className="cell">Status</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style={{ height: 50 }}>
+              <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                <div className="cell text-sm font-bold">₹{data.turnover_requirement?.toFixed(2) || 0}</div>
+              </td>
+              <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                <div className="cell text-sm font-bold">₹{data.total_turnover_completed?.toFixed(2) || 0}</div>
+              </td>
+              <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                <div className="cell text-sm font-bold">{data.progress || 0}%</div>
+              </td>
+              <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                <div className="cell">
+                  <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${data.canWithdraw ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
+                    {data.canWithdraw ? 'Can Withdraw' : 'Cannot Withdraw'}
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       {data.batches && data.batches.length > 0 && (
-        <div className="mt-4 border border-border rounded overflow-hidden">
-          <div className="bg-secondary/50 px-3 py-2 border-b border-border text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-            Active Turnover Batches
-          </div>
-          <div className="max-h-60 overflow-y-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-[10px]">Date</TableHead>
-                  <TableHead className="text-[10px]">Type</TableHead>
-                  <TableHead className="text-[10px] text-right">Amount</TableHead>
-                  <TableHead className="text-[10px] text-center">Mult.</TableHead>
-                  <TableHead className="text-[10px] text-right">Required</TableHead>
-                  <TableHead className="text-[10px] text-right">Completed</TableHead>
-                  <TableHead className="text-[10px] text-right">Remaining</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+        <div className="border border-border rounded overflow-hidden">
+          <div style={{ overflowX: 'auto' }}>
+            <table className="el-table w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', minWidth: 700 }}>
+              <thead style={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'hsl(var(--card))' }}>
+                <tr style={{ height: 40 }}>
+                  {['Date', 'Type', 'Amount', 'Mult.', 'Required', 'Completed', 'Remaining'].map((label) => (
+                    <th key={label} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
+                      <div className="cell">{label}</div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
                 {data.batches.map((batch: any, i: number) => (
-                  <TableRow key={i}>
-                    <TableCell className="text-[11px] p-2 whitespace-nowrap">{new Date(batch.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-[11px] p-2">{batch.type}</TableCell>
-                    <TableCell className="text-[11px] p-2 text-right">₹{batch.amount}</TableCell>
-                    <TableCell className="text-[11px] p-2 text-center">{batch.multiplier}x</TableCell>
-                    <TableCell className="text-[11px] p-2 text-right">₹{batch.required}</TableCell>
-                    <TableCell className="text-[11px] p-2 text-right text-muted-foreground">₹{batch.completed}</TableCell>
-                    <TableCell className="text-[11px] p-2 text-right font-medium">₹{batch.remaining}</TableCell>
-                  </TableRow>
+                  <tr key={i} style={{ height: 40 }}>
+                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                      <div className="cell text-xs whitespace-nowrap">{new Date(batch.createdAt).toLocaleDateString()}</div>
+                    </td>
+                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                      <div className="cell text-xs">{batch.type}</div>
+                    </td>
+                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                      <div className="cell text-xs">₹{batch.amount}</div>
+                    </td>
+                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                      <div className="cell text-xs">{batch.multiplier}x</div>
+                    </td>
+                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                      <div className="cell text-xs">₹{batch.required}</div>
+                    </td>
+                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                      <div className="cell text-xs text-muted-foreground">₹{batch.completed}</div>
+                    </td>
+                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                      <div className="cell text-xs font-medium">₹{batch.remaining}</div>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
+              </tbody>
+            </table>
           </div>
         </div>
       )}
