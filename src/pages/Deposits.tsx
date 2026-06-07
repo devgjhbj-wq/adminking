@@ -537,9 +537,11 @@ const Deposits = () => {
           {bonusLoading ? (
             <div className="flex justify-center py-8"><Loading size={20} /></div>
           ) : (
-            <div className="grid grid-cols-3 gap-4">
-              {bonusConfig.map((c: any) => (
-                <div key={c.depositCount} className="border border-border rounded-lg p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {bonusConfig.map((c: any) => {
+                const borderColors: Record<number, string> = { 1: 'border-l-amber-400', 2: 'border-l-slate-400', 3: 'border-l-orange-600' };
+                return (
+                <div key={c.depositCount} className={`border border-border rounded-lg p-4 border-l-4 ${borderColors[c.depositCount] || 'border-l-blue-500'}`}>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold text-foreground uppercase">
                       {c.depositCount === 1 ? '1st' : c.depositCount === 2 ? '2nd' : '3rd'} Deposit Bonus
@@ -548,7 +550,7 @@ const Deposits = () => {
                       onClick={() => handleSaveBonusConfig(c.depositCount)}
                       disabled={bonusSaving}
                       size="sm"
-                      className="h-7 text-xs"
+                      className="h-7 text-xs rounded-[5px]"
                       style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
                     >
                       {bonusSaving && <Loading size={12} className="mr-1" />}
@@ -590,7 +592,8 @@ const Deposits = () => {
                     {c.updatedAt && <span>| Updated: {new Date(c.updatedAt).toLocaleDateString()}</span>}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -602,9 +605,11 @@ const Deposits = () => {
           {configLoading ? (
             <div className="flex justify-center py-8"><Loading size={20} /></div>
           ) : (
-            <div className="grid grid-cols-3 gap-4">
-              {config.map((ch: any) => (
-                <div key={ch.channel} className="border border-border rounded-lg p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {config.map((ch: any, idx: number) => {
+                const borderColors = ['border-l-blue-500', 'border-l-emerald-500', 'border-l-purple-500', 'border-l-rose-500', 'border-l-cyan-500'];
+                return (
+                <div key={ch.channel} className={`border border-border rounded-lg p-4 border-l-4 ${borderColors[idx % borderColors.length]}`}>
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <span className="text-xs font-bold text-foreground uppercase">{ch.name}</span>
@@ -615,7 +620,7 @@ const Deposits = () => {
                       onClick={() => handleSaveConfig(ch.channel)}
                       disabled={configSaving}
                       size="sm"
-                      className="h-7 text-xs"
+                      className="h-7 text-xs rounded-[5px]"
                       style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
                     >
                       {configSaving && <Loading size={12} className="mr-1" />}
@@ -674,7 +679,8 @@ const Deposits = () => {
                     </div>
                   </div>
                 </div>
-              ))}
+              );
+            })}
             </div>
           )}
         </div>
