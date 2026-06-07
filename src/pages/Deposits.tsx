@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import Loading from '@/components/Loading';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
@@ -562,33 +563,14 @@ const Deposits = () => {
                     </div>
                     <div>
                       <label className="text-[10px] text-muted-foreground">Active</label>
-                      <div className="flex bg-secondary/30 p-0.5 rounded-md border border-border h-[26px] w-fit mt-0.5">
-                        <button
-                          onClick={() => setEditBonus(prev => ({
+                      <div className="mt-1.5">
+                        <Switch
+                          checked={editBonus[c.depositCount]?.active ?? false}
+                          onCheckedChange={(checked) => setEditBonus(prev => ({
                             ...prev,
-                            [c.depositCount]: { ...prev[c.depositCount], active: true }
+                            [c.depositCount]: { ...prev[c.depositCount], active: checked }
                           }))}
-                          className={`px-2.5 text-[11px] font-medium rounded transition-colors h-full ${
-                            editBonus[c.depositCount]?.active
-                              ? 'bg-[rgb(32,143,255)] text-white shadow-sm'
-                              : 'text-muted-foreground hover:text-foreground'
-                          }`}
-                        >
-                          Enabled
-                        </button>
-                        <button
-                          onClick={() => setEditBonus(prev => ({
-                            ...prev,
-                            [c.depositCount]: { ...prev[c.depositCount], active: false }
-                          }))}
-                          className={`px-2.5 text-[11px] font-medium rounded transition-colors h-full ${
-                            !editBonus[c.depositCount]?.active
-                              ? 'bg-[rgb(32,143,255)] text-white shadow-sm'
-                              : 'text-muted-foreground hover:text-foreground'
-                          }`}
-                        >
-                          Disabled
-                        </button>
+                        />
                       </div>
                     </div>
                   </div>
@@ -634,33 +616,14 @@ const Deposits = () => {
                   <div className="grid grid-cols-4 gap-4 mb-3">
                     <div>
                       <label className="text-[10px] text-muted-foreground">Active</label>
-                      <div className="flex bg-secondary/30 p-0.5 rounded-md border border-border h-[26px] w-fit mt-0.5">
-                        <button
-                          onClick={() => setEditConfig(prev => ({
+                      <div className="mt-1.5">
+                        <Switch
+                          checked={editConfig[ch.channel]?.isActive ?? false}
+                          onCheckedChange={(checked) => setEditConfig(prev => ({
                             ...prev,
-                            [ch.channel]: { ...prev[ch.channel], isActive: true }
+                            [ch.channel]: { ...prev[ch.channel], isActive: checked }
                           }))}
-                          className={`px-2.5 text-[11px] font-medium rounded transition-colors h-full ${
-                            editConfig[ch.channel]?.isActive
-                              ? 'bg-[rgb(32,143,255)] text-white shadow-sm'
-                              : 'text-muted-foreground hover:text-foreground'
-                          }`}
-                        >
-                          Enabled
-                        </button>
-                        <button
-                          onClick={() => setEditConfig(prev => ({
-                            ...prev,
-                            [ch.channel]: { ...prev[ch.channel], isActive: false }
-                          }))}
-                          className={`px-2.5 text-[11px] font-medium rounded transition-colors h-full ${
-                            !editConfig[ch.channel]?.isActive
-                              ? 'bg-[rgb(32,143,255)] text-white shadow-sm'
-                              : 'text-muted-foreground hover:text-foreground'
-                          }`}
-                        >
-                          Disabled
-                        </button>
+                        />
                       </div>
                     </div>
                     <div>
