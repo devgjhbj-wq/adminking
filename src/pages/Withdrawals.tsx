@@ -342,7 +342,7 @@ const Withdrawals = () => {
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
                       <div className="cell">
                         {d.paymentMethod ? (
-                          <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-sm ${
+                          <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-pill ${
                             d.paymentMethod === 'UPI' ? 'bg-green-500/20 text-green-400' :
                             d.paymentMethod === 'BANK' ? 'bg-blue-500/20 text-blue-400' :
                             'bg-purple-500/20 text-purple-400'
@@ -410,7 +410,7 @@ const Withdrawals = () => {
                     </td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
                       <div className="cell">
-                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-sm ${statusColor[d.status] || 'bg-muted text-muted-foreground'}`}>
+                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-pill ${statusColor[d.status] || 'bg-muted text-muted-foreground'}`}>
                           {d.status}
                         </span>
                       </div>
@@ -431,17 +431,8 @@ const Withdrawals = () => {
                             <button
                               onClick={() => handleApprove(d.orderId)}
                               disabled={!!approvingId || !!cancellingId}
-                              style={{
-                                background: approvingId === d.orderId ? 'hsl(var(--primary) / 0.5)' : 'hsl(var(--primary))',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: 2,
-                                padding: '4px 6px',
-                                fontSize: 11,
-                                cursor: (!!approvingId || !!cancellingId) ? 'not-allowed' : 'pointer',
-                                lineHeight: 1,
-                                opacity: (!!approvingId || !!cancellingId) ? 0.6 : 1,
-                              }}
+                              className={`rounded-pill px-1.5 py-1 text-[10px] font-medium border-0 ${approvingId === d.orderId ? 'bg-primary/50 text-white cursor-not-allowed' : 'bg-primary text-white cursor-pointer'}`}
+                              style={{ opacity: (!!approvingId || !!cancellingId) ? 0.6 : 1 }}
                             >
                               {approvingId === d.orderId ? '...' : '✓'}
                             </button>
@@ -450,17 +441,8 @@ const Withdrawals = () => {
                             <button
                               onClick={() => handleCancel(d)}
                               disabled={!!approvingId || !!cancellingId}
-                              style={{
-                                background: (!!approvingId || !!cancellingId) ? 'hsl(var(--destructive) / 0.5)' : 'hsl(var(--destructive))',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: 2,
-                                padding: '4px 6px',
-                                fontSize: 11,
-                                cursor: (!!approvingId || !!cancellingId) ? 'not-allowed' : 'pointer',
-                                lineHeight: 1,
-                                opacity: (!!approvingId || !!cancellingId) ? 0.6 : 1,
-                              }}
+                              className={`rounded-pill px-1.5 py-1 text-[10px] font-medium border-0 ${(!!approvingId || !!cancellingId) ? 'bg-destructive/50 text-white cursor-not-allowed' : 'bg-destructive text-white cursor-pointer'}`}
+                              style={{ opacity: (!!approvingId || !!cancellingId) ? 0.6 : 1 }}
                             >
                               {cancellingId === d.orderId ? '...' : '✕'}
                             </button>
@@ -484,17 +466,16 @@ const Withdrawals = () => {
   return (
     <PageContainer>
       {/* Tab Bar */}
-      <div className="flex items-center gap-0 bg-card border border-border rounded px-1" style={{ height: 34 }}>
+      <div className="flex items-center gap-0 bg-card border border-border rounded-lg px-1.5 h-[34px]">
         {(['orders', 'config'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-2 text-xs font-medium rounded transition-all capitalize ${
+            className={`px-3 text-xs font-medium rounded-pill transition-all h-[26px] capitalize ${
               tab === t
-                ? 'bg-[rgb(32,143,255)] text-white border border-[rgb(32,143,255)]'
-                : 'text-muted-foreground border border-transparent hover:text-foreground hover:border-border'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
-            style={{ height: 26, lineHeight: '26px', marginRight: 5 }}
           >
             {t}
           </button>
@@ -530,7 +511,7 @@ const Withdrawals = () => {
           <div>
             <div className="text-xs text-muted-foreground font-medium mb-1">Status</div>
             <select
-              className="w-full h-[34px] rounded border border-input bg-background px-2 text-sm"
+              className="w-full h-[34px] rounded-pill border border-input bg-background px-3 text-sm"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             >
@@ -546,7 +527,7 @@ const Withdrawals = () => {
           <div>
             <div className="text-xs text-muted-foreground font-medium mb-1">Charge</div>
             <select
-              className="w-full h-[34px] rounded border border-input bg-background px-2 text-sm"
+              className="w-full h-[34px] rounded-pill border border-input bg-background px-3 text-sm"
               value={chargeFrom}
               onChange={(e) => setChargeFrom(e.target.value as 'user' | 'platform')}
             >
@@ -561,10 +542,10 @@ const Withdrawals = () => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal text-sm h-[34px] px-3 rounded-[5px]"
-                >
-                  <CalendarIcon className="mr-1.5 h-4 w-4" />
-                  {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}
+                    className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"
+                  >
+                    <CalendarIcon className="mr-1.5 h-4 w-4" />
+                    {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -587,10 +568,10 @@ const Withdrawals = () => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal text-sm h-[34px] px-3 rounded-[5px]"
-                >
-                  <CalendarIcon className="mr-1.5 h-4 w-4" />
-                  {dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}
+                    className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"
+                  >
+                    <CalendarIcon className="mr-1.5 h-4 w-4" />
+                    {dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -611,8 +592,7 @@ const Withdrawals = () => {
             <Button
               onClick={handleToday}
               size="sm"
-              className="h-[34px] px-3 text-sm rounded-[5px]"
-              style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+              className="h-[34px] px-3 text-sm bg-primary text-primary-foreground"
             >
               Today
             </Button>
@@ -623,8 +603,7 @@ const Withdrawals = () => {
               onClick={() => loadGlobalSearch(1)}
               disabled={loading}
               size="sm"
-              className="h-[34px] px-4 text-sm rounded-[5px] gap-1.5"
-              style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+              className="h-[34px] px-4 text-sm gap-1.5 bg-primary text-primary-foreground"
             >
               {loading && lastSearchType === 'global' ? <Loading size={14} /> : null}
               Search
@@ -633,7 +612,7 @@ const Withdrawals = () => {
               onClick={handleClear}
               variant="outline"
               size="sm"
-              className="h-[34px] px-4 text-sm rounded-[5px]"
+              className="h-[34px] px-4 text-sm"
             >
               Reset
             </Button>
@@ -674,12 +653,12 @@ const Withdrawals = () => {
                 {(['BANK', 'UPI', 'UPAY'] as const).map((method) => (
                   <div key={method} className="border border-border rounded p-3 space-y-2">
                     <span className="text-xs font-semibold text-foreground">{method}</span>
-                    <div className="flex ga">
+                    <div className="flex gap-2">
                       <div className="flex-1">
                         <label className="text-[10px] text-muted-foreground">Min</label>
                         <input
                           type="number"
-                          className="flex h-7 w-full rounded border border-input bg-background px-2 py-0.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          className="flex h-7 w-full rounded border border-input bg-background px-2 py-0.5 text-xs"
                           value={editLimits[method].min}
                           onChange={(e) => setEditLimits({ ...editLimits, [method]: { ...editLimits[method], min: Number(e.target.value) } })}
                           min={0}
@@ -689,7 +668,7 @@ const Withdrawals = () => {
                         <label className="text-[10px] text-muted-foreground">Max</label>
                         <input
                           type="number"
-                          className="flex h-7 w-full rounded border border-input bg-background px-2 py-0.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          className="flex h-7 w-full rounded border border-input bg-background px-2 py-0.5 text-xs"
                           value={editLimits[method].max}
                           onChange={(e) => setEditLimits({ ...editLimits, [method]: { ...editLimits[method], max: Number(e.target.value) } })}
                           min={0}
@@ -699,8 +678,8 @@ const Withdrawals = () => {
                   </div>
                 ))}
               </div>
-              <div className="flex ga">
-                <Button onClick={handleSaveConfig} disabled={configSaving} size="sm" className="h-7 text-xs">
+              <div className="flex gap-2">
+                <Button onClick={handleSaveConfig} disabled={configSaving} size="sm" className="h-7 text-xs bg-primary text-primary-foreground">
                   {configSaving && <Loading size={12} className="mr-1" />}
                   Save Config
                 </Button>

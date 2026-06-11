@@ -1,4 +1,4 @@
-# Agency API - Admin Side
+# Deposit API - Admin Side
 
 ## Base URL
 
@@ -8,7 +8,7 @@ https://backend-ledger-0ra6.onrender.com/api
 
 ## Authentication
 
-All endpoints require Bearer token with admin privileges:
+All admin endpoints require Bearer token with admin privileges:
 
 ```
 Authorization: Bearer <admin_token>
@@ -16,12 +16,187 @@ Authorization: Bearer <admin_token>
 
 ---
 
-## Level Config Management
+## Get Deposit Orders
 
-### Get All Level Configs
+**Get all orders with filters (supports userId or mobile):**
 
 ```
-GET /agency/configs
+GET /admin/deposits?page=1&limit=50&status=PENDING&dateFrom=2026-03-01&dateTo=2026-03-20
+```
+
+**Get orders by user:**
+
+```
+GET /admin/deposits?userId=123456&page=1&limit=50
+```
+
+**Get orders by mobile:**
+
+```
+GET /admin/deposits?mobile=3333333333&page=1&limit=50
+```
+
+**Get single order:**
+
+```
+GET /admin/deposits?orderId=ODR1234567890123456
+```
+
+### Query Params
+
+| Param | Type | Required | Description |
+|-------|------|---------|-------------|
+| page | number | No | Page number (default: 1) |
+| limit | number | No | Items per page (default: 50, max: 100) |
+| status | string | No | Filter: PENDING, SUCCESS, FAILED, REFUNDED, EXPIRED |
+| userId | number | No | Filter by user ID |
+| mobile | string | No | Filter by 10-digit mobile number |
+| dateFrom | string | No | Start date (YYYY-MM-DD) |
+| dateTo | string | No | End date (YYYY-MM-DD) |
+| orderId | string | No | Get single order by ID |
+
+### Response (paginated)
+
+```json
+{
+  "status": "success",
+  "total": 150,
+  "page": 1,
+  "limit": 50,
+  "items": [
+    {
+      "orderId": "ODR1234567890123456",
+      "userId": 123456,
+      "amount": 1000.0,
+      "currency": "INR",
+      "status": "PENDING",
+      "gatewayOrderNo": "gw123456",
+      "channelName": "SimplyPay",
+      "bonusOptIn": true,
+      "note": "Deposit request",
+      "createdAt": "2026-03-19T10:30:00.000Z",
+      "updatedAt": "2026-03-19T10:30:00.000Z"
+    }
+  ]
+}
+```
+POST /admin/deposits/approve
+```
+
+**Body:**
+
+```json
+{
+  "orderId": "ODR1234567890123456"
+}
+```
+
+**Response:**
+
+```json
+{
+  "msg": "Deposit approved",
+  "orderId": "ODR1234567890123456",
+  "userId": 123456,
+  "amount": 1000.0,
+  "status": "SUCCESS",
+  "bonusAmount": 1000
+}
+```
+
+---
+
+## Deposit Channel Config
+
+### Get All Channels
+
+```
+GET /admin/deposit-config
+```
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "channel": "simplypay",
+      "name": "SimplyPay",
+      "isActive": true,
+      "minAmount": 100,
+      "maxAmount": 100000,
+      "exchangeRate": 1,
+      "sortOrder": 0,
+      "description": "UPI / Bank Transfer"
+    },
+    {
+      "channel": "gspayusdt",
+      "name": "USDT",
+      "isActive": true,
+      "minAmount": 1,
+      "maxAmount": 1000,
+      "exchangeRate": 90,
+      "sortOrder": 2,
+      "description": "USDT (Tether)"
+    }
+  ]
+}
+```
+
+### Update a Channel
+
+```
+PUT /admin/deposit-config/:channel
+```
+
+**Body (all fields optional):**
+
+```json
+{
+  "isActive": false,
+  "minAmount": 500,
+  "maxAmount": 100000
+}
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| isActive | boolean | Enable/disable the channel |
+| minAmount | number | Minimum deposit amount |
+| maxAmount | number | Maximum deposit amount |
+| exchangeRate | number | Exchange rate (e.g., 90 for USDT → INR) |
+| name | string | Display name |
+| description | string | Channel description |
+| sortOrder | number | Display order |
+
+**Response:**
+
+```json
+{
+  "status": "success",
+  "data": {
+    "channel": "simplypay",
+    "name": "SimplyPay",
+    "isActive": false,
+    "minAmount": 500,
+    "maxAmount": 100000,
+    "sortOrder": 0,
+    "description": "UPI / Bank Transfer",
+    "createdAt": "2026-05-29T12:41:09.804Z",
+    "updatedAt": "2026-05-29T12:41:09.804Z"
+  }
+}
+```
+
+---
+
+## Deposit Bonus Config
+
+### Get All Bonus Configs
+
+```
+GET /admin/deposit-bonus-config
 ```
 
 **Response:**
@@ -30,242 +205,63 @@ GET /agency/configs
 {
   "status": "success",
   "configs": [
-    { "level": 0, "minMembers": 0, "minBets": 0, "minDeposit": 0, "l1Rate": 0.006, "l2Rate": 0.0018, "l3Rate": 0.00054 }
+    {
+      "depositCount": 1,
+      "bonusRate": 1.0,
+      "active": true,
+      "createdAt": "2026-06-07T10:00:00.000Z",
+      "updatedAt": "2026-06-07T10:00:00.000Z"
+    },
+    {
+      "depositCount": 2,
+      "bonusRate": 0.5,
+      "active": true,
+      "createdAt": "2026-06-07T10:00:00.000Z",
+      "updatedAt": "2026-06-07T10:00:00.000Z"
+    },
+    {
+      "depositCount": 3,
+      "bonusRate": 0.3,
+      "active": true,
+      "createdAt": "2026-06-07T10:00:00.000Z",
+      "updatedAt": "2026-06-07T10:00:00.000Z"
+    }
   ]
 }
 ```
 
-### Update a Level Config
+### Update a Bonus Config
 
 ```
-PUT /agency/configs/:level
+PUT /admin/deposit-bonus-config
 ```
 
 **Body:**
 
 ```json
 {
-  "minMembers": 10,
-  "minBets": 1000000,
-  "minDeposit": 200000,
-  "l1Rate": 0.0075,
-  "l2Rate": 0.0028125,
-  "l3Rate": 0.00105469
+  "depositCount": 1,
+  "bonusRate": 0.8
 }
 ```
 
-### Seed Default Configs
-
-```
-POST /agency/configs/seed
-```
-
----
-
-## Admin Agency Endpoints
-
-### Get Agent Level (Admin) — Unified
-
-```
-GET /agency/admin/level?userId=32545513
-GET /agency/admin/level?userId=32545513&date=2026-06-03
-```
-
-`date` is optional, defaults to today. Returns per-tier lifetime + daily stats, and commission data — replaces the old `/daily` endpoint.
+| Param | Type | Required | Description |
+|-------|------|---------|-------------|
+| depositCount | number | Yes | 1, 2, or 3 (which deposit to configure) |
+| bonusRate | number | Yes | Multiplier (1.0 = 100%, 0.5 = 50%, 0.3 = 30%) |
+| active | boolean | No | Enable/disable this bonus tier |
 
 **Response:**
 
 ```json
 {
   "status": "success",
-  "rebate_level": 1,
-  "date": "2026-06-03T00:00:00.000Z",
-  "level1": {
-    "members": 5,
-    "todayMembers": 1,
-    "totalBets": 200000,
-    "todayBets": 20000,
-    "totalDeposit": 50000,
-    "todayDeposit": 4000,
+  "config": {
     "depositCount": 1,
-    "firstDepositCount": 1,
-    "totalWithdrawal": 10000,
-    "todayWithdrawal": 500
-  },
-  "level2": {
-    "members": 4,
-    "todayMembers": 1,
-    "totalBets": 150000,
-    "todayBets": 15000,
-    "totalDeposit": 40000,
-    "todayDeposit": 3000,
-    "depositCount": 1,
-    "firstDepositCount": 1,
-    "totalWithdrawal": 8000,
-    "todayWithdrawal": 600
-  },
-  "level3": {
-    "members": 3,
-    "todayMembers": 0,
-    "totalBets": 150000,
-    "todayBets": 7417,
-    "totalDeposit": 30000,
-    "todayDeposit": 1000,
-    "depositCount": 0,
-    "firstDepositCount": 0,
-    "totalWithdrawal": 7000,
-    "todayWithdrawal": 400
-  },
-  "total": {
-    "members": 12,
-    "todayMembers": 2,
-    "totalBets": 500000,
-    "todayBets": 42417,
-    "totalDeposit": 120000,
-    "todayDeposit": 8000,
-    "depositCount": 2,
-    "firstDepositCount": 2,
-    "totalWithdrawal": 25000,
-    "todayWithdrawal": 1500
-  },
-  "commission": {
-    "thisWeek": 1234.56,
-    "total": 56789.01,
-    "today": 456.78
+    "bonusRate": 0.8,
+    "active": true,
+    "createdAt": "2026-06-07T10:00:00.000Z",
+    "updatedAt": "2026-06-07T10:00:00.000Z"
   }
-}
-```
-
-| Field | Description |
-|---|---|
-| `rebate_level` | Current commission rebate level (0–10) |
-| `date` | The date the daily tally is for |
-| `level1/2/3.members` | Lifetime unique team members at that tier |
-| `level1/2/3.todayMembers` | New members registered for that date at that tier |
-| `level1/2/3.totalBets` | Lifetime bet amount from that tier |
-| `level1/2/3.todayBets` | Bet amount for that date from that tier |
-| `level1/2/3.totalDeposit` | Lifetime deposit amount from that tier |
-| `level1/2/3.todayDeposit` | Deposit amount for that date from that tier |
-| `level1/2/3.depositCount` | Number of deposit transactions for that date from that tier |
-| `level1/2/3.firstDepositCount` | First-time depositors for that date from that tier |
-| `level1/2/3.totalWithdrawal` | Lifetime withdrawal amount from that tier |
-| `level1/2/3.todayWithdrawal` | Withdrawal amount for that date from that tier |
-| `commission.thisWeek` | Total commission earned this week (Mon–Sun) |
-| `commission.total` | Lifetime total commission earned |
-| `commission.today` | Commission earned on that date |
-
----
-
-### View Agent Team (Admin) — Unified
-
-Returns team aggregation stats plus agent and inviter info. Individual member details are available via a separate endpoint (see below).
-
-```
-GET /agency/admin/team?agentId=32545513&toDate=2026-05-26&page=1&limit=25
-GET /agency/admin/team?agentId=32545513&fromDate=2026-05-01&toDate=2026-05-26&tier=1&page=1&limit=25
-```
-
-`toDate` is **required** and must be yesterday or earlier.
-
-**Response:**
-
-```json
-{
-  "status": "success",
-  "total": 50,
-  "page": 1,
-  "limit": 25,
-  "agent": {
-    "userId": 32545513,
-    "mobile": "98***13",
-    "admin": false,
-    "referredBy": 100001,
-    "createdAt": "2026-01-01T00:00:00.000Z"
-  },
-  "inviter": {
-    "userId": 100001,
-    "mobile": "98***00",
-    "createdAt": "2025-12-01T00:00:00.000Z"
-  },
-  "aggregation": {
-    "level1": { "depositCount": 120, "depositAmount": 450000, "bettorCount": 45, "betAmount": 1200000, "firstDepositCount": 30, "firstDepositAmount": 75000 },
-    "level2": { "depositCount": 60, "depositAmount": 200000, "bettorCount": 25, "betAmount": 600000, "firstDepositCount": 15, "firstDepositAmount": 35000 },
-    "level3": { "depositCount": 20, "depositAmount": 50000, "bettorCount": 10, "betAmount": 150000, "firstDepositCount": 5, "firstDepositAmount": 10000 },
-    "total": { "depositCount": 200, "depositAmount": 700000, "bettorCount": 80, "betAmount": 1950000, "firstDepositCount": 50, "firstDepositAmount": 120000 }
-  }
-}
-```
-
----
-
-### View Team Members (Admin) — Full Details
-
-Returns individual team member details with unmasked mobile numbers and total bet amount. Filterable by tier.
-
-```
-GET /agency/admin/team-members?agentId=32545513&toDate=2026-05-26&page=1&limit=25
-GET /agency/admin/team-members?agentId=32545513&fromDate=2026-05-01&toDate=2026-05-26&tier=1&page=1&limit=25
-GET /agency/admin/team-members?agentId=32545513&toDate=2026-05-26&tier=2&page=1&limit=25
-```
-
-**Parameters:**
-
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `agentId` | Yes | Agent's userId whose team members to view |
-| `tier` | No | Filter by downline level (1=direct, 2=indirect, 3=3rd level) |
-| `userId` | No | Search specific user by userId |
-| `fromDate` | No | Registration start date (YYYY-MM-DD) |
-| `toDate` | No | Registration end date (YYYY-MM-DD) |
-| `page` | No | Page number (default: 1) |
-| `limit` | No | Items per page (default: 25, max: 100) |
-
-**Response:**
-
-```json
-{
-  "status": "success",
-  "total": 50,
-  "page": 1,
-  "limit": 25,
-  "items": [
-    {
-      "userId": 32545514,
-      "mobile": "9876543210",
-      "registeredAt": "2026-01-15T10:30:00.000Z",
-      "tier": 1,
-      "totalDeposit": 15000,
-      "totalWithdrawal": 3000,
-      "totalBet": 120000
-    }
-  ]
-}
-```
-
-| Field | Description |
-|-------|-------------|
-| `userId` | User ID of the team member |
-| `mobile` | Full mobile number (unmasked) |
-| `registeredAt` | Registration timestamp |
-| `tier` | Downline level (1, 2, or 3) |
-| `totalDeposit` | Lifetime deposit amount |
-| `totalWithdrawal` | Lifetime withdrawal amount |
-| `totalBet` | Total bet amount placed (all games) |
-
----
-
-### Run Midnight Batch Manually
-
-```
-POST /agency/admin/run-midnight
-```
-
-**Response:**
-
-```json
-{
-  "status": "success",
-  "processed": 150,
-  "totalCommission": 4523.5
 }
 ```

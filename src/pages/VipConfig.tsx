@@ -59,9 +59,9 @@ const VipConfig = () => {
 
   return (
     <div className="space-y-1.5">
-      <div className="bg-card border border-border flex items-center justify-between\">
+      <div className="bg-card border border-border rounded-lg p-3 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-semibold text-foreground">VIP Configuration</h2>
+          <h2 className="text-sm font-semibold tracking-tight text-foreground">VIP Configuration</h2>
           <p className="text-xs text-muted-foreground mt-0.5">Configure VIP levels with deposit limits and bonuses</p>
         </div>
         <div className="flex gap-1.5">
@@ -134,7 +134,7 @@ const VipConfig = () => {
                       </td>
                       <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
                         <div className="cell">
-                          <button onClick={() => handleDelete(i)} style={{ background: 'none', border: '1px solid hsl(var(--border))', borderRadius: 2, padding: '2px 6px', cursor: 'pointer', color: 'hsl(var(--destructive))', fontSize: 11, lineHeight: 1 }}>
+                          <button onClick={() => handleDelete(i)} className="rounded-pill px-2 py-0.5 text-[10px] font-medium border border-destructive/30 text-destructive hover:bg-destructive/10">
                             Delete
                           </button>
                         </div>
@@ -147,7 +147,7 @@ const VipConfig = () => {
           </div>
 
           <div className="flex justify-end p-3 border-t border-border">
-            <Button size="sm" onClick={handleSave} disabled={saving}>
+            <Button size="sm" onClick={handleSave} disabled={saving} className="bg-primary text-primary-foreground">
               {saving ? <Loading size={14} /> : <Save className="w-3.5 h-3.5" />}
               Save Changes
             </Button>

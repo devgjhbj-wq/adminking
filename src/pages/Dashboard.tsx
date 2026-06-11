@@ -38,14 +38,13 @@ interface DashboardStats {
   };
 }
 
-const SectionCard = ({ title, color, children }: {
+const SectionCard = ({ title, children }: {
   title: string;
-  color: string;
   children: React.ReactNode;
 }) => (
-  <div className={`bg-card border border-border rounded-xl shadow-sm border-l-4 overflow-hidden ${color}`}>
-    <div className="px-4 py-2.5 border-b border-border">
-      <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">{title}</h3>
+  <div className="bg-card border border-border rounded-lg shadow-apple-card overflow-hidden">
+    <div className="px-4 py-3 border-b border-border/50">
+      <h3 className="text-xs font-semibold text-foreground/80 uppercase tracking-wider">{title}</h3>
     </div>
     <div className="p-4">
       {children}
@@ -56,7 +55,7 @@ const SectionCard = ({ title, color, children }: {
 const FormField = ({ label, value, sub }: { label: string; value: any; sub?: string }) => (
   <div>
     <label className="text-[11px] text-muted-foreground block mb-1">{label}</label>
-    <div className="text-xs font-bold text-foreground">
+    <div className="text-xs font-semibold text-foreground">
       {value}
       {sub && <span className="text-[10px] text-muted-foreground ml-1.5">{sub}</span>}
     </div>
@@ -95,10 +94,10 @@ const Dashboard = () => {
         <div className="form-grid w-full" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
           <div>
             <div className="text-xs text-muted-foreground font-medium mb-1">Period</div>
-            <div className="flex bg-secondary/30 p-0.5 rounded-md border border-border h-[34px] w-fit">
-              <button onClick={() => setPeriod('today')} className={cn("px-3 text-sm font-medium rounded transition-colors h-full", period === 'today' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>Today</button>
-              <button onClick={() => setPeriod('month')} className={cn("px-3 text-sm font-medium rounded transition-colors h-full", period === 'month' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>This Month</button>
-              <button onClick={() => setPeriod('custom')} className={cn("px-3 text-sm font-medium rounded transition-colors h-full", period === 'custom' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>By Date</button>
+            <div className="flex bg-secondary/30 p-0.5 rounded-pill border border-border h-[34px] w-fit">
+              <button onClick={() => setPeriod('today')} className={cn("px-3 text-sm font-medium rounded-pill transition-colors h-full", period === 'today' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}>Today</button>
+              <button onClick={() => setPeriod('month')} className={cn("px-3 text-sm font-medium rounded-pill transition-colors h-full", period === 'month' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}>This Month</button>
+              <button onClick={() => setPeriod('custom')} className={cn("px-3 text-sm font-medium rounded-pill transition-colors h-full", period === 'custom' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}>By Date</button>
             </div>
           </div>
           {period === 'custom' && (
@@ -106,7 +105,7 @@ const Dashboard = () => {
               <div className="text-xs text-muted-foreground font-medium mb-1">Date</div>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="h-[34px] rounded-[5px] text-sm font-normal px-3 w-full justify-start">
+                  <Button variant="outline" className="h-[34px] text-sm font-normal px-3 w-full justify-start">
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
                   </Button>
@@ -118,7 +117,7 @@ const Dashboard = () => {
             </div>
           )}
           <div className="flex items-end gap-3">
-            <Button onClick={handleSearch} disabled={loading} size="sm" className="h-[34px] px-4 rounded-[5px] gap-1.5 text-sm" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
+            <Button onClick={handleSearch} disabled={loading} size="sm" className="h-[34px] px-4 gap-1.5 text-sm">
               <Search className="w-4 h-4" /> Search
             </Button>
             <LastUpdated timestamp={updatedAt} onRefresh={handleSearch} loading={loading} compact />
@@ -132,17 +131,14 @@ const Dashboard = () => {
         <div className="flex items-center justify-center h-48"><span className="text-xs text-muted-foreground">No data</span></div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-          {/* Overview Card */}
-          <SectionCard title="Overview" color="border-l-blue-500">
+          <SectionCard title="Overview">
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
               <FormField label="Total Users" value={(stats?.overview?.totalUsers ?? 0).toLocaleString()} />
               <FormField label="New Users" value={(stats?.overview?.newUsers ?? 0).toLocaleString()} sub={`in ${stats?.period === 'all' ? 'all time' : stats?.period}`} />
             </div>
           </SectionCard>
 
-          {/* Deposits Card */}
-          <SectionCard title="Deposits" color="border-l-emerald-500">
+          <SectionCard title="Deposits">
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
               <FormField label="Total Success Deposit Amount" value={`₹${(stats?.deposits?.total ?? 0).toLocaleString()}`} />
               <FormField label="Number of Success Order" value={(stats?.deposits?.count ?? 0).toLocaleString()} />
@@ -150,8 +146,7 @@ const Dashboard = () => {
             </div>
           </SectionCard>
 
-          {/* Withdrawals Card */}
-          <SectionCard title="Withdrawals" color="border-l-purple-500">
+          <SectionCard title="Withdrawals">
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
               <FormField label="Total Withdrawal Amount (All Statuses)" value={`₹${(stats?.withdrawals?.total ?? 0).toLocaleString()}`} />
               <FormField label="Total Charges (All Orders)" value={`₹${(stats?.withdrawals?.chargeTotal ?? 0).toLocaleString()}`} sub={`${(stats?.withdrawals?.count ?? 0).toLocaleString()} orders`} />
@@ -162,8 +157,7 @@ const Dashboard = () => {
             </div>
           </SectionCard>
 
-          {/* Agent Commission Card */}
-          <SectionCard title="Agent Commission" color="border-l-amber-500">
+          <SectionCard title="Agent Commission">
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
               <FormField label="Total Agent Commission Amount" value={stats?.agentCommission ? `₹${stats.agentCommission.total.toLocaleString()}` : '—'} />
               <FormField label="Commission Transactions" value={stats?.agentCommission ? stats.agentCommission.count.toLocaleString() : '—'} />

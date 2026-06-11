@@ -17,7 +17,7 @@ const LastUpdated = ({ timestamp, onRefresh, loading, compact }: LastUpdatedProp
         <button
           onClick={onRefresh}
           disabled={loading}
-          className="flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-secondary hover:bg-primary hover:text-primary-foreground text-muted-foreground rounded border border-border transition-all disabled:opacity-50"
+          className="flex items-center gap-1 px-2 py-1 text-[9px] font-semibold uppercase tracking-wider bg-secondary hover:bg-primary hover:text-primary-foreground text-muted-foreground rounded-pill border border-border transition-all disabled:opacity-50 active:scale-[0.96]"
         >
           <RefreshCw className={`w-2.5 h-2.5 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh</span>

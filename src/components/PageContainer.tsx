@@ -4,12 +4,12 @@ import { ChevronLeft, ChevronRight, Search, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const PageContainer = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <div className={cn("space-y-1", className)}>{children}</div>
+  <div className={cn("space-y-3", className)}>{children}</div>
 );
 
 const SearchHeader = ({ children, className }: { children: React.ReactNode; className?: string }) => (
   <div className={cn("bg-card border border-border rounded-lg", className)}>
-    <div className="flex flex-wrap items-center pb-[5px] pt-1 px-1.5 gap-[10px] text-xs">{children}</div>
+    <div className="flex flex-wrap items-center p-3 gap-3 text-xs">{children}</div>
   </div>
 );
 
@@ -19,7 +19,7 @@ interface TableContainerProps {
   loading?: boolean;
 }
 const TableContainer = ({ children, className, loading }: TableContainerProps) => (
-  <div className={cn("relative w-full overflow-x-auto bg-card border border-border rounded-lg shadow-sm max-w-full", className)}>
+  <div className={cn("relative w-full overflow-x-auto bg-card border border-border rounded-lg max-w-full", className)}>
     {loading && (
       <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60 backdrop-blur-[1px]">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -65,14 +65,14 @@ const Pagination = ({ page, totalPages, total, loading, onPageChange }: Paginati
     }
   };
 
-  const btnBase = 'inline-flex items-center justify-center min-w-[25px] h-[25px] leading-[25px] text-xs rounded border bg-card px-1.5 transition-colors';
+  const btnBase = 'inline-flex items-center justify-center min-w-[26px] h-[26px] text-xs rounded-pill border bg-card px-2 transition-all';
 
   return (
-    <div className="flex items-center justify-end bg-card border border-border rounded-lg p-1.5 shadow-sm mt-2">
-      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+    <div className="flex items-center justify-end bg-card border border-border rounded-lg p-2 mt-3">
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
         {total !== undefined && <span className="mr-2">Total {total}</span>}
         <button
-          className={`${btnBase} border-border hover:border-[rgb(32,143,255)] hover:text-[rgb(32,143,255)] ${page <= 1 ? 'opacity-40 cursor-not-allowed' : ''}`}
+          className={`${btnBase} border-border hover:border-primary hover:text-primary ${page <= 1 ? 'opacity-40 cursor-not-allowed' : ''}`}
           disabled={page <= 1 || loading}
           onClick={() => onPageChange(page - 1)}
         >
@@ -84,8 +84,8 @@ const Pagination = ({ page, totalPages, total, loading, onPageChange }: Paginati
               <button
                 className={`${btnBase} ${
                   p === page
-                    ? 'border-[rgb(32,143,255)] bg-[rgb(32,143,255)] text-white'
-                    : 'border-border text-foreground hover:border-[rgb(32,143,255)] hover:text-[rgb(32,143,255)]'
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border text-foreground hover:border-primary hover:text-primary'
                 }`}
                 onClick={() => p !== page && onPageChange(p)}
               >
@@ -95,7 +95,7 @@ const Pagination = ({ page, totalPages, total, loading, onPageChange }: Paginati
           ))}
         </ul>
         <button
-          className={`${btnBase} border-border hover:border-[rgb(32,143,255)] hover:text-[rgb(32,143,255)] ${page >= totalPages ? 'opacity-40 cursor-not-allowed' : ''}`}
+          className={`${btnBase} border-border hover:border-primary hover:text-primary ${page >= totalPages ? 'opacity-40 cursor-not-allowed' : ''}`}
           disabled={page >= totalPages || loading}
           onClick={() => onPageChange(page + 1)}
         >
@@ -105,7 +105,7 @@ const Pagination = ({ page, totalPages, total, loading, onPageChange }: Paginati
           Go to
           <input
             type="number"
-            className="w-[50px] h-[25px] leading-[25px] text-xs text-center border border-border rounded bg-card text-foreground outline-none focus:border-[rgb(32,143,255)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="w-[50px] h-[26px] text-xs text-center border border-border rounded-pill bg-card text-foreground outline-none focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none px-2"
             value={jumpVal}
             onChange={(e) => setJumpVal(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleJump()}

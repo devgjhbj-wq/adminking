@@ -7,7 +7,7 @@ interface LoadingProps {
   className?: string;
 }
 
-const Loading = ({ size = 43, color = 'currentColor', className }: LoadingProps) => {
+const Loading = ({ size = 43, color = 'hsl(var(--primary))', className }: LoadingProps) => {
   return (
     <div className={className}>
       <l-dot-pulse

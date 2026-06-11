@@ -13,7 +13,8 @@ export default {
       },
     },
     fontFamily: {
-      sans: ['Ginto', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+      display: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
     },
     extend: {
       colors: {
@@ -65,6 +66,12 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        pill: "9999px",
+      },
+      boxShadow: {
+        'apple-product': '0 3px 30px 0 rgba(0, 0, 0, 0.22)',
+        'apple-card': '0 1px 3px rgba(0, 0, 0, 0.08)',
+        'apple-nav': '0 1px 0 rgba(255, 255, 255, 0.04)',
       },
       keyframes: {
         "accordion-down": {

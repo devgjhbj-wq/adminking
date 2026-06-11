@@ -51,21 +51,21 @@ const Drawer = ({
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-[2000] bg-black/50 transition-opacity duration-300"
+      className="fixed inset-0 z-[2000] bg-black/60 backdrop-blur-sm transition-opacity duration-300"
       onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
     >
       <div
         className={cn(
-          "absolute top-0 right-0 h-full bg-card border-l border-border shadow-[-2px_0_8px_rgba(0,0,0,0.15)]",
+          "absolute top-0 right-0 h-full bg-card border-l border-border shadow-[-4px_0_24px_rgba(0,0,0,0.2)]",
           "flex flex-col animate-slide-in-right"
         )}
         style={{ width }}
       >
-        <div className="flex items-center justify-between px-5 h-14 border-b border-border flex-shrink-0">
-          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+        <div className="flex items-center justify-between px-5 h-13 border-b border-border flex-shrink-0">
+          <h2 className="text-sm font-semibold text-foreground tracking-tight">{title}</h2>
           <button
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground transition-colors rounded-sm p-1"
+            className="text-muted-foreground hover:text-foreground transition-colors rounded-pill p-1.5 hover:bg-secondary"
           >
             <X className="w-4 h-4" />
           </button>
@@ -75,7 +75,7 @@ const Drawer = ({
           {children}
         </div>
 
-        <div className="flex items-center justify-end gap-2 px-5 h-14 border-t border-border flex-shrink-0">
+        <div className="flex items-center justify-end gap-2 px-5 h-13 border-t border-border flex-shrink-0">
           {footer || (
             <>
               <Button variant="outline" size="sm" onClick={onClose}>

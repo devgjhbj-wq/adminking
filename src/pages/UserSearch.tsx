@@ -10,19 +10,17 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Search, ShieldAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { SearchHeader } from '@/components/PageContainer';
 
-const SectionCard = ({ title, titleExtra, color, children, rightAction }: {
+const SectionCard = ({ title, titleExtra, children, rightAction }: {
   title: string;
   titleExtra?: React.ReactNode;
-  color: string;
   children: React.ReactNode;
   rightAction?: React.ReactNode;
 }) => (
-  <div className={`bg-card border border-border rounded-xl shadow-sm border-l-4 overflow-hidden ${color}`}>
-    <div className="px-4 py-2.5 border-b border-border flex items-center justify-between">
+  <div className="bg-card border border-border rounded-lg shadow-apple-card overflow-hidden">
+    <div className="px-4 py-3 border-b border-border/50 flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">{title}</h3>
+        <h3 className="text-xs font-semibold text-foreground/80 uppercase tracking-wider">{title}</h3>
         {titleExtra && <span className="text-xs text-muted-foreground">{titleExtra}</span>}
       </div>
       {rightAction && <div className="flex items-center gap-2">{rightAction}</div>}
@@ -36,21 +34,8 @@ const SectionCard = ({ title, titleExtra, color, children, rightAction }: {
 const FormField = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div>
     <div className="text-[11px] text-muted-foreground font-medium mb-0.5">{label}</div>
-    <div className="text-xs font-bold text-foreground">{value}</div>
+    <div className="text-xs font-semibold text-foreground">{value}</div>
   </div>
-);
-
-const SearchButton = ({ onClick, disabled, loading }: { onClick: () => void; disabled?: boolean; loading?: boolean }) => (
-  <Button
-    onClick={onClick}
-    disabled={disabled || loading}
-    size="sm"
-    className="h-[34px] px-4 text-sm rounded-[5px] gap-1.5"
-    style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
-  >
-    {loading ? <Loading size={14} /> : <Search className="w-4 h-4" />}
-    Search
-  </Button>
 );
 
 const UserSearch = () => {
@@ -171,38 +156,40 @@ const UserSearch = () => {
 
   return (
     <div className="space-y-4">
-      <SearchHeader>
+      <div className="bg-card border border-border rounded-lg p-3">
         <div className="form-grid w-full" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
           <div>
-            <div className="text-xs text-muted-foreground font-medium mb-1">User ID</div>
+            <div className="text-xs text-muted-foreground font-medium mb-1.5">User ID</div>
             <Input
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
               placeholder="Enter User ID"
-              className="w-full h-[34px] text-sm px-2"
+              className="w-full h-9 text-sm px-3"
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             />
           </div>
           <div>
-            <div className="text-xs text-muted-foreground font-medium mb-1">Mobile</div>
+            <div className="text-xs text-muted-foreground font-medium mb-1.5">Mobile</div>
             <Input
               value={mobile}
               onChange={(e) => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
               placeholder="10-digit mobile"
-              className="w-full h-[34px] text-sm px-2"
+              className="w-full h-9 text-sm px-3"
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             />
           </div>
           <div className="flex items-end">
-            <SearchButton onClick={handleSearch} disabled={!userId.trim() && mobile.length !== 10} loading={loading} />
+            <Button onClick={handleSearch} disabled={!userId.trim() && mobile.length !== 10} loading={loading} size="sm" className="h-9 px-4">
+              <Search className="w-4 h-4" />
+              Search
+            </Button>
           </div>
         </div>
-      </SearchHeader>
+      </div>
 
       {result && (
         <div className="space-y-4">
-          {/* User Profile */}
-          <SectionCard title="User Profile" color="border-l-blue-500">
+          <SectionCard title="User Profile">
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
               <FormField label="User ID" value={user?.userId ?? '—'} />
               <FormField label="Mobile" value={user?.mobile ?? '—'} />
@@ -212,15 +199,12 @@ const UserSearch = () => {
             </div>
           </SectionCard>
 
-          {/* Account */}
           <SectionCard
             title="Account"
-            color="border-l-emerald-500"
             rightAction={
               <Button
                 size="sm"
-                className="h-[26px] px-2.5 text-xs rounded-[5px] gap-1"
-                style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+                className="h-7 px-3 text-xs gap-1"
                 onClick={() => setStatusDialogOpen(true)}
               >
                 <ShieldAlert className="w-3.5 h-3.5" />
@@ -237,7 +221,7 @@ const UserSearch = () => {
                 label="Status"
                 value={
                   account ? (
-                    <span className={cn("px-1.5 py-0.5 text-[11px] font-semibold rounded",
+                    <span className={cn("px-2 py-0.5 text-[11px] font-semibold rounded-pill",
                       account.status === 'active' ? 'bg-emerald-500/15 text-emerald-400' :
                       account.status === 'suspended' ? 'bg-amber-500/15 text-amber-400' :
                       'bg-rose-500/15 text-rose-400'
@@ -260,18 +244,15 @@ const UserSearch = () => {
             </div>
           </SectionCard>
 
-          {/* Same IP Users */}
           <SectionCard
             title="Same IP Users"
             titleExtra={<span className="font-semibold text-foreground">Users Sharing IP: {result?.sameIpUsers ?? 0}</span>}
-            color="border-l-purple-500"
             rightAction={
               <Sheet>
                 <SheetTrigger asChild>
                   <Button
                     size="sm"
-                    className="h-[26px] px-2.5 text-xs rounded-[5px] gap-1"
-                    style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+                    className="h-7 px-3 text-xs gap-1"
                     disabled={!lastIp}
                     onClick={() => { handleSearchSameIp(); }}
                   >
@@ -290,17 +271,17 @@ const UserSearch = () => {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="text-xs text-foreground">User ID</TableHead>
-                            <TableHead className="text-xs text-foreground">Mobile</TableHead>
-                            <TableHead className="text-xs text-foreground">Created</TableHead>
+                            <TableHead>User ID</TableHead>
+                            <TableHead>Mobile</TableHead>
+                            <TableHead>Created</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {ipUsers.map((u: any) => (
                             <TableRow key={u.userId}>
-                              <TableCell className="text-xs text-foreground">{u.userId}</TableCell>
-                              <TableCell className="text-xs text-foreground">{u.mobile}</TableCell>
-                              <TableCell className="text-xs text-foreground">{new Date(u.createdAt).toLocaleDateString()}</TableCell>
+                              <TableCell className="text-xs">{u.userId}</TableCell>
+                              <TableCell className="text-xs">{u.mobile}</TableCell>
+                              <TableCell className="text-xs">{new Date(u.createdAt).toLocaleDateString()}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -329,15 +310,12 @@ const UserSearch = () => {
             </div>
           </SectionCard>
 
-          {/* Payment Methods */}
           <SectionCard
             title="Payment Methods"
-            color="border-l-amber-500"
             rightAction={
               <Button
                 size="sm"
-                className="h-[26px] px-2.5 text-xs rounded-[5px] gap-1"
-                style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+                className="h-7 px-3 text-xs gap-1"
                 onClick={() => {
                   setPaymentType('BANK');
                   setBankName(paymentMethods?.bank?.bankName || '');
@@ -354,9 +332,9 @@ const UserSearch = () => {
             }
           >
             <div className="flex items-center gap-1.5 mb-3">
-              {(paymentMethods?.bank?.bankName) && <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-400">BANK</span>}
-              {(paymentMethods?.upi?.address) && <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400">UPI</span>}
-              {(paymentMethods?.upay?.address) && <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-400">UPAY</span>}
+              {(paymentMethods?.bank?.bankName) && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-pill bg-primary/10 text-primary">BANK</span>}
+              {(paymentMethods?.upi?.address) && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-pill bg-emerald-500/15 text-emerald-400">UPI</span>}
+              {(paymentMethods?.upay?.address) && <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-pill bg-purple-500/15 text-purple-400">UPAY</span>}
               {paymentMethods?.isDefault && <span className="text-[9px] text-muted-foreground">(Default)</span>}
             </div>
             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
@@ -375,26 +353,25 @@ const UserSearch = () => {
         </div>
       )}
 
-      {/* Status Sheet */}
       <Sheet open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
         <SheetContent side="right" className="w-[400px] sm:max-w-[400px]">
           <SheetHeader>
             <SheetTitle className="text-sm">Change User Status</SheetTitle>
           </SheetHeader>
           <div className="mt-4 space-y-3">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="text-xs font-medium">Status</label>
               <select
                 value={newStatus}
                 onChange={(e) => setNewStatus(e.target.value as any)}
-                className="w-full h-8 border border-input bg-background px-2 text-xs rounded"
+                className="w-full h-8 border border-input bg-background px-3 text-xs rounded-pill"
               >
                 <option value="active">Active</option>
                 <option value="suspended">Suspended</option>
                 <option value="inactive">Inactive (Ban)</option>
               </select>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="text-xs font-medium">
                 Remark {newStatus !== 'active' ? <span className="text-rose-400">*</span> : '(optional)'}
               </label>
@@ -415,19 +392,18 @@ const UserSearch = () => {
         </SheetContent>
       </Sheet>
 
-      {/* Payment Sheet */}
       <Sheet open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
         <SheetContent side="right" className="w-[400px] sm:max-w-[400px]">
           <SheetHeader>
             <SheetTitle className="text-sm">Edit Payment Details</SheetTitle>
           </SheetHeader>
           <div className="mt-4 space-y-3">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="text-xs font-medium">Payment Type</label>
               <select
                 value={paymentType}
                 onChange={(e) => setPaymentType(e.target.value as any)}
-                className="w-full h-8 border border-input bg-background px-2 text-xs rounded"
+                className="w-full h-8 border border-input bg-background px-3 text-xs rounded-pill"
               >
                 <option value="BANK">Bank Account</option>
                 <option value="UPI">UPI</option>
@@ -436,33 +412,33 @@ const UserSearch = () => {
             </div>
             {paymentType === 'BANK' && (
               <>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <label className="text-xs font-medium">Bank Name</label>
                   <Input value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="e.g., SBI" />
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <label className="text-xs font-medium">IFSC Code</label>
                   <Input value={bankCode} onChange={(e) => setBankCode(e.target.value)} placeholder="e.g., SBIN0001234" />
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <label className="text-xs font-medium">Account Number</label>
                   <Input value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="e.g., 1234567890" />
                 </div>
               </>
             )}
             {paymentType === 'UPI' && (
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <label className="text-xs font-medium">UPI ID</label>
                 <Input value={upiId} onChange={(e) => setUpiId(e.target.value)} placeholder="e.g., name@paytm" />
               </div>
             )}
             {paymentType === 'UPAY' && (
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <label className="text-xs font-medium">RPL ID</label>
                 <Input value={rplId} onChange={(e) => setRplId(e.target.value)} placeholder="e.g., RPL123456" />
               </div>
             )}
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="text-xs font-medium">Account Holder</label>
               <Input value={accountHolder} onChange={(e) => setAccountHolder(e.target.value)} placeholder="e.g., John Doe" />
             </div>

@@ -31,13 +31,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 
 interface WingoRound {
   _id: string;
@@ -194,17 +188,16 @@ const WingoDashboard = () => {
     <div className="space-y-4">
 
       {/* Tab Bar */}
-      <div className="flex items-center gap-0 bg-card border border-border rounded px-1" style={{ height: 34 }}>
+      <div className="flex items-center gap-0 bg-card border border-border rounded-lg px-1.5 h-[34px]">
         {(['current', 'history', 'mode'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setActiveTab(t)}
-            className={`px-2 text-xs font-medium rounded transition-all ${
+            className={`px-3 text-xs font-medium rounded-pill transition-all h-[26px] ${
               activeTab === t
-                ? 'bg-[rgb(32,143,255)] text-white border border-[rgb(32,143,255)]'
-                : 'text-muted-foreground border border-transparent hover:text-foreground hover:border-border'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
-            style={{ height: 26, lineHeight: '26px', marginRight: 5 }}
           >
             {t === 'current' ? 'Current Round' : t === 'history' ? 'History' : 'Mode'}
           </button>
@@ -344,16 +337,16 @@ const WingoDashboard = () => {
                               setLoadingBets(false);
                             }
                           }}
-                          disabled={loading || loadingBets}
-                          size="sm" 
-                          className="h-7 text-[10px] gap-1"
-                        >
-                          {loadingBets ? (
-                            <RefreshCw className="w-3 h-3 animate-spin" />
-                          ) : (
-                            'Show'
-                          )}
-                        </Button>
+                  disabled={loading || loadingBets}
+                  size="sm" 
+                  className="h-7 text-[10px] gap-1 bg-primary text-primary-foreground"
+                >
+                  {loadingBets ? (
+                    <RefreshCw className="w-3 h-3 animate-spin" />
+                  ) : (
+                    'Show'
+                  )}
+                </Button>
                       ) : (
                         <Button 
                           onClick={async () => {
@@ -367,7 +360,7 @@ const WingoDashboard = () => {
                           }}
                           disabled={loading || loadingBets}
                           size="sm" 
-                          className="h-7 text-[10px] gap-1"
+                          className="h-7 text-[10px] gap-1 bg-primary text-primary-foreground"
                         >
                           <RefreshCw className={`w-3 h-3 ${loadingBets ? 'animate-spin' : ''}`} />
                           Refresh
@@ -466,34 +459,34 @@ const WingoDashboard = () => {
                           setLoadingHistory(false);
                         }
                       }}
-                      disabled={loading || loadingHistory}
-                      size="sm" 
-                      className="h-7 text-[10px] gap-1"
-                    >
-                      {loadingHistory ? (
-                        <RefreshCw className="w-3 h-3 animate-spin" />
-                      ) : (
-                        'Show'
-                      )}
-                    </Button>
+                  disabled={loading || loadingHistory}
+                  size="sm" 
+                  className="h-7 text-[10px] gap-1 bg-primary text-primary-foreground"
+                >
+                  {loadingHistory ? (
+                    <RefreshCw className="w-3 h-3 animate-spin" />
                   ) : (
-                    <Button 
-                      onClick={async () => {
-                        setLoadingHistory(true);
-                        try {
-                          const res = await fetchWingoRounds(roundsPage, 25);
-                          setSettledRounds(res.data.items);
-                        } finally {
-                          setLoadingHistory(false);
-                        }
-                      }}
-                      disabled={loading || loadingHistory}
-                      size="sm" 
-                      className="h-7 text-[10px] gap-1"
-                    >
-                      <RefreshCw className={`w-3 h-3 ${loadingHistory ? 'animate-spin' : ''}`} />
-                      Refresh
-                    </Button>
+                    'Show'
+                  )}
+                </Button>
+                      ) : (
+                        <Button 
+                          onClick={async () => {
+                            setLoadingHistory(true);
+                            try {
+                              const res = await fetchWingoRounds(roundsPage, 25);
+                              setSettledRounds(res.data.items);
+                            } finally {
+                              setLoadingHistory(false);
+                            }
+                          }}
+                          disabled={loading || loadingHistory}
+                          size="sm" 
+                          className="h-7 text-[10px] gap-1 bg-primary text-primary-foreground"
+                        >
+                          <RefreshCw className={`w-3 h-3 ${loadingHistory ? 'animate-spin' : ''}`} />
+                          Refresh
+                        </Button>
                   )}
                 </div>
               </div>
@@ -579,7 +572,7 @@ const WingoDashboard = () => {
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      style={{ height: 24, padding: '0 8px', fontSize: 11, borderRadius: 2 }}
+                                      className="rounded-pill h-6 px-2 text-[11px]"
                                       onClick={async () => {
                                         setLoadingStats(true);
                                         try {
@@ -714,7 +707,7 @@ const WingoDashboard = () => {
                   onClick={loadAllData} 
                   disabled={loading}
                   size="sm" 
-                  className="h-8 text-xs gap-1.5"
+                  className="h-8 text-xs gap-1.5 bg-primary text-primary-foreground"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                   Refresh
@@ -725,26 +718,22 @@ const WingoDashboard = () => {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <p className="text-xs text-muted-foreground">Select Result Mode</p>
-                  <Select 
-                    value={resultMode} 
-                    onValueChange={(v: any) => setResultMode(v)}
+                  <select
+                    value={resultMode}
+                    onChange={(e) => setResultMode(e.target.value as any)}
+                    className="w-full h-8 rounded-pill border border-input bg-background px-3 text-xs"
                   >
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue placeholder="Select mode" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="RANDOM">RANDOM - Pure random 0-9 (default)</SelectItem>
-                      <SelectItem value="MAX_PROFIT">MAX_PROFIT - Minimize payout (house wins more)</SelectItem>
-                      <SelectItem value="MAX_LOSS">MAX_LOSS - Maximize payout (house loses more)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="RANDOM">RANDOM - Pure random 0-9 (default)</option>
+                    <option value="MAX_PROFIT">MAX_PROFIT - Minimize payout (house wins more)</option>
+                    <option value="MAX_LOSS">MAX_LOSS - Maximize payout (house loses more)</option>
+                  </select>
                 </div>
                 <Button 
                   onClick={async () => {
                     await handleSetMode(resultMode);
                   }}
                   disabled={loading}
-                  className="w-full h-9 text-xs"
+                  className="w-full h-9 text-xs bg-primary text-primary-foreground"
                 >
                   Apply Change
                 </Button>

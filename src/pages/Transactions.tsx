@@ -168,9 +168,9 @@ const Transactions = () => {
                     </td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
                       <div className="cell">
-                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-sm ${
-                          statusColor[d.status] || 'bg-muted text-muted-foreground'
-                        }`}>{d.status}</span>
+                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-pill ${
+                           statusColor[d.status] || 'bg-muted text-muted-foreground'
+                         }`}>{d.status}</span>
                       </div>
                     </td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
@@ -232,7 +232,7 @@ const Transactions = () => {
           <div>
             <div className="text-xs text-muted-foreground font-medium mb-1">Type</div>
             <select
-              className="w-full h-[34px] rounded border border-input bg-background px-2 text-sm"
+              className="w-full h-[34px] rounded-pill border border-input bg-background px-3 text-sm"
               value={type}
               onChange={(e) => setType(e.target.value)}
             >
@@ -248,10 +248,10 @@ const Transactions = () => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal text-sm h-[34px] px-3 rounded-[5px]"
-                >
-                  <CalendarIcon className="mr-1.5 h-4 w-4" />
-                  {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}
+                    className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"
+                  >
+                    <CalendarIcon className="mr-1.5 h-4 w-4" />
+                    {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -274,10 +274,10 @@ const Transactions = () => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal text-sm h-[34px] px-3 rounded-[5px]"
-                >
-                  <CalendarIcon className="mr-1.5 h-4 w-4" />
-                  {dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}
+                    className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"
+                  >
+                    <CalendarIcon className="mr-1.5 h-4 w-4" />
+                    {dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -298,8 +298,7 @@ const Transactions = () => {
             <Button
               onClick={handleToday}
               size="sm"
-              className="h-[34px] px-3 text-sm rounded-[5px]"
-              style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+              className="h-[34px] px-3 text-sm bg-primary text-primary-foreground"
             >
               Today
             </Button>
@@ -310,8 +309,7 @@ const Transactions = () => {
               onClick={() => load(1)}
               disabled={loading || (!userId.trim() && !orderId.trim() && !transactionId.trim())}
               size="sm"
-              className="h-[34px] px-4 text-sm rounded-[5px] gap-1.5"
-              style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+              className="h-[34px] px-4 text-sm gap-1.5 bg-primary text-primary-foreground"
             >
               {loading ? <Loading size={14} /> : null}
               Search
@@ -320,7 +318,7 @@ const Transactions = () => {
               onClick={handleReset}
               variant="outline"
               size="sm"
-              className="h-[34px] px-4 text-sm rounded-[5px]"
+              className="h-[34px] px-4 text-sm"
             >
               Reset
             </Button>

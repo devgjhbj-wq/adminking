@@ -313,7 +313,7 @@ const Deposits = () => {
                     </td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
                       <div className="cell">
-                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-sm ${statusColor[d.status] || 'bg-muted text-muted-foreground'}`}>{d.status}</span>
+                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-pill ${statusColor[d.status] || 'bg-muted text-muted-foreground'}`}>{d.status}</span>
                       </div>
                     </td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
@@ -337,16 +337,7 @@ const Deposits = () => {
                           <button
                             onClick={() => handleApprove(d.orderId)}
                             disabled={approvingId === d.orderId}
-                            style={{
-                              background: approvingId === d.orderId ? 'hsl(var(--primary) / 0.5)' : 'hsl(var(--primary))',
-                              color: 'hsl(var(--primary-foreground))',
-                              border: 'none',
-                              borderRadius: 2,
-                              padding: '4px 8px',
-                              fontSize: 12,
-                              cursor: approvingId === d.orderId ? 'not-allowed' : 'pointer',
-                              lineHeight: 1,
-                            }}
+                            className={`rounded-pill px-2.5 py-1 text-[11px] font-medium border-0 ${approvingId === d.orderId ? 'bg-primary/50 text-primary-foreground cursor-not-allowed' : 'bg-primary text-primary-foreground cursor-pointer'}`}
                           >
                             {approvingId === d.orderId ? 'Loading...' : 'Approve'}
                           </button>
@@ -368,17 +359,16 @@ const Deposits = () => {
   return (
     <PageContainer>
       {/* Tab Bar */}
-      <div className="flex items-center gap-0 bg-card border border-border rounded px-1" style={{ height: 34 }}>
+      <div className="flex items-center gap-0 bg-card border border-border rounded-lg px-1.5 h-[34px]">
         {(['orders', 'config', 'bonus'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-2 text-xs font-medium rounded transition-all capitalize ${
+            className={`px-3 text-xs font-medium rounded-pill transition-all h-[26px] capitalize ${
               tab === t
-                ? 'bg-[rgb(32,143,255)] text-white border border-[rgb(32,143,255)]'
-                : 'text-muted-foreground border border-transparent hover:text-foreground hover:border-border'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
-            style={{ height: 26, lineHeight: '26px', marginRight: 5 }}
           >
             {t}
           </button>
@@ -423,7 +413,7 @@ const Deposits = () => {
           <div>
             <div className="text-xs text-muted-foreground font-medium mb-1">Status</div>
             <select
-              className="w-full h-[34px] rounded border border-input bg-background px-2 text-sm"
+              className="w-full h-[34px] rounded-pill border border-input bg-background px-3 text-sm"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             >
@@ -442,10 +432,10 @@ const Deposits = () => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal text-sm h-[34px] px-3 rounded-[5px]"
-                >
-                  <CalendarIcon className="mr-1.5 h-4 w-4" />
-                  {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}
+                    className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"
+                  >
+                    <CalendarIcon className="mr-1.5 h-4 w-4" />
+                    {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -468,10 +458,10 @@ const Deposits = () => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-full justify-start text-left font-normal text-sm h-[34px] px-3 rounded-[5px]"
-                >
-                  <CalendarIcon className="mr-1.5 h-4 w-4" />
-                  {dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}
+                    className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"
+                  >
+                    <CalendarIcon className="mr-1.5 h-4 w-4" />
+                    {dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -492,8 +482,7 @@ const Deposits = () => {
             <Button
               onClick={handleToday}
               size="sm"
-              className="h-[34px] px-3 text-sm rounded-[5px]"
-              style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+              className="h-[34px] px-3 text-sm bg-primary text-primary-foreground"
             >
               Today
             </Button>
@@ -504,8 +493,7 @@ const Deposits = () => {
               onClick={() => handleSearchClick(1)}
               disabled={loading}
               size="sm"
-              className="h-[34px] px-4 text-sm rounded-[5px]"
-              style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+              className="h-[34px] px-4 text-sm bg-primary text-primary-foreground"
             >
               {loading ? <Loading size={14} /> : null}
               Search
@@ -514,7 +502,7 @@ const Deposits = () => {
               onClick={handleReset}
               variant="outline"
               size="sm"
-              className="h-[34px] px-4 text-sm rounded-[5px]"
+              className="h-[34px] px-4 text-sm"
             >
               Reset
             </Button>
@@ -533,25 +521,23 @@ const Deposits = () => {
 
       {tab === 'bonus' && (
         <div className="bg-card border border-border p-4 rounded-lg space-y-4">
-          <h3 className="text-sm font-semibold">Deposit Bonus Configuration</h3>
+          <h3 className="text-sm font-semibold tracking-tight">Deposit Bonus Configuration</h3>
           {bonusLoading ? (
             <div className="flex justify-center py-8"><Loading size={20} /></div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {bonusConfig.map((c: any) => {
-                const borderColors: Record<number, string> = { 1: 'border-l-amber-400', 2: 'border-l-slate-400', 3: 'border-l-orange-600' };
                 return (
-                <div key={c.depositCount} className={`border border-border rounded-xl p-4 border-l-4 shadow-sm ${borderColors[c.depositCount] || 'border-l-blue-500'}`}>
+                <div className="border border-border rounded-lg p-4 bg-card shadow-apple-card">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold text-foreground uppercase">
+                    <span className="text-xs font-semibold text-foreground uppercase tracking-tight">
                       {c.depositCount === 1 ? '1st' : c.depositCount === 2 ? '2nd' : '3rd'} Deposit Bonus
                     </span>
                     <Button
                       onClick={() => handleSaveBonusConfig(c.depositCount)}
                       disabled={bonusSaving}
                       size="sm"
-                      className="h-7 text-xs rounded-[5px]"
-                      style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+                      className="h-7 text-xs bg-primary text-primary-foreground"
                     >
                       {bonusSaving && <Loading size={12} className="mr-1" />}
                       Save
@@ -601,18 +587,17 @@ const Deposits = () => {
 
       {tab === 'config' && (
         <div className="bg-card border border-border p-4 rounded-lg space-y-4">
-          <h3 className="text-sm font-semibold">Deposit Channel Configuration</h3>
+          <h3 className="text-sm font-semibold tracking-tight">Deposit Channel Configuration</h3>
           {configLoading ? (
             <div className="flex justify-center py-8"><Loading size={20} /></div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {config.map((ch: any, idx: number) => {
-                const borderColors = ['border-l-blue-500', 'border-l-emerald-500', 'border-l-purple-500', 'border-l-rose-500', 'border-l-cyan-500'];
                 return (
-                <div key={ch.channel} className={`border border-border rounded-xl p-4 border-l-4 shadow-sm ${borderColors[idx % borderColors.length]}`}>
+                <div key={ch.channel} className="border border-border rounded-lg p-4 bg-card shadow-apple-card">
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <span className="text-xs font-bold text-foreground uppercase">{ch.name}</span>
+                      <span className="text-xs font-semibold text-foreground uppercase tracking-tight">{ch.name}</span>
                       <span className="text-[10px] text-muted-foreground ml-2">({ch.channel})</span>
                       <span className="text-[10px] text-muted-foreground ml-2">{ch.description}</span>
                     </div>
@@ -620,8 +605,7 @@ const Deposits = () => {
                       onClick={() => handleSaveConfig(ch.channel)}
                       disabled={configSaving}
                       size="sm"
-                      className="h-7 text-xs rounded-[5px]"
-                      style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+                      className="h-7 text-xs bg-primary text-primary-foreground"
                     >
                       {configSaving && <Loading size={12} className="mr-1" />}
                       Save

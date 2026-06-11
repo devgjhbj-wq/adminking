@@ -67,12 +67,12 @@ const SearchInputWithHistory = ({ value, onChange, placeholder, className }: Pro
         className={className}
       />
       {open && history.length > 0 && (
-        <div className="absolute z-50 top-full mt-0.5 left-0 w-full bg-[rgb(20,20,20)] border border-border rounded shadow-md max-h-[200px] overflow-y-auto">
+        <div className="absolute z-50 top-full mt-1 left-0 w-full bg-card border border-border rounded-lg shadow-lg max-h-[200px] overflow-y-auto">
           {history.map((id) => (
             <div
               key={id}
               onMouseDown={() => handleSelect(id)}
-              className="px-2 py-1 text-xs cursor-pointer hover:bg-[rgb(50,50,50)] text-white"
+              className="px-3 py-1.5 text-xs cursor-pointer hover:bg-accent/10 text-foreground"
             >
               {id}
             </div>

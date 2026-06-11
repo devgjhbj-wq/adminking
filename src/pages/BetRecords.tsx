@@ -187,7 +187,7 @@ const BetRecords = () => {
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}><div className="cell">{item.selectType || '-'}</div></td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
                       <div className="cell">
-                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-sm ${statusColor[item.status] || 'bg-muted text-muted-foreground'}`}>{item.status}</span>
+                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-pill ${statusColor[item.status] || 'bg-muted text-muted-foreground'}`}>{item.status}</span>
                       </div>
                     </td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}><div className="cell" style={{ fontSize: 11 }}>{item.createdAt ? new Date(item.createdAt).toLocaleString() : '-'}</div></td>
@@ -203,17 +203,16 @@ const BetRecords = () => {
 
   return (
     <PageContainer>
-      <div className="flex items-center gap-0 bg-card border border-border rounded px-1" style={{ height: 34 }}>
+      <div className="flex items-center gap-0 bg-card border border-border rounded-lg px-1.5 h-[34px]">
         {(['provider', 'wingo'] as const).map((t) => (
           <button
             key={t}
             onClick={() => { setTab(t); setData(null); }}
-            className={`px-2 text-xs font-medium rounded transition-all capitalize ${
+            className={`px-3 text-xs font-medium rounded-pill transition-all h-[26px] capitalize ${
               tab === t
-                ? 'bg-[rgb(32,143,255)] text-white border border-[rgb(32,143,255)]'
-                : 'text-muted-foreground border border-transparent hover:text-foreground hover:border-border'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
-            style={{ height: 26, lineHeight: '26px', marginRight: 5 }}
           >
             {t === 'provider' ? 'Provider' : 'Wingo'}
           </button>
@@ -229,13 +228,13 @@ const BetRecords = () => {
             </div>
             <div>
               <div className="text-xs text-muted-foreground font-medium mb-1">Site</div>
-              <select className="w-full h-[34px] rounded border border-input bg-background px-2 text-sm" value={site} onChange={(e) => setSite(e.target.value)}>
+              <select className="w-full h-[34px] rounded-pill border border-input bg-background px-3 text-sm" value={site} onChange={(e) => setSite(e.target.value)}>
                 <option value="">All</option><option value="JE">JE</option><option value="PG">PG</option><option value="JD">JD</option><option value="TU">TU</option>
               </select>
             </div>
             <div>
               <div className="text-xs text-muted-foreground font-medium mb-1">Status</div>
-              <select className="w-full h-[34px] rounded border border-input bg-background px-2 text-sm" value={status} onChange={(e) => setStatus(e.target.value)}>
+              <select className="w-full h-[34px] rounded-pill border border-input bg-background px-3 text-sm" value={status} onChange={(e) => setStatus(e.target.value)}>
                 <option value="">All</option><option value="1">Valid</option>
               </select>
             </div>
@@ -243,7 +242,7 @@ const BetRecords = () => {
               <div className="text-xs text-muted-foreground font-medium mb-1">From</div>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal text-sm h-[34px] px-3 rounded-[5px]"><CalendarIcon className="mr-1.5 h-4 w-4" />{dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}</Button>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"><CalendarIcon className="mr-1.5 h-4 w-4" />{dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}</Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
@@ -254,7 +253,7 @@ const BetRecords = () => {
               <div className="text-xs text-muted-foreground font-medium mb-1">To</div>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal text-sm h-[34px] px-3 rounded-[5px]"><CalendarIcon className="mr-1.5 h-4 w-4" />{dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}</Button>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"><CalendarIcon className="mr-1.5 h-4 w-4" />{dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}</Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar mode="single" selected={dateTo} onSelect={setDateTo} initialFocus captionLayout="dropdown-buttons" fromYear={2024} toYear={2026} />
@@ -262,11 +261,11 @@ const BetRecords = () => {
               </Popover>
             </div>
             <div className="flex items-end">
-              <Button onClick={handleToday} size="sm" className="h-[34px] px-3 text-sm rounded-[5px]" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>Today</Button>
+              <Button onClick={handleToday} size="sm" className="h-[34px] px-3 text-sm bg-primary text-primary-foreground">Today</Button>
             </div>
             <div className="flex items-end gap-3">
-              <Button onClick={() => handleProviderSearch(1)} disabled={loading || !member.trim()} size="sm" className="h-[34px] px-4 text-sm rounded-[5px] gap-1.5" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>{loading ? <Loading size={14} /> : null}Search</Button>
-              <Button onClick={handleReset} variant="outline" size="sm" className="h-[34px] px-4 text-sm rounded-[5px]">Reset</Button>
+              <Button onClick={() => handleProviderSearch(1)} disabled={loading || !member.trim()} size="sm" className="h-[34px] px-4 text-sm gap-1.5 bg-primary text-primary-foreground">{loading ? <Loading size={14} /> : null}Search</Button>
+              <Button onClick={handleReset} variant="outline" size="sm" className="h-[34px] px-4 text-sm">Reset</Button>
             </div>
           </div>
         ) : (
@@ -285,13 +284,13 @@ const BetRecords = () => {
             </div>
             <div>
               <div className="text-xs text-muted-foreground font-medium mb-1">Status</div>
-              <select className="w-full h-[34px] rounded border border-input bg-background px-2 text-sm" value={wingoStatus} onChange={(e) => setWingoStatus(e.target.value)}>
+              <select className="w-full h-[34px] rounded-pill border border-input bg-background px-3 text-sm" value={wingoStatus} onChange={(e) => setWingoStatus(e.target.value)}>
                 <option value="">All</option><option value="pending">Pending</option><option value="won">Won</option><option value="lost">Lost</option>
               </select>
             </div>
             <div className="flex items-end gap-3">
-              <Button onClick={() => handleWingoSearch(1)} disabled={loading} size="sm" className="h-[34px] px-4 text-sm rounded-[5px] gap-1.5" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>{loading ? <Loading size={14} /> : null}Search</Button>
-              <Button onClick={handleReset} variant="outline" size="sm" className="h-[34px] px-4 text-sm rounded-[5px]">Reset</Button>
+              <Button onClick={() => handleWingoSearch(1)} disabled={loading} size="sm" className="h-[34px] px-4 text-sm gap-1.5 bg-primary text-primary-foreground">{loading ? <Loading size={14} /> : null}Search</Button>
+              <Button onClick={handleReset} variant="outline" size="sm" className="h-[34px] px-4 text-sm">Reset</Button>
             </div>
           </div>
         )}
@@ -299,23 +298,23 @@ const BetRecords = () => {
 
       {data && data.summary && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-card border border-border p-4 rounded-md space-y-1">
+          <div className="bg-card border border-border p-4 rounded-lg shadow-apple-card space-y-1">
             <h4 className="text-xs font-medium text-muted-foreground">Total Bet</h4>
-            <div className="text-xl font-bold text-foreground">₹{(data.summary.totalBet ?? 0).toFixed(2)}</div>
+            <div className="text-xl font-semibold text-foreground">₹{(data.summary.totalBet ?? 0).toFixed(2)}</div>
           </div>
-          <div className="bg-card border border-border p-4 rounded-md space-y-1">
+          <div className="bg-card border border-border p-4 rounded-lg shadow-apple-card space-y-1">
             <h4 className="text-xs font-medium text-muted-foreground">Total Payout</h4>
-            <div className="text-xl font-bold text-foreground">₹{(data.summary.totalPayout ?? 0).toFixed(2)}</div>
+            <div className="text-xl font-semibold text-foreground">₹{(data.summary.totalPayout ?? 0).toFixed(2)}</div>
           </div>
           {tab === 'provider' && (
             <>
-              <div className="bg-card border border-border p-4 rounded-md space-y-1">
+              <div className="bg-card border border-border p-4 rounded-lg shadow-apple-card space-y-1">
                 <h4 className="text-xs font-medium text-muted-foreground">Total Turnover</h4>
-                <div className="text-xl font-bold text-foreground">₹{(data.summary.totalTurnover ?? 0).toFixed(2)}</div>
+                <div className="text-xl font-semibold text-foreground">₹{(data.summary.totalTurnover ?? 0).toFixed(2)}</div>
               </div>
-              <div className="bg-card border border-border p-4 rounded-md space-y-1">
+              <div className="bg-card border border-border p-4 rounded-lg shadow-apple-card space-y-1">
                 <h4 className="text-xs font-medium text-muted-foreground">Net PnL</h4>
-                <div className="text-xl font-bold text-foreground">₹{(data.summary.netPnl ?? 0).toFixed(2)}</div>
+                <div className="text-xl font-semibold text-foreground">₹{(data.summary.netPnl ?? 0).toFixed(2)}</div>
               </div>
             </>
           )}

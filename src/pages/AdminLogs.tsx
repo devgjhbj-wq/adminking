@@ -48,7 +48,7 @@ const AdminLogs = () => {
           <select
             value={level}
             onChange={(e) => setLevel(e.target.value as '' | 'info' | 'error')}
-            className="w-[200px] h-[26px] rounded-md border border-input bg-background px-2.5 text-xs text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="w-[200px] h-[26px] rounded-pill border border-input bg-background px-2.5 text-xs text-foreground"
           >
             <option value="">All</option>
             <option value="info">Info</option>
@@ -67,7 +67,7 @@ const AdminLogs = () => {
         </span>
 
         <span className="inline-flex items-center shrink-0">
-          <Button onClick={loadLogs} disabled={loading} className="h-[26px] px-2.5 rounded-[5px] gap-1 text-xs" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
+          <Button onClick={loadLogs} disabled={loading} className="h-[26px] px-2.5 gap-1 text-xs bg-primary text-primary-foreground">
             {loading ? <Loading size={14} /> : <RefreshCw className="w-3.5 h-3.5" />}
             Apply
           </Button>
@@ -124,10 +124,10 @@ const AdminLogs = () => {
                     </td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
                       <div className="cell">
-                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-sm ${
-                          log.level === 'error' || log.level === 'ERROR' ? 'bg-destructive/20 text-destructive' :
-                          log.level === 'warn' || log.level === 'WARN' ? 'bg-yellow-500/20 text-yellow-400' :
-                          'bg-primary/20 text-primary'
+                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-pill ${
+                           log.level === 'error' || log.level === 'ERROR' ? 'bg-destructive/20 text-destructive' :
+                           log.level === 'warn' || log.level === 'WARN' ? 'bg-yellow-500/20 text-yellow-400' :
+                           'bg-primary/20 text-primary'
                         }`}>{log.level}</span>
                       </div>
                     </td>

@@ -289,8 +289,8 @@ const GiftCodes = () => {
                     </td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
                       <div className="cell">
-                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-sm ${
-                          code.type === 'BONUS' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'
+                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-pill ${
+                           code.type === 'BONUS' ? 'bg-green-500/20 text-green-400' : 'bg-blue-500/20 text-blue-400'
                         }`}>{code.type}</span>
                       </div>
                     </td>
@@ -315,8 +315,8 @@ const GiftCodes = () => {
                     </td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
                       <div className="cell">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                          code.active ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
+                        <span className={`px-2 py-0.5 rounded-pill text-[10px] font-semibold uppercase ${
+                           code.active ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'
                         }`}>{code.active ? 'Active' : 'Inactive'}</span>
                       </div>
                     </td>
@@ -326,10 +326,10 @@ const GiftCodes = () => {
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
                       <div className="cell">
                         <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
-                          <button onClick={() => handleToggle(code._id || code.id, code.active)} style={{ background: 'none', border: '1px solid hsl(var(--border))', borderRadius: 2, padding: '2px 4px', cursor: 'pointer', color: code.active ? 'hsl(var(--destructive))' : 'hsl(var(--primary))', fontSize: 11, lineHeight: 1 }}>
+                          <button onClick={() => handleToggle(code._id || code.id, code.active)} className={`rounded-pill px-2 py-0.5 text-[10px] font-medium border ${code.active ? 'border-destructive/30 text-destructive hover:bg-destructive/10' : 'border-primary/30 text-primary hover:bg-primary/10'}`}>
                             {code.active ? 'Off' : 'On'}
                           </button>
-                          <button onClick={() => handleDelete(code._id || code.id)} style={{ background: 'none', border: '1px solid hsl(var(--border))', borderRadius: 2, padding: '2px 4px', cursor: 'pointer', color: 'hsl(var(--destructive))', fontSize: 11, lineHeight: 1 }}>
+                          <button onClick={() => handleDelete(code._id || code.id)} className="rounded-pill px-2 py-0.5 text-[10px] font-medium border border-destructive/30 text-destructive hover:bg-destructive/10">
                             Del
                           </button>
                         </div>
@@ -359,7 +359,7 @@ const GiftCodes = () => {
           />
         </div>
         <select
-          className="w-[200px] h-[26px] rounded-md border border-input bg-background px-2.5 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="w-[200px] h-[26px] rounded-pill border border-input bg-background px-2.5 text-xs"
           value={isActiveFilter}
           onChange={(e) => setIsActiveFilter(e.target.value)}
         >
@@ -367,7 +367,7 @@ const GiftCodes = () => {
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
-        <Button size="sm" onClick={() => loadCodes(1)} disabled={loading} className="h-[26px] px-2.5 rounded-[5px] gap-1 text-xs" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
+        <Button size="sm" onClick={() => loadCodes(1)} disabled={loading} className="h-[26px] px-2.5 gap-1 text-xs bg-primary text-primary-foreground">
           {loading ? <Loading size={12} /> : <Search className="w-3.5 h-3.5" />}
           Search
         </Button>
@@ -392,7 +392,7 @@ const GiftCodes = () => {
             }
           }}>
             <DialogTrigger asChild>
-              <Button size="sm" className="h-[26px] rounded-[5px] gap-1 text-xs font-bold">
+              <Button size="sm" className="h-[26px] gap-1 text-xs font-semibold bg-primary text-primary-foreground">
                 <Plus className="w-3.5 h-3.5" />
                 Create Gift Code
               </Button>
@@ -514,7 +514,7 @@ const GiftCodes = () => {
 
                 <DialogFooter>
                   <Button type="button" variant="outline" size="sm" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
-                  <Button type="submit" size="sm" disabled={createLoading}>
+                  <Button type="submit" size="sm" disabled={createLoading} className="bg-primary text-primary-foreground">
                     {createLoading ? <Loading size={14} className="mr-2" /> : isEditMode ? <Edit2 className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
                     {isEditMode ? 'Update Code' : 'Create Code'}
                   </Button>
@@ -577,24 +577,24 @@ const GiftCodes = () => {
 
           {redemptionTotalPages > 1 && (
             <div className="p-4 border-t border-border flex justify-end gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 w-8 p-0"
-                disabled={redemptionPage <= 1 || redemptionLoading}
-                onClick={() => loadRedemptions(selectedCode!, redemptionPage - 1)}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 w-8 p-0"
-                disabled={redemptionPage >= redemptionTotalPages || redemptionLoading}
-                onClick={() => loadRedemptions(selectedCode!, redemptionPage + 1)}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 w-8 p-0 rounded-pill"
+                  disabled={redemptionPage <= 1 || redemptionLoading}
+                  onClick={() => loadRedemptions(selectedCode!, redemptionPage - 1)}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 w-8 p-0 rounded-pill"
+                  disabled={redemptionPage >= redemptionTotalPages || redemptionLoading}
+                  onClick={() => loadRedemptions(selectedCode!, redemptionPage + 1)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
             </div>
           )}
           

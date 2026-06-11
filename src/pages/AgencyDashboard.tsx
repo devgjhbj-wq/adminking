@@ -223,17 +223,16 @@ const AgencyDashboard = () => {
   return (
     <div className="space-y-3">
       {/* Tab Bar */}
-      <div className="flex items-center gap-0 bg-card border border-border rounded px-1" style={{ height: 34 }}>
+      <div className="flex items-center gap-0 bg-card border border-border rounded-lg px-1.5 h-[34px]">
         {tabs.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-2 text-xs font-medium rounded transition-all ${
+            className={`px-3 text-xs font-medium rounded-pill transition-all h-[26px] ${
               tab === t
-                ? 'bg-[rgb(32,143,255)] text-white border border-[rgb(32,143,255)]'
-                : 'text-muted-foreground border border-transparent hover:text-foreground hover:border-border'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
-            style={{ height: 26, lineHeight: '26px', marginRight: 5 }}
           >
             {t}
           </button>
@@ -254,7 +253,7 @@ const AgencyDashboard = () => {
             <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px] ml-[3px]">Date</label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]">
+                <Button variant="outline" className="w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2">
                   <CalendarIcon className="mr-1 h-3 w-3" />
                   {levelDate ? format(levelDate, "MMM dd, yyyy") : "Today"}
                 </Button>
@@ -267,8 +266,7 @@ const AgencyDashboard = () => {
               onClick={loadLevel}
               disabled={levelLoading || !levelUserId.trim()}
               size="sm"
-              className="h-[26px] px-2.5 text-xs rounded-[5px]"
-              style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+              className="h-[26px] px-2.5 text-xs bg-primary text-primary-foreground"
             >
               {levelLoading ? <Loading size={10} /> : <Search className="w-3.5 h-3.5" />}
               Search
@@ -341,7 +339,7 @@ const AgencyDashboard = () => {
             <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px] ml-[3px]">To</label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]">
+                <Button variant="outline" className="w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2">
                   <CalendarIcon className="mr-1 h-3 w-3" />
                   {teamToDate ? format(teamToDate, "MMM dd, yyyy") : "Select"}
                 </Button>
@@ -353,7 +351,7 @@ const AgencyDashboard = () => {
             <label className="text-xs font-medium text-foreground whitespace-nowrap mr-[3px] ml-[3px]">From</label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2 rounded-[5px]">
+                <Button variant="outline" className="w-[130px] justify-start text-left font-normal text-xs h-[26px] px-2">
                   <CalendarIcon className="mr-1 h-3 w-3" />
                   {teamFromDate ? format(teamFromDate, "MMM dd, yyyy") : "Select"}
                 </Button>
@@ -373,8 +371,7 @@ const AgencyDashboard = () => {
               onClick={() => loadTeam(1)}
               disabled={teamLoading}
               size="sm"
-              className="h-[26px] px-2.5 text-xs rounded-[5px]"
-              style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
+              className="h-[26px] px-2.5 text-xs bg-primary text-primary-foreground"
             >
               {teamLoading ? <Loading size={10} /> : <Search className="w-3.5 h-3.5" />}
               Search
@@ -410,14 +407,13 @@ const AgencyDashboard = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-[11px] font-semibold text-foreground">Aggregation</label>
-                <Button
-                  size="sm"
-                  onClick={() => { setTmOpen(true); setTmData(null); setTmPage(1); }}
-                  className="h-[26px] px-2.5 text-xs rounded-[5px]"
-                  style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}
-                >
-                  <Users className="w-3.5 h-3.5 mr-1" /> Team Members
-                </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => { setTmOpen(true); setTmData(null); setTmPage(1); }}
+                    className="h-[26px] px-2.5 text-xs bg-primary text-primary-foreground"
+                  >
+                    <Users className="w-3.5 h-3.5 mr-1" /> Team Members
+                  </Button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {['level1', 'level2', 'level3', 'total'].map((key) => {
@@ -457,7 +453,7 @@ const AgencyDashboard = () => {
                 <label className="text-[11px] text-muted-foreground block mb-1">From Date</label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal text-xs h-[30px] px-2 rounded-[5px]">
+                    <Button variant="outline" className="w-full justify-start text-left font-normal text-xs h-[30px] px-2">
                       <CalendarIcon className="mr-1 h-3 w-3" />
                       {tmFromDate ? format(tmFromDate, "MMM dd, yyyy") : "Select"}
                     </Button>
@@ -471,7 +467,7 @@ const AgencyDashboard = () => {
                 <label className="text-[11px] text-muted-foreground block mb-1">To Date</label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal text-xs h-[30px] px-2 rounded-[5px]">
+                    <Button variant="outline" className="w-full justify-start text-left font-normal text-xs h-[30px] px-2">
                       <CalendarIcon className="mr-1 h-3 w-3" />
                       {tmToDate ? format(tmToDate, "MMM dd, yyyy") : "Select"}
                     </Button>
@@ -482,7 +478,7 @@ const AgencyDashboard = () => {
                 </Popover>
               </div>
             </div>
-            <Button onClick={() => loadTeamMembers(1)} disabled={tmLoading} size="sm" className="w-full h-[30px] text-xs" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
+            <Button onClick={() => loadTeamMembers(1)} disabled={tmLoading} size="sm" className="w-full h-[30px] text-xs bg-primary text-primary-foreground">
               {tmLoading ? <Loading size={10} className="mr-1" /> : <Search className="w-3.5 h-3.5 mr-1" />}
               Search
             </Button>
@@ -522,7 +518,7 @@ const AgencyDashboard = () => {
                           <tr key={i} style={{ height: 44 }}>
                             <td style={{ border: '1px solid hsl(var(--border))', padding: '4px', textAlign: 'center' }}><div className="cell text-xs">{item.userId}</div></td>
                             <td style={{ border: '1px solid hsl(var(--border))', padding: '4px', textAlign: 'center' }}><div className="cell text-xs">{item.mobile}</div></td>
-                            <td style={{ border: '1px solid hsl(var(--border))', padding: '4px', textAlign: 'center' }}><div className="cell"><span className="px-1.5 py-0.5 text-[10px] font-medium rounded-sm bg-secondary text-foreground">L{item.tier}</span></div></td>
+                            <td style={{ border: '1px solid hsl(var(--border))', padding: '4px', textAlign: 'center' }}><div className="cell"><span className="px-1.5 py-0.5 text-[10px] font-medium rounded-pill bg-secondary text-foreground">L{item.tier}</span></div></td>
                             <td style={{ border: '1px solid hsl(var(--border))', padding: '4px', textAlign: 'center' }}><div className="cell text-xs">₹{(item.totalDeposit ?? 0).toLocaleString()}</div></td>
                             <td style={{ border: '1px solid hsl(var(--border))', padding: '4px', textAlign: 'center' }}><div className="cell text-xs">₹{(item.totalWithdrawal ?? 0).toLocaleString()}</div></td>
                             <td style={{ border: '1px solid hsl(var(--border))', padding: '4px', textAlign: 'center' }}><div className="cell text-xs">₹{(item.totalBet ?? 0).toLocaleString()}</div></td>
@@ -550,9 +546,9 @@ const AgencyDashboard = () => {
       {/* ── Config Tab ── */}
       {tab === 'Config' && (
         <div className="space-y-2">
-          <div className="flex items-center justify-between bg-card border border-border rounded-lg">
-            <h3 className="text-xs font-semibold text-foreground">Level Configurations</h3>
-            <div className="flex ga">
+          <div className="bg-card border border-border rounded-lg p-3 flex items-center justify-between">
+            <h3 className="text-xs font-semibold tracking-tight text-foreground">Level Configurations</h3>
+            <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={loadConfigs} disabled={configLoading} className="h-7 text-xs"><RefreshCw className={`w-3 h-3 mr-1 ${configLoading ? 'animate-spin' : ''}`} />Refresh</Button>
               <Button variant="outline" size="sm" onClick={handleSeed} className="h-7 text-xs"><Plus className="w-3 h-3 mr-1" />Seed Defaults</Button>
             </div>
@@ -641,7 +637,7 @@ const AgencyDashboard = () => {
 
           {/* Admin: Run Midnight Batch */}
           <div className="bg-card border border-border p-3 rounded-lg space-y-2">
-            <h3 className="text-xs font-semibold text-foreground">Admin Actions</h3>
+            <h3 className="text-xs font-semibold tracking-tight text-foreground">Admin Actions</h3>
             <div className="flex items-center gap-3">
               <Button size="sm" onClick={handleRunBatch} disabled={batchRunning} className="h-7 text-xs">
                 {batchRunning ? <Loading size={12} className="mr-1" /> : <Play className="w-3 h-3 mr-1" />}

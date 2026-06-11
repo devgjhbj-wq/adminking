@@ -82,7 +82,7 @@ const UserTurnover = ({ userId }: { userId: string | number }) => {
 
   if (loading && !data) {
     return (
-      <div className="bg-card border border-border rounded-xl shadow-sm border-l-4 border-l-blue-500 p-4 flex justify-center py-6">
+      <div className="bg-card border border-border rounded-lg p-4 flex justify-center py-6">
         <Loading />
       </div>
     );
@@ -91,8 +91,8 @@ const UserTurnover = ({ userId }: { userId: string | number }) => {
   if (!data) return null;
 
   return (
-    <div className="bg-card border border-border rounded-xl shadow-sm border-l-4 border-l-blue-500 p-4 space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
+    <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/50 pb-3">
         <div>
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
             Turnover Status
@@ -102,74 +102,37 @@ const UserTurnover = ({ userId }: { userId: string | number }) => {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button size="sm" onClick={loadData} disabled={loading} className="h-7 text-[10px] rounded-[5px]" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
+          <Button size="sm" onClick={loadData} disabled={loading} className="h-7 text-[10px]">
             <RefreshCw className={`w-3 h-3 mr-1 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </Button>
-          <Button size="sm" onClick={() => setAddDialogOpen(true)} className="h-7 text-[10px] rounded-[5px]" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
+          <Button size="sm" onClick={() => setAddDialogOpen(true)} className="h-7 text-[10px]">
             <Plus className="w-3 h-3 mr-1" /> Add
           </Button>
-          <Button size="sm" onClick={() => setClearDialogOpen(true)} className="h-7 text-[10px] rounded-[5px]" style={{ backgroundColor: 'rgb(32,143,255)', color: '#fff' }}>
+          <Button size="sm" onClick={() => setClearDialogOpen(true)} className="h-7 text-[10px]">
             <Trash2 className="w-3 h-3 mr-1" /> Clear
           </Button>
         </div>
       </div>
 
-      <style>{`
-        .el-table {
-          font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
-          font-size: 14px;
-          line-height: 1.15;
-          color: hsl(var(--foreground));
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-        }
-        .el-table tbody { font-size: 12px; }
-        .el-table tbody tr { transition: background-color 0.25s ease; }
-        .el-table tbody tr:hover { background-color: hsl(var(--accent) / 0.12); }
-        .el-table .cell {
-          box-sizing: border-box;
-          padding: 0 5px;
-          word-break: break-word;
-          overflow-wrap: break-word;
-          overflow: hidden;
-        }
-      `}</style>
-
-      <div style={{ overflowX: 'auto' }}>
-        <table className="el-table w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse' }}>
-          <thead style={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'hsl(var(--card))' }}>
-            <tr style={{ height: 40 }}>
-              <th style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
-                <div className="cell">Requirement</div>
-              </th>
-              <th style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
-                <div className="cell">Completed</div>
-              </th>
-              <th style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
-                <div className="cell">Progress</div>
-              </th>
-              <th style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
-                <div className="cell">Status</div>
-              </th>
+      <div className="overflow-x-auto">
+        <table className="pro-table w-full">
+          <thead>
+            <tr>
+              <th className="text-center">Requirement</th>
+              <th className="text-center">Completed</th>
+              <th className="text-center">Progress</th>
+              <th className="text-center">Status</th>
             </tr>
           </thead>
           <tbody>
-            <tr style={{ height: 50 }}>
-              <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                <div className="cell text-sm font-bold">₹{data.turnover_requirement?.toFixed(2) || 0}</div>
-              </td>
-              <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                <div className="cell text-sm font-bold">₹{data.total_turnover_completed?.toFixed(2) || 0}</div>
-              </td>
-              <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                <div className="cell text-sm font-bold">{data.progress || 0}%</div>
-              </td>
-              <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                <div className="cell">
-                  <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${data.canWithdraw ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
-                    {data.canWithdraw ? 'Can Withdraw' : 'Cannot Withdraw'}
-                  </span>
-                </div>
+            <tr>
+              <td className="text-center font-semibold">₹{data.turnover_requirement?.toFixed(2) || 0}</td>
+              <td className="text-center font-semibold">₹{data.total_turnover_completed?.toFixed(2) || 0}</td>
+              <td className="text-center font-semibold">{data.progress || 0}%</td>
+              <td className="text-center">
+                <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-pill ${data.canWithdraw ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}>
+                  {data.canWithdraw ? 'Can Withdraw' : 'Cannot Withdraw'}
+                </span>
               </td>
             </tr>
           </tbody>
@@ -177,42 +140,26 @@ const UserTurnover = ({ userId }: { userId: string | number }) => {
       </div>
 
       {data.batches && data.batches.length > 0 && (
-        <div className="border border-border rounded overflow-hidden">
-          <div style={{ overflowX: 'auto' }}>
-            <table className="el-table w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', minWidth: 700 }}>
-              <thead style={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'hsl(var(--card))' }}>
-                <tr style={{ height: 40 }}>
+        <div className="border border-border rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="pro-table w-full" style={{ minWidth: 700 }}>
+              <thead>
+                <tr>
                   {['Date', 'Type', 'Amount', 'Mult.', 'Required', 'Completed', 'Remaining'].map((label) => (
-                    <th key={label} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
-                      <div className="cell">{label}</div>
-                    </th>
+                    <th key={label} className="text-center">{label}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {data.batches.map((batch: any, i: number) => (
-                  <tr key={i} style={{ height: 40 }}>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                      <div className="cell text-xs whitespace-nowrap">{new Date(batch.createdAt).toLocaleDateString()}</div>
-                    </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                      <div className="cell text-xs">{batch.type}</div>
-                    </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                      <div className="cell text-xs">₹{batch.amount}</div>
-                    </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                      <div className="cell text-xs">{batch.multiplier}x</div>
-                    </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                      <div className="cell text-xs">₹{batch.required}</div>
-                    </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                      <div className="cell text-xs text-muted-foreground">₹{batch.completed}</div>
-                    </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
-                      <div className="cell text-xs font-medium">₹{batch.remaining}</div>
-                    </td>
+                  <tr key={i}>
+                    <td className="text-center whitespace-nowrap">{new Date(batch.createdAt).toLocaleDateString()}</td>
+                    <td className="text-center">{batch.type}</td>
+                    <td className="text-center">₹{batch.amount}</td>
+                    <td className="text-center">{batch.multiplier}x</td>
+                    <td className="text-center">₹{batch.required}</td>
+                    <td className="text-center text-muted-foreground">₹{batch.completed}</td>
+                    <td className="text-center font-medium">₹{batch.remaining}</td>
                   </tr>
                 ))}
               </tbody>
@@ -224,7 +171,7 @@ const UserTurnover = ({ userId }: { userId: string | number }) => {
       <Dialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-sm text-red-500 flex items-center gap-2">
+            <DialogTitle className="text-sm text-destructive flex items-center gap-2">
               <ShieldAlert className="w-4 h-4" /> Clear Turnover
             </DialogTitle>
           </DialogHeader>
@@ -262,7 +209,7 @@ const UserTurnover = ({ userId }: { userId: string | number }) => {
               <select
                 value={addType}
                 onChange={(e) => setAddType(e.target.value)}
-                className="w-full h-9 border border-input rounded-md bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="w-full h-9 border border-input rounded-pill bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <option value="ADMIN_BONUS">Admin Bonus</option>
                 <option value="PROMOTION">Promotion</option>

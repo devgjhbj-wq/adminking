@@ -56,10 +56,10 @@ const TurnoverConfig = () => {
   };
 
   return (
-    <div className="space-y-1.5">
-      <div className="flex items-center justify-between pb-1 border-b border-border">
+    <div className="space-y-4">
+      <div className="bg-card border border-border rounded-lg p-3 flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">Turnover Requirements</h2>
+          <h2 className="text-sm font-semibold tracking-tight text-foreground">Turnover Requirements</h2>
           <p className="text-xs text-muted-foreground">Configure turnover multipliers for various transactions.</p>
         </div>
         <Button size="sm" variant="outline" onClick={loadData} disabled={loading}>
@@ -70,9 +70,9 @@ const TurnoverConfig = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
         {configs.map((config, i) => (
-          <div key={config.type} className="bg-card border border-border p-2 rounded-md space-y-1.5\">
+          <div key={config.type} className="bg-card border border-border p-3 rounded-lg shadow-apple-card space-y-2">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold flex items-center gap-2">
+              <h3 className="text-sm font-semibold tracking-tight flex items-center gap-2">
                 {config.type}
               </h3>
               <Switch
@@ -103,7 +103,7 @@ const TurnoverConfig = () => {
               </div>
             </div>
             <Button
-              className="w-full h-8 text-xs"
+              className="w-full h-8 text-xs bg-primary text-primary-foreground"
               onClick={() => handleSave(config)}
               disabled={saving === config.type}
             >

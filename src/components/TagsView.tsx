@@ -139,46 +139,48 @@ const TagsView = () => {
     <div className="tags-view-container" ref={containerRef}>
       <style>{`
         .tags-view-container {
-          height: 34px;
+          height: 32px;
           width: 100%;
           background: hsl(var(--card));
-          border-bottom: 1px solid hsl(var(--border));
-          box-shadow: 0 1px 3px 0 rgba(0,0,0,.12), 0 0 3px 0 rgba(0,0,0,.04);
+          border-bottom: 1px solid hsl(var(--border) / 0.5);
           overflow-x: auto;
           overflow-y: hidden;
           white-space: nowrap;
           display: flex;
-          align-items: flex-start;
-          padding-left: 4px;
+          align-items: center;
+          padding-left: 6px;
         }
         .tags-view-container::-webkit-scrollbar { height: 0; }
         .tags-view-item {
           display: inline-flex;
           align-items: center;
           cursor: pointer;
-          height: 26px;
-          line-height: 26px;
-          border: 1px solid hsl(var(--border));
-          color: hsl(var(--foreground));
-          background: hsl(var(--card));
-          padding: 0 8px;
-          font-size: 12px;
-          margin-left: 5px;
-          margin-top: 4px;
+          height: 22px;
+          line-height: 22px;
+          border-radius: 9999px;
+          color: hsl(var(--foreground) / 0.7);
+          background: transparent;
+          padding: 0 10px;
+          font-size: 11px;
+          margin-right: 4px;
           flex-shrink: 0;
           user-select: none;
           transition: all 0.15s;
+          border: 1px solid transparent;
         }
-        .tags-view-item:hover { color: rgb(32,143,255); }
+        .tags-view-item:hover {
+          color: hsl(var(--foreground));
+          background: hsl(var(--secondary));
+        }
         .tags-view-item.active {
-          background-color: rgb(32,143,255);
-          color: #fff;
-          border-color: rgb(32,143,255);
+          color: hsl(var(--primary));
+          background: hsl(var(--primary) / 0.12);
+          border-color: hsl(var(--primary) / 0.25);
         }
-        .tags-view-item.active .tag-close:hover { background: #fff; color: rgb(32,143,255); }
+        .tags-view-item.active .tag-close:hover { background: hsl(var(--primary) / 0.2); color: hsl(var(--primary)); }
         .tag-close {
-          width: 16px;
-          height: 16px;
+          width: 14px;
+          height: 14px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
@@ -186,28 +188,29 @@ const TagsView = () => {
           margin-left: 4px;
           transition: all 0.15s;
         }
-        .tag-close:hover { background: hsl(var(--muted-foreground) / 0.3); color: hsl(var(--foreground)); }
+        .tag-close:hover { background: hsl(var(--muted-foreground) / 0.2); color: hsl(var(--foreground)); }
         .contextmenu {
           position: fixed;
           z-index: 9999;
           list-style: none;
-          padding: 5px 0;
+          padding: 4px 0;
           margin: 0;
-          border-radius: 4px;
+          border-radius: 8px;
           font-size: 12px;
           font-weight: 400;
           color: hsl(var(--foreground));
-          box-shadow: 2px 2px 3px 0 rgba(0,0,0,.3);
+          box-shadow: 0 4px 16px rgba(0,0,0,0.3);
           background: hsl(var(--card));
           border: 1px solid hsl(var(--border));
           min-width: 120px;
+          overflow: hidden;
         }
         .contextmenu li {
-          padding: 6px 16px;
+          padding: 6px 14px;
           cursor: pointer;
-          transition: background 0.15s;
+          transition: background 0.1s;
         }
-        .contextmenu li:hover { background: hsl(var(--secondary)); color: rgb(32,143,255); }
+        .contextmenu li:hover { background: hsl(var(--accent) / 0.1); color: hsl(var(--primary)); }
         .contextmenu li.disabled { color: hsl(var(--muted-foreground)); cursor: not-allowed; }
         .contextmenu li.disabled:hover { background: transparent; color: hsl(var(--muted-foreground)); }
       `}</style>
@@ -223,7 +226,7 @@ const TagsView = () => {
           {tag.title}
           {tag.path !== '/dashboard' && (
             <span className="tag-close" onClick={(e) => removeTag(e, tag.path)}>
-              <X className="w-3 h-3" />
+              <X className="w-2.5 h-2.5" />
             </span>
           )}
         </span>
