@@ -23,6 +23,13 @@ const statusColor: Record<string, string> = {
   CANCELLED: 'bg-muted text-muted-foreground',
 };
 
+const FormField = ({ label, value }: { label: string; value: React.ReactNode }) => (
+  <div>
+    <div className="text-[11px] text-muted-foreground font-medium mb-0.5">{label}</div>
+    <div className="text-xs font-semibold text-foreground">{value}</div>
+  </div>
+);
+
 const Withdrawals = () => {
   const { token } = useAuth();
   
@@ -681,7 +688,7 @@ const Withdrawals = () => {
       )}
 
       <Dialog open={!!actionItem} onOpenChange={(open) => { if (!open) { setActionItem(null); setCancelStep(false); setCancelReason(''); } }}>
-        <DialogContent className="sm:max-w-[420px]">
+        <DialogContent className="sm:max-w-[560px]">
           <DialogHeader>
             <DialogTitle>{cancelStep ? 'Cancel Withdrawal' : 'Withdrawal Action'}</DialogTitle>
             <DialogDescription>
@@ -701,14 +708,39 @@ const Withdrawals = () => {
               />
             </div>
           ) : actionItem && (
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">User ID</span><span>{actionItem.userId}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="font-medium">₹{actionItem.amount?.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Method</span><span>{actionItem.paymentMethod || '-'}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Status</span><span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-pill ${statusColor[actionItem.status] || 'bg-muted text-muted-foreground'}`}>{actionItem.status}</span></div>
-              {actionItem.status === 'PENDING' && (
-                <div className="flex justify-between"><span className="text-muted-foreground">Charge</span><span className="text-destructive">₹{Number(actionItem.charge || 0).toFixed(2)}</span></div>
-              )}
+            <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+              <FormField label="User ID" value={actionItem.userId} />
+              <FormField label="Order ID" value={<span style={{ fontFamily: 'monospace', fontSize: 11 }}>{actionItem.orderId}</span>} />
+              <FormField label="Amount" value={<span className="font-semibold">₹{actionItem.amount?.toLocaleString()}</span>} />
+              <FormField label="Charge" value={actionItem.charge ? <span className="text-destructive">₹{Number(actionItem.charge).toFixed(2)}</span> : '—'} />
+              <FormField label="Balance After" value={actionItem.balanceAfter ? `₹${actionItem.balanceAfter.toLocaleString()}` : '—'} />
+              <FormField label="Currency" value={actionItem.currency || 'INR'} />
+              <FormField label="Payment Method" value={
+                actionItem.paymentMethod ? (
+                  <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-pill ${
+                    actionItem.paymentMethod === 'UPI' ? 'bg-green-500/20 text-green-400' :
+                    actionItem.paymentMethod === 'BANK' ? 'bg-blue-500/20 text-blue-400' :
+                    'bg-purple-500/20 text-purple-400'
+                  }`}>
+                    {actionItem.paymentMethod}
+                  </span>
+                ) : '—'
+              } />
+              <FormField label="Status" value={<span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-pill ${statusColor[actionItem.status] || 'bg-muted text-muted-foreground'}`}>{actionItem.status}</span>} />
+              <FormField label="Channel" value={actionItem.channelName || '—'} />
+              <FormField label="Gateway Order No" value={<span style={{ fontFamily: 'monospace', fontSize: 11 }}>{actionItem.gatewayOrderNo || '—'}</span>} />
+              <FormField label="Note" value={actionItem.note || actionItem.remark || '—'} />
+              <FormField label="Created At" value={new Date(actionItem.createdAt).toLocaleString()} />
+              <FormField label="Updated At" value={actionItem.updatedAt ? new Date(actionItem.updatedAt).toLocaleString() : '—'} />
+              {actionItem.paymentDetails?.holderName && <FormField label="Holder Name" value={actionItem.paymentDetails.holderName} />}
+              {actionItem.paymentDetails?.upiId && <FormField label="UPI ID" value={actionItem.paymentDetails.upiId} />}
+              {actionItem.paymentDetails?.accountNo && <FormField label="Account No" value={actionItem.paymentDetails.accountNo} />}
+              {actionItem.paymentDetails?.ifsc && <FormField label="IFSC" value={actionItem.paymentDetails.ifsc} />}
+              {actionItem.paymentDetails?.rplId && <FormField label="RPL ID" value={actionItem.paymentDetails.rplId} />}
+              {actionItem.bankDetails?.bankName && <FormField label="Bank Name" value={actionItem.bankDetails.bankName} />}
+              {actionItem.bankDetails?.accountNumber && <FormField label="Account No" value={actionItem.bankDetails.accountNumber} />}
+              {actionItem.bankDetails?.ifsc && <FormField label="IFSC" value={actionItem.bankDetails.ifsc} />}
+              {actionItem.bankDetails?.bankCode && <FormField label="Bank Code" value={actionItem.bankDetails.bankCode} />}
             </div>
           )}
 
