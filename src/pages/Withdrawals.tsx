@@ -16,7 +16,7 @@ import type { WithdrawalResponse, WithdrawalItem, WithdrawalConfig, WithdrawalFi
 import { PageContainer, SearchHeader, Pagination } from '@/components/PageContainer';
 
 const statusColor: Record<string, string> = {
-  SUCCESS: 'bg-primary/20 text-primary',
+  SUCCESS: 'bg-green-500/20 text-green-400',
   AUDITING: 'bg-blue-500/20 text-blue-400',
   PENDING: 'bg-yellow-500/20 text-yellow-400',
   FAILED: 'bg-destructive/20 text-destructive',

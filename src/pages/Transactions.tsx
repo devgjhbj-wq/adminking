@@ -14,7 +14,7 @@ import { PageContainer, SearchHeader, Pagination } from '@/components/PageContai
 import type { TransactionResponse } from '@/types/transaction';
 
 const statusColor: Record<string, string> = {
-  SUCCESS: 'bg-primary/20 text-primary',
+  SUCCESS: 'bg-green-500/20 text-green-400',
   PENDING: 'bg-yellow-500/20 text-yellow-400',
   FAILED: 'bg-destructive/20 text-destructive',
 };
