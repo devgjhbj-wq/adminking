@@ -688,7 +688,7 @@ const Withdrawals = () => {
       )}
 
       <Dialog open={!!actionItem} onOpenChange={(open) => { if (!open) { setActionItem(null); setCancelStep(false); setCancelReason(''); } }}>
-        <DialogContent className="sm:max-w-[560px]">
+        <DialogContent className="w-[90vw] max-w-[90vw]">
           <DialogHeader>
             <DialogTitle>{cancelStep ? 'Cancel Withdrawal' : 'Withdrawal Action'}</DialogTitle>
             <DialogDescription>
