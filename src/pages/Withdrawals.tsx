@@ -6,7 +6,8 @@ import LastUpdated from '@/components/LastUpdated';
 import Loading from '@/components/Loading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CalendarIcon, ChevronLeft, ChevronRight, CheckCircle, XCircle, Info } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { CalendarIcon, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -42,6 +43,9 @@ const Withdrawals = () => {
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [actionItem, setActionItem] = useState<WithdrawalItem | null>(null);
+  const [cancelStep, setCancelStep] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
 
   // Tab state
   const [tab, setTab] = useState<'orders' | 'config'>('orders');
@@ -123,13 +127,11 @@ const Withdrawals = () => {
     }
   };
 
-  const handleCancel = async (item: WithdrawalItem) => {
-    const note = window.prompt(`Reason for cancelling withdrawal ${item.orderId} (₹${item.amount?.toLocaleString()}):`, '');
-    if (note === null) return;
+  const handleCancel = async (item: WithdrawalItem, note?: string) => {
     setAuthToken(token);
     setCancellingId(item.orderId);
     try {
-      const res = await cancelWithdrawal(item.orderId, note || undefined);
+      const res = await cancelWithdrawal(item.orderId, note);
       toast.success(res.data.msg || 'Withdrawal cancelled');
       if (results?.items) {
         const updatedItems = results.items.map((d) =>
@@ -277,30 +279,29 @@ const Withdrawals = () => {
     const showEmpty = !data?.items?.length;
 
     return (
-      <div className="relative rounded" style={{ height: 445, border: '1px solid hsl(var(--border))' }}>
+      <div className="relative w-full overflow-x-auto bg-card border border-border rounded-lg">
         {loading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60 backdrop-blur-[1px]">
             <Loading size={30} />
           </div>
         )}
 
-        <div style={{ height: '100%', overflowX: 'auto', overflowY: 'auto' }}>
-          <table className="el-table" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', minWidth: 1770 }}>
-            <colgroup>
-              <col style={{ width: 95 }} />
-              <col style={{ width: 160 }} />
+        <table className="el-table" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', minWidth: 1770 }}>
+          <colgroup>
+            <col style={{ width: 95 }} />
+            <col style={{ width: 160 }} />
+            <col style={{ width: 100 }} />
+            <col style={{ width: 80 }} />
+            <col style={{ width: 80 }} />
+            <col style={{ width: 90 }} />
+            <col style={{ width: 250 }} />
+            <col style={{ width: 90 }} />
+            <col style={{ width: 140 }} />
+            <col style={{ width: 90 }} />
+            <col style={{ width: 130 }} />
+            <col style={{ width: 150 }} />
+            <col style={{ width: 150 }} />
               <col style={{ width: 100 }} />
-              <col style={{ width: 80 }} />
-              <col style={{ width: 80 }} />
-              <col style={{ width: 90 }} />
-              <col style={{ width: 250 }} />
-              <col style={{ width: 90 }} />
-              <col style={{ width: 140 }} />
-              <col style={{ width: 90 }} />
-              <col style={{ width: 130 }} />
-              <col style={{ width: 150 }} />
-              <col style={{ width: 150 }} />
-              <col style={{ width: 90 }} />
             </colgroup>
             <thead style={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'hsl(var(--card))' }}>
               <tr style={{ height: 50 }}>
@@ -426,31 +427,19 @@ const Withdrawals = () => {
                     </td>
                     <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
                       <div className="cell">
-                        <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
-                          {d.status === 'PENDING' && (
-                            <button
-                              onClick={() => handleApprove(d.orderId)}
-                              disabled={!!approvingId || !!cancellingId}
-                              className={`rounded-pill px-1.5 py-1 text-[10px] font-medium border-0 ${approvingId === d.orderId ? 'bg-primary/50 text-white cursor-not-allowed' : 'bg-primary text-white cursor-pointer'}`}
-                              style={{ opacity: (!!approvingId || !!cancellingId) ? 0.6 : 1 }}
-                            >
-                              {approvingId === d.orderId ? '...' : '✓'}
-                            </button>
-                          )}
-                          {(d.status === 'PENDING' || d.status === 'AUDITING') && (
-                            <button
-                              onClick={() => handleCancel(d)}
-                              disabled={!!approvingId || !!cancellingId}
-                              className={`rounded-pill px-1.5 py-1 text-[10px] font-medium border-0 ${(!!approvingId || !!cancellingId) ? 'bg-destructive/50 text-white cursor-not-allowed' : 'bg-destructive text-white cursor-pointer'}`}
-                              style={{ opacity: (!!approvingId || !!cancellingId) ? 0.6 : 1 }}
-                            >
-                              {cancellingId === d.orderId ? '...' : '✕'}
-                            </button>
-                          )}
-                          {d.status !== 'PENDING' && d.status !== 'AUDITING' && (
-                            <span style={{ color: 'hsl(var(--muted-foreground))', fontSize: 11 }}>—</span>
-                          )}
-                        </div>
+                        {d.status === 'PENDING' || d.status === 'AUDITING' ? (
+                          <Button
+                            onClick={() => setActionItem(d)}
+                            size="sm"
+                            className="h-7 px-2.5 text-[11px] gap-1"
+                            variant="outline"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            Action
+                          </Button>
+                        ) : (
+                          <span className="text-muted-foreground text-[11px]">—</span>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -458,7 +447,6 @@ const Withdrawals = () => {
               )}
             </tbody>
           </table>
-        </div>
       </div>
     );
   };
@@ -691,6 +679,93 @@ const Withdrawals = () => {
           )}
         </div>
       )}
+
+      <Dialog open={!!actionItem} onOpenChange={(open) => { if (!open) { setActionItem(null); setCancelStep(false); setCancelReason(''); } }}>
+        <DialogContent className="sm:max-w-[420px]">
+          <DialogHeader>
+            <DialogTitle>{cancelStep ? 'Cancel Withdrawal' : 'Withdrawal Action'}</DialogTitle>
+            <DialogDescription>
+              Order {actionItem?.orderId}
+            </DialogDescription>
+          </DialogHeader>
+
+          {cancelStep ? (
+            <div className="space-y-3">
+              <p className="text-xs text-muted-foreground">Reason for cancelling withdrawal ₹{actionItem?.amount?.toLocaleString()}:</p>
+              <textarea
+                className="w-full h-20 rounded-lg border border-input bg-background px-3 py-2 text-xs resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                placeholder="Enter reason (optional)"
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                autoFocus
+              />
+            </div>
+          ) : actionItem && (
+            <div className="space-y-2 text-xs">
+              <div className="flex justify-between"><span className="text-muted-foreground">User ID</span><span>{actionItem.userId}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Amount</span><span className="font-medium">₹{actionItem.amount?.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Method</span><span>{actionItem.paymentMethod || '-'}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Status</span><span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-pill ${statusColor[actionItem.status] || 'bg-muted text-muted-foreground'}`}>{actionItem.status}</span></div>
+              {actionItem.status === 'PENDING' && (
+                <div className="flex justify-between"><span className="text-muted-foreground">Charge</span><span className="text-destructive">₹{Number(actionItem.charge || 0).toFixed(2)}</span></div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            {cancelStep ? (
+              <>
+                <Button
+                  onClick={() => { setCancelStep(false); setCancelReason(''); }}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  disabled={!!approvingId || !!cancellingId}
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={async () => {
+                    await handleCancel(actionItem!, cancelReason || undefined);
+                    setActionItem(null);
+                    setCancelStep(false);
+                    setCancelReason('');
+                  }}
+                  disabled={!!approvingId || !!cancellingId}
+                  size="sm"
+                  className="text-xs"
+                  variant="destructive"
+                >
+                  {cancellingId === actionItem?.orderId ? 'Cancelling...' : 'Confirm Cancel'}
+                </Button>
+              </>
+            ) : (
+              <>
+                {actionItem?.status === 'PENDING' && (
+                  <Button
+                    onClick={() => { handleApprove(actionItem.orderId); setActionItem(null); }}
+                    disabled={!!approvingId || !!cancellingId}
+                    size="sm"
+                    className="text-xs"
+                    variant="default"
+                  >
+                    {approvingId === actionItem?.orderId ? 'Approving...' : 'Approve'}
+                  </Button>
+                )}
+                <Button
+                  onClick={() => setCancelStep(true)}
+                  disabled={!!approvingId || !!cancellingId}
+                  size="sm"
+                  className="text-xs"
+                  variant="destructive"
+                >
+                  Cancel
+                </Button>
+              </>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PageContainer>
   );
 };
