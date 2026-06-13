@@ -483,24 +483,44 @@ const Withdrawals = () => {
         <div className="form-grid w-full" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
           <div>
             <div className="text-xs text-muted-foreground font-medium mb-1">User ID</div>
-            <Input
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              placeholder="User ID"
-              className="w-full h-[34px] text-sm px-2"
-              onKeyDown={(e) => e.key === 'Enter' && loadByUserId(1)}
-            />
+            <div className="flex gap-1">
+              <Input
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                placeholder="User ID"
+                className="w-full h-[34px] text-sm px-2"
+                onKeyDown={(e) => e.key === 'Enter' && loadByUserId(1)}
+              />
+              <Button
+                onClick={() => loadByUserId(1)}
+                disabled={loading || !userId.trim()}
+                size="sm"
+                className="h-[34px] px-2.5 text-xs flex-shrink-0"
+              >
+                Search
+              </Button>
+            </div>
           </div>
 
           <div>
             <div className="text-xs text-muted-foreground font-medium mb-1">Order ID</div>
-            <Input
-              value={orderId}
-              onChange={(e) => setOrderId(e.target.value)}
-              placeholder="Order ID"
-              className="w-full h-[34px] text-sm px-2"
-              onKeyDown={(e) => e.key === 'Enter' && loadByOrderId()}
-            />
+            <div className="flex gap-1">
+              <Input
+                value={orderId}
+                onChange={(e) => setOrderId(e.target.value)}
+                placeholder="Order ID"
+                className="w-full h-[34px] text-sm px-2"
+                onKeyDown={(e) => e.key === 'Enter' && loadByOrderId()}
+              />
+              <Button
+                onClick={loadByOrderId}
+                disabled={loading || !orderId.trim()}
+                size="sm"
+                className="h-[34px] px-2.5 text-xs flex-shrink-0"
+              >
+                Search
+              </Button>
+            </div>
           </div>
 
           <div>

@@ -203,8 +203,9 @@ const UserSearch = () => {
             title="Account"
             rightAction={
               <Button
+                variant="outline"
                 size="sm"
-                className="h-7 px-3 text-xs gap-1"
+                className="h-7 px-3 text-xs gap-1 border-amber-500/40 text-amber-400 hover:bg-amber-500/10"
                 onClick={() => setStatusDialogOpen(true)}
               >
                 <ShieldAlert className="w-3.5 h-3.5" />
@@ -251,8 +252,9 @@ const UserSearch = () => {
               <Sheet>
                 <SheetTrigger asChild>
                   <Button
+                    variant="outline"
                     size="sm"
-                    className="h-7 px-3 text-xs gap-1"
+                    className="h-7 px-3 text-xs gap-1 border-sky-500/40 text-sky-400 hover:bg-sky-500/10"
                     disabled={!lastIp}
                     onClick={() => { handleSearchSameIp(); }}
                   >
@@ -314,8 +316,9 @@ const UserSearch = () => {
             title="Payment Methods"
             rightAction={
               <Button
+                variant="outline"
                 size="sm"
-                className="h-7 px-3 text-xs gap-1"
+                className="h-7 px-3 text-xs gap-1 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
                 onClick={() => {
                   setPaymentType('BANK');
                   setBankName(paymentMethods?.bank?.bankName || '');
