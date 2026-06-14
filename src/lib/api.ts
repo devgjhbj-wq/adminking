@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { TransactionFilters } from '@/types/transaction';
 
-const BASE_URL = 'https://backend-ledger-0ra6.onrender.com';
+const BASE_URL = 'https://admin-backend-7lwn.onrender.com';
 
 export const api = axios.create({ baseURL: BASE_URL });
 
