@@ -24,7 +24,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post('https://admin-backend-7lwn.onrender.com/api/auth/login', {
+      const res = await axios.post('https://backend-ledger-0ra6.onrender.com/api/auth/login', {
         mobile,
         password,
       });
