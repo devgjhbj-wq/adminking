@@ -44,8 +44,26 @@
   --radius: 0.25rem;
 }
 
+.deposits-page .text-sm {
+  font-size: 12px !important;
+}
+.deposits-page .rounded-lg {
+  border-radius: 4px !important;
+}
 .deposits-page .rounded-pill {
-  border-radius: 0.1875rem !important;
+  border-radius: 3px !important;
+}
+.deposits-page button,
+.deposits-page [role="button"] {
+  line-height: 1 !important;
+  gap: 4px !important;
+}
+.deposits-page button:focus-visible,
+.deposits-page [data-slot="input"]:focus-visible,
+.deposits-page [data-slot="select-trigger"]:focus-visible {
+  outline: 2px solid var(--ds-border-strong) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
 }
 
 .deposits-page [data-slot="select-trigger"] {
@@ -58,11 +76,11 @@
   font-weight: 600 !important;
   font-size: 12px !important;
   border-bottom: 1px solid var(--ds-border-default) !important;
-  padding: 8px 6px !important;
+  padding: 8px 10px !important;
 }
 .deposits-page .el-table tbody tr td {
   border-bottom: 1px solid var(--ds-surface-muted) !important;
-  padding: 9px 6px !important;
+  padding: 9px 10px !important;
   font-size: 12px !important;
   color: #333;
 }

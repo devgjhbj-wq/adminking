@@ -464,7 +464,7 @@ const Deposits = () => {
             </Button>
           </div>
 
-          <div className="flex items-end gap-3">
+          <div className="flex items-end gap-2">
             <Button
               onClick={() => handleSearchClick(1)}
               disabled={loading}
