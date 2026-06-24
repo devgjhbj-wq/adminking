@@ -359,7 +359,7 @@ const Deposits = () => {
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
               placeholder="User ID"
-              className="w-full h-[34px] text-sm px-2"
+              className="w-full h-8 text-sm px-2"
             />
           </div>
 
@@ -369,7 +369,7 @@ const Deposits = () => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Phone Number"
-              className="w-full h-[34px] text-sm px-2"
+              className="w-full h-8 text-sm px-2"
             />
           </div>
 
@@ -379,14 +379,14 @@ const Deposits = () => {
               value={orderId}
               onChange={(e) => setOrderId(e.target.value)}
               placeholder="Order ID"
-              className="w-full h-[34px] text-sm px-2"
+              className="w-full h-8 text-sm px-2"
             />
           </div>
 
           <div>
             <div className="text-xs text-muted-foreground font-medium mb-1">Status</div>
             <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="w-full h-[34px] text-sm px-3">
+              <SelectTrigger className="w-full h-8 text-sm px-3">
                 <SelectValue placeholder="All" />
               </SelectTrigger>
               <SelectContent>
@@ -407,7 +407,7 @@ const Deposits = () => {
                 <Button
                   variant="outline"
                   aria-label={dateFrom ? `From date: ${format(dateFrom, 'MMM dd, yyyy')}` : 'From date'}
-                  className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"
+                  className="w-full justify-start text-left font-normal text-sm h-8 px-3"
                 >
                   <CalendarIcon className="mr-1.5 h-4 w-4" />
                   {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}
@@ -434,7 +434,7 @@ const Deposits = () => {
                 <Button
                   variant="outline"
                   aria-label={dateTo ? `To date: ${format(dateTo, 'MMM dd, yyyy')}` : 'To date'}
-                  className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"
+                  className="w-full justify-start text-left font-normal text-sm h-8 px-3"
                 >
                   <CalendarIcon className="mr-1.5 h-4 w-4" />
                   {dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}
@@ -458,7 +458,7 @@ const Deposits = () => {
             <Button
               onClick={handleToday}
               size="sm"
-              className="h-[34px] px-3 text-sm bg-primary text-primary-foreground"
+              className="h-8 px-3 text-sm"
             >
               Today
             </Button>
@@ -469,7 +469,7 @@ const Deposits = () => {
               onClick={() => handleSearchClick(1)}
               disabled={loading}
               size="sm"
-              className="h-[34px] px-4 text-sm bg-primary text-primary-foreground"
+              className="h-8 px-4 text-sm"
             >
               {loading ? <Loading size={14} /> : null}
               Search
@@ -479,7 +479,7 @@ const Deposits = () => {
               disabled={loading}
               variant="outline"
               size="sm"
-              className="h-[34px] px-4 text-sm"
+              className="h-8 px-4 text-sm"
             >
               Reset
             </Button>

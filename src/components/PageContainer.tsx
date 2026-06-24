@@ -103,7 +103,7 @@ const Pagination = ({ page, totalPages, total, loading, onPageChange }: Paginati
           Go to
           <input
             type="number"
-            className="w-[50px] h-[26px] text-xs text-center border border-border rounded-pill bg-card text-foreground outline-none focus:border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none px-2"
+            className="pagination-go-input"
             value={jumpVal}
             onChange={(e) => setJumpVal(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleJump()}
