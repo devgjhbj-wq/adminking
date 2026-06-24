@@ -10,47 +10,31 @@ import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { DepositResponse, DepositItem, DepositFilters } from '@/types/deposit';
 import { PageContainer, SearchHeader, Pagination } from '@/components/PageContainer';
-
-const statusColor: Record<string, string> = {
-  SUCCESS: 'bg-green-500/20 text-green-400',
-  PENDING: 'bg-yellow-500/20 text-yellow-400',
-  FAILED: 'bg-destructive/20 text-destructive',
-  REFUNDED: 'bg-blue-500/20 text-blue-400',
-  EXPIRED: 'bg-muted text-muted-foreground',
-};
+import '@/styles/deposits-design.css';
 
 const Deposits = () => {
   const { token } = useAuth();
-  
-  // Search state
+
   const [userId, setUserId] = useState('');
   const [phone, setPhone] = useState('');
   const [orderId, setOrderId] = useState('');
   const [status, setStatus] = useState('');
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
-  
-  // Results state
   const [results, setResults] = useState<DepositResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [pageInput, setPageInput] = useState('1');
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
-
-  // Tab state
   const [tab, setTab] = useState<'orders' | 'config' | 'bonus'>('orders');
-
-  // Config state
   const [config, setConfig] = useState<any[]>([]);
   const [configLoading, setConfigLoading] = useState(false);
   const [configSaving, setConfigSaving] = useState(false);
   const [editConfig, setEditConfig] = useState<Record<string, { isActive: boolean; minAmount: number; maxAmount: number; exchangeRate: number }>>({});
-
-  // Bonus config state
   const [bonusConfig, setBonusConfig] = useState<any[]>([]);
   const [bonusLoading, setBonusLoading] = useState(false);
   const [bonusSaving, setBonusSaving] = useState(false);
@@ -141,7 +125,7 @@ const Deposits = () => {
       const res = await approveDeposit(orderIdToApprove);
       toast.success(res.data.msg || 'Deposit approved');
       if (results?.items) {
-        const updatedItems = results.items.map((d) => 
+        const updatedItems = results.items.map((d) =>
           d.orderId === orderIdToApprove ? { ...d, status: 'SUCCESS' as const } : d
         );
         setResults({ ...results, items: updatedItems });
@@ -172,7 +156,6 @@ const Deposits = () => {
       if (status && status !== 'all') filters.status = status;
       if (dateFrom) filters.dateFrom = format(dateFrom, 'yyyy-MM-dd');
       if (dateTo) filters.dateTo = format(dateTo, 'yyyy-MM-dd');
-
       const response = await fetchDeposits(filters);
       setResults(response.data);
       setPage(p);
@@ -230,34 +213,12 @@ const Deposits = () => {
     const showEmpty = !data?.items?.length;
 
     return (
-      <div className="relative rounded" style={{ height: 445, border: '1px solid hsl(var(--border))' }}>
-        <style>{`
-          .el-table {
-            font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
-            font-size: 14px;
-            line-height: 1.15;
-            color: hsl(var(--foreground));
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-          }
-          .el-table tbody { font-size: 12px; }
-          .el-table tbody tr { transition: background-color 0.25s ease; }
-          .el-table tbody tr:hover { background-color: hsl(var(--accent) / 0.12); }
-          .el-table .cell {
-            box-sizing: border-box;
-            padding: 0 5px;
-            word-break: break-word;
-            overflow-wrap: break-word;
-            overflow: hidden;
-          }
-        `}</style>
-
+      <div className="relative rounded" style={{ maxHeight: 'calc(100vh - 380px)', border: '1px solid var(--ds-border-default, rgb(188,198,222))' }}>
         {loading && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60">
             <Loading size={30} />
           </div>
         )}
-
         <div style={{ height: '100%', overflowX: 'auto', overflowY: 'auto' }}>
           <table className="el-table w-full" style={{ tableLayout: 'fixed', borderCollapse: 'collapse', minWidth: 1250 }}>
             <colgroup>
@@ -274,19 +235,17 @@ const Deposits = () => {
               <col />
               <col style={{ width: 80 }} />
             </colgroup>
-            <thead style={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'hsl(var(--card))' }}>
-              <tr style={{ height: 50 }}>
+            <thead style={{ position: 'sticky', top: 0, zIndex: 2 }}>
+              <tr>
                 {['User ID', 'Order No.', 'Amount', 'Recvd Amt', 'Currency', 'Status', 'Channel', 'Gateway No.', 'Note', 'Created At', 'Updated At', 'Action'].map((label) => (
-                  <th key={label} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: '2px 0', fontWeight: 400, fontSize: 14 }}>
-                    <div className="cell">{label}</div>
-                  </th>
+                  <th key={label} className="ds-card-header">{label}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {showEmpty ? (
                 <tr>
-                  <td colSpan={12} style={{ textAlign: 'center', border: '1px solid hsl(var(--border))', padding: 50, color: 'hsl(var(--muted-foreground))' }}>
+                  <td colSpan={12} style={{ textAlign: 'center', borderBottom: '1px solid var(--ds-surface-muted, #eaeaea)', padding: 50, color: '#b0b0b0' }}>
                     <div className="flex flex-col items-center gap-2">
                       <svg className="w-12 h-12 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                       <span>No Data</span>
@@ -294,55 +253,67 @@ const Deposits = () => {
                   </td>
                 </tr>
               ) : (
-                data.items.map((d: DepositItem, i: number) => (
-                  <tr key={i} style={{ height: 50 }}>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                data.items.map((d: DepositItem) => (
+                  <tr key={d.orderId} style={{ height: 50 }}>
+                    <td style={{ borderBottom: '1px solid var(--ds-surface-muted, #eaeaea)', padding: '9px 6px', textAlign: 'center', fontSize: 12, color: '#333' }}>
                       <div className="cell">{d.userId}</div>
                     </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                    <td style={{ borderBottom: '1px solid var(--ds-surface-muted, #eaeaea)', padding: '9px 6px', textAlign: 'center', fontSize: 12, color: '#333' }}>
                       <div className="cell" style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{d.orderId}</div>
                     </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                    <td style={{ borderBottom: '1px solid var(--ds-surface-muted, #eaeaea)', padding: '9px 6px', textAlign: 'center', fontSize: 12, color: '#333' }}>
                       <div className="cell">₹{d.amount?.toLocaleString()}</div>
                     </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                    <td style={{ borderBottom: '1px solid var(--ds-surface-muted, #eaeaea)', padding: '9px 6px', textAlign: 'center', fontSize: 12, color: '#333' }}>
                       <div className="cell">{d.receivedAmount != null ? `₹${d.receivedAmount.toLocaleString()}` : '—'}</div>
                     </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                    <td style={{ borderBottom: '1px solid var(--ds-surface-muted, #eaeaea)', padding: '9px 6px', textAlign: 'center', fontSize: 12, color: '#333' }}>
                       <div className="cell">{d.currency || 'INR'}</div>
                     </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                    <td style={{ borderBottom: '1px solid var(--ds-surface-muted, #eaeaea)', padding: '9px 6px', textAlign: 'center', fontSize: 12, color: '#333' }}>
                       <div className="cell">
-                        <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-pill ${statusColor[d.status] || 'bg-muted text-muted-foreground'}`}>{d.status}</span>
+                        <span className={`ds-badge ds-badge--${d.status}`}>
+                          <span className="sr-only">Status: </span>{d.status}
+                        </span>
                       </div>
                     </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                    <td style={{ borderBottom: '1px solid var(--ds-surface-muted, #eaeaea)', padding: '9px 6px', textAlign: 'center', fontSize: 12, color: '#333' }}>
                       <div className="cell">{d.channelName}</div>
                     </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                    <td style={{ borderBottom: '1px solid var(--ds-surface-muted, #eaeaea)', padding: '9px 6px', textAlign: 'center', fontSize: 12, color: '#333' }}>
                       <div className="cell" style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>{d.gatewayOrderNo}</div>
                     </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                    <td style={{ borderBottom: '1px solid var(--ds-surface-muted, #eaeaea)', padding: '9px 6px', textAlign: 'center', fontSize: 12, color: '#333' }}>
                       <div className="cell">{d.note || '-'}</div>
                     </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                    <td style={{ borderBottom: '1px solid var(--ds-surface-muted, #eaeaea)', padding: '9px 6px', textAlign: 'center', fontSize: 12, color: '#333' }}>
                       <div className="cell">{new Date(d.createdAt).toLocaleString()}</div>
                     </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                    <td style={{ borderBottom: '1px solid var(--ds-surface-muted, #eaeaea)', padding: '9px 6px', textAlign: 'center', fontSize: 12, color: '#333' }}>
                       <div className="cell">{d.updatedAt ? new Date(d.updatedAt).toLocaleString() : '—'}</div>
                     </td>
-                    <td style={{ border: '1px solid hsl(var(--border))', padding: '2px 0', textAlign: 'center' }}>
+                    <td style={{ borderBottom: '1px solid var(--ds-surface-muted, #eaeaea)', padding: '9px 6px', textAlign: 'center', fontSize: 12, color: '#333' }}>
                       <div className="cell">
                         {d.status === 'PENDING' ? (
                           <button
                             onClick={() => handleApprove(d.orderId)}
                             disabled={approvingId === d.orderId}
-                            className={`rounded-pill px-2.5 py-1 text-[11px] font-medium border-0 ${approvingId === d.orderId ? 'bg-primary/50 text-primary-foreground cursor-not-allowed' : 'bg-primary text-primary-foreground cursor-pointer'}`}
+                            aria-label={`Approve order ${d.orderId}`}
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                              height: 24, padding: '0 8px', fontSize: 11, fontWeight: 600,
+                              borderRadius: 3, border: 0, cursor: approvingId === d.orderId ? 'not-allowed' : 'pointer',
+                              background: approvingId === d.orderId ? '#a0c0e0' : '#67c23a',
+                              color: '#fff', lineHeight: 1, whiteSpace: 'nowrap',
+                              transition: 'background 200ms',
+                            }}
+                            onMouseOver={e => { if (approvingId !== d.orderId) (e.target as HTMLButtonElement).style.background = '#85ce61'; }}
+                            onMouseOut={e => { if (approvingId !== d.orderId) (e.target as HTMLButtonElement).style.background = '#67c23a'; }}
                           >
                             {approvingId === d.orderId ? 'Loading...' : 'Approve'}
                           </button>
                         ) : (
-                          <span style={{ color: 'hsl(var(--muted-foreground))', fontSize: 12 }}>—</span>
+                          <span style={{ color: '#b0b0b0', fontSize: 12 }}>—</span>
                         )}
                       </div>
                     </td>
@@ -357,12 +328,14 @@ const Deposits = () => {
   };
 
   return (
+    <div className="deposits-page">
     <PageContainer>
-      {/* Tab Bar */}
-      <div className="flex items-center gap-0 bg-card border border-border rounded-lg px-1.5 h-[34px]">
+      <div className="flex items-center gap-0 bg-card border border-border rounded-lg px-1.5 h-[34px]" role="tablist" aria-label="Deposit sections">
         {(['orders', 'config', 'bonus'] as const).map((t) => (
           <button
             key={t}
+            role="tab"
+            aria-selected={tab === t}
             onClick={() => setTab(t)}
             className={`px-3 text-xs font-medium rounded-pill transition-all h-[26px] capitalize ${
               tab === t
@@ -379,7 +352,7 @@ const Deposits = () => {
       <>
 
       <SearchHeader>
-        <div className="form-grid w-full" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+        <div className="form-grid w-full" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
           <div>
             <div className="text-xs text-muted-foreground font-medium mb-1">User ID</div>
             <Input
@@ -412,18 +385,19 @@ const Deposits = () => {
 
           <div>
             <div className="text-xs text-muted-foreground font-medium mb-1">Status</div>
-            <select
-              className="w-full h-[34px] rounded-pill border border-input bg-background px-3 text-sm"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-            >
-              <option value="">All</option>
-              <option value="PENDING">Pending</option>
-              <option value="SUCCESS">Success</option>
-              <option value="FAILED">Failed</option>
-              <option value="REFUNDED">Refunded</option>
-              <option value="EXPIRED">Expired</option>
-            </select>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger className="w-full h-[34px] text-sm px-3">
+                <SelectValue placeholder="All" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="SUCCESS">Success</SelectItem>
+                <SelectItem value="FAILED">Failed</SelectItem>
+                <SelectItem value="REFUNDED">Refunded</SelectItem>
+                <SelectItem value="EXPIRED">Expired</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
@@ -432,10 +406,11 @@ const Deposits = () => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                    className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"
-                  >
-                    <CalendarIcon className="mr-1.5 h-4 w-4" />
-                    {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}
+                  aria-label={dateFrom ? `From date: ${format(dateFrom, 'MMM dd, yyyy')}` : 'From date'}
+                  className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"
+                >
+                  <CalendarIcon className="mr-1.5 h-4 w-4" />
+                  {dateFrom ? format(dateFrom, "MMM dd, yyyy") : "From"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -458,10 +433,11 @@ const Deposits = () => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                    className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"
-                  >
-                    <CalendarIcon className="mr-1.5 h-4 w-4" />
-                    {dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}
+                  aria-label={dateTo ? `To date: ${format(dateTo, 'MMM dd, yyyy')}` : 'To date'}
+                  className="w-full justify-start text-left font-normal text-sm h-[34px] px-3"
+                >
+                  <CalendarIcon className="mr-1.5 h-4 w-4" />
+                  {dateTo ? format(dateTo, "MMM dd, yyyy") : "To"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -500,6 +476,7 @@ const Deposits = () => {
             </Button>
             <Button
               onClick={handleReset}
+              disabled={loading}
               variant="outline"
               size="sm"
               className="h-[34px] px-4 text-sm"
@@ -528,7 +505,7 @@ const Deposits = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {bonusConfig.map((c: any) => {
                 return (
-                <div className="border border-border rounded-lg p-4 bg-card shadow-apple-card">
+                <div key={c.depositCount} className="border border-border rounded-lg p-4 bg-card shadow-apple-card">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-foreground uppercase tracking-tight">
                       {c.depositCount === 1 ? '1st' : c.depositCount === 2 ? '2nd' : '3rd'} Deposit Bonus
@@ -545,13 +522,14 @@ const Deposits = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4 mb-3">
                     <div>
-                      <label className="text-[10px] text-muted-foreground">Bonus Rate (%)</label>
-                      <input
+                      <label className="text-[10px] text-muted-foreground" htmlFor={`bonus-rate-${c.depositCount}`}>Bonus Rate (%)</label>
+                      <Input
+                        id={`bonus-rate-${c.depositCount}`}
                         type="number"
                         step="0.01"
                         min="0"
                         max="10"
-                        className="flex h-7 w-full rounded border border-input bg-background px-2 py-0.5 text-xs mt-0.5"
+                        className="h-7 text-xs mt-0.5"
                         value={editBonus[c.depositCount]?.bonusRate ?? 0}
                         onChange={(e) => setEditBonus(prev => ({
                           ...prev,
@@ -560,9 +538,10 @@ const Deposits = () => {
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] text-muted-foreground">Active</label>
+                      <label className="text-[10px] text-muted-foreground" htmlFor={`bonus-active-${c.depositCount}`}>Active</label>
                       <div className="mt-1.5">
                         <Switch
+                          id={`bonus-active-${c.depositCount}`}
                           checked={editBonus[c.depositCount]?.active ?? false}
                           onCheckedChange={(checked) => setEditBonus(prev => ({
                             ...prev,
@@ -592,7 +571,7 @@ const Deposits = () => {
             <div className="flex justify-center py-8"><Loading size={20} /></div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {config.map((ch: any, idx: number) => {
+              {config.map((ch: any) => {
                 return (
                 <div key={ch.channel} className="border border-border rounded-lg p-4 bg-card shadow-apple-card">
                   <div className="flex items-center justify-between mb-3">
@@ -613,9 +592,10 @@ const Deposits = () => {
                   </div>
                   <div className="grid grid-cols-4 gap-4 mb-3">
                     <div>
-                      <label className="text-[10px] text-muted-foreground">Active</label>
+                      <label className="text-[10px] text-muted-foreground" htmlFor={`active-${ch.channel}`}>Active</label>
                       <div className="mt-1.5">
                         <Switch
+                          id={`active-${ch.channel}`}
                           checked={editConfig[ch.channel]?.isActive ?? false}
                           onCheckedChange={(checked) => setEditConfig(prev => ({
                             ...prev,
@@ -625,10 +605,11 @@ const Deposits = () => {
                       </div>
                     </div>
                     <div>
-                      <label className="text-[10px] text-muted-foreground">Min Amount</label>
-                      <input
+                      <label className="text-[10px] text-muted-foreground" htmlFor={`min-${ch.channel}`}>Min Amount</label>
+                      <Input
+                        id={`min-${ch.channel}`}
                         type="number"
-                        className="flex h-7 w-full rounded border border-input bg-background px-2 py-0.5 text-xs mt-0.5"
+                        className="h-7 text-xs mt-0.5"
                         value={editConfig[ch.channel]?.minAmount ?? ''}
                         onChange={(e) => setEditConfig(prev => ({
                           ...prev,
@@ -637,10 +618,11 @@ const Deposits = () => {
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] text-muted-foreground">Max Amount</label>
-                      <input
+                      <label className="text-[10px] text-muted-foreground" htmlFor={`max-${ch.channel}`}>Max Amount</label>
+                      <Input
+                        id={`max-${ch.channel}`}
                         type="number"
-                        className="flex h-7 w-full rounded border border-input bg-background px-2 py-0.5 text-xs mt-0.5"
+                        className="h-7 text-xs mt-0.5"
                         value={editConfig[ch.channel]?.maxAmount ?? ''}
                         onChange={(e) => setEditConfig(prev => ({
                           ...prev,
@@ -649,11 +631,12 @@ const Deposits = () => {
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] text-muted-foreground">Exchange Rate</label>
-                      <input
+                      <label className="text-[10px] text-muted-foreground" htmlFor={`rate-${ch.channel}`}>Exchange Rate</label>
+                      <Input
+                        id={`rate-${ch.channel}`}
                         type="number"
                         step="0.01"
-                        className="flex h-7 w-full rounded border border-input bg-background px-2 py-0.5 text-xs mt-0.5"
+                        className="h-7 text-xs mt-0.5"
                         value={editConfig[ch.channel]?.exchangeRate ?? 1}
                         onChange={(e) => setEditConfig(prev => ({
                           ...prev,
@@ -670,6 +653,7 @@ const Deposits = () => {
         </div>
       )}
     </PageContainer>
+    </div>
   );
 };
 

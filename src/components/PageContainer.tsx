@@ -65,16 +65,15 @@ const Pagination = ({ page, totalPages, total, loading, onPageChange }: Paginati
     }
   };
 
-  const btnBase = 'inline-flex items-center justify-center min-w-[26px] h-[26px] text-xs rounded-pill border bg-card px-2 transition-all';
-
   return (
-    <div className="flex items-center justify-end bg-card border border-border rounded-lg p-2 mt-3">
+    <div className="ds-pagination flex items-center justify-end bg-card border border-border rounded-lg p-2 mt-3">
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
         {total !== undefined && <span className="mr-2">Total {total}</span>}
         <button
-          className={`${btnBase} border-border hover:border-primary hover:text-primary ${page <= 1 ? 'opacity-40 cursor-not-allowed' : ''}`}
+          className={`ds-page-btn ${page <= 1 ? 'opacity-40 cursor-not-allowed' : ''}`}
           disabled={page <= 1 || loading}
           onClick={() => onPageChange(page - 1)}
+          aria-label="Previous page"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
         </button>
@@ -82,12 +81,10 @@ const Pagination = ({ page, totalPages, total, loading, onPageChange }: Paginati
           {getPageNumbers().map((p) => (
             <li key={p} className="m-0 p-0">
               <button
-                className={`${btnBase} ${
-                  p === page
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border text-foreground hover:border-primary hover:text-primary'
-                }`}
+                className={`ds-page-btn ${p === page ? 'active' : ''}`}
                 onClick={() => p !== page && onPageChange(p)}
+                aria-current={p === page ? 'page' : undefined}
+                aria-label={`Page ${p}`}
               >
                 {p}
               </button>
@@ -95,9 +92,10 @@ const Pagination = ({ page, totalPages, total, loading, onPageChange }: Paginati
           ))}
         </ul>
         <button
-          className={`${btnBase} border-border hover:border-primary hover:text-primary ${page >= totalPages ? 'opacity-40 cursor-not-allowed' : ''}`}
+          className={`ds-page-btn ${page >= totalPages ? 'opacity-40 cursor-not-allowed' : ''}`}
           disabled={page >= totalPages || loading}
           onClick={() => onPageChange(page + 1)}
+          aria-label="Next page"
         >
           <ChevronRight className="h-3.5 w-3.5" />
         </button>
@@ -111,6 +109,7 @@ const Pagination = ({ page, totalPages, total, loading, onPageChange }: Paginati
             onKeyDown={(e) => e.key === 'Enter' && handleJump()}
             min={1}
             max={totalPages}
+            aria-label="Go to page number"
           />
         </span>
       </div>

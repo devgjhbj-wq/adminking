@@ -1,0 +1,123 @@
+.deposits-page {
+    --ds-primary: #409eff;
+    --ds-primary-hover: #66b1ff;
+    --ds-primary-active: #3a8ee6;
+    --ds-primary-disabled: #a0c0e0;
+    --ds-success: #67c23a;
+    --ds-success-bg: #e1f3d8;
+    --ds-warning: #e6a23c;
+    --ds-warning-bg: #faecd8;
+    --ds-danger: #f56c6c;
+    --ds-danger-bg: #fde2e2;
+    --ds-info: #666;
+    --ds-info-bg: #eaeaea;
+    --ds-primary-badge-bg: #d9ecff;
+    --ds-primary-badge-text: #409eff;
+    --ds-border-default: rgb(188, 198, 222);
+    --ds-border-strong: #a0c5fc;
+    --ds-surface-strong: #f1f1f1;
+    --ds-surface-muted: #eaeaea;
+    --ds-text-tertiary: #606266;
+    --ds-text-primary: #666;
+    --ds-radius: 3px;
+    --ds-radius-sm: 4px;
+  }
+
+  .deposits-page .el-table thead tr th {
+    background: var(--ds-surface-strong) !important;
+    color: var(--ds-text-tertiary) !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    border-bottom: 1px solid var(--ds-border-default) !important;
+    padding: 8px 6px !important;
+  }
+  .deposits-page .el-table tbody tr td {
+    border-bottom: 1px solid var(--ds-surface-muted) !important;
+    padding: 9px 6px !important;
+    font-size: 12px !important;
+    color: #333;
+  }
+  .deposits-page .el-table tbody tr:hover td {
+    background: #f5f7fa;
+  }
+
+  .deposits-page .ds-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: var(--ds-radius);
+    white-space: nowrap;
+    line-height: 1.4;
+  }
+  .deposits-page .ds-badge--SUCCESS { background: var(--ds-success-bg); color: var(--ds-success); }
+  .deposits-page .ds-badge--PENDING { background: var(--ds-warning-bg); color: var(--ds-warning); }
+  .deposits-page .ds-badge--FAILED { background: var(--ds-danger-bg); color: var(--ds-danger); }
+  .deposits-page .ds-badge--REFUNDED { background: var(--ds-primary-badge-bg); color: var(--ds-primary-badge-text); }
+  .deposits-page .ds-badge--EXPIRED { background: var(--ds-info-bg); color: var(--ds-info); }
+
+  .deposits-page .ds-pagination .ds-page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    border: 1px solid var(--ds-border-default);
+    border-radius: var(--ds-radius);
+    background: #fff;
+    color: var(--ds-text-primary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 200ms;
+    padding: 0 6px;
+    outline: none;
+    line-height: 1;
+  }
+  .deposits-page .ds-pagination .ds-page-btn:hover:not(:disabled) {
+    color: var(--ds-primary);
+    border-color: #c6e2ff;
+  }
+  .deposits-page .ds-pagination .ds-page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .deposits-page .ds-pagination .ds-page-btn.active {
+    background: var(--ds-primary);
+    color: #fff;
+    border-color: var(--ds-primary);
+  }
+  .deposits-page .ds-pagination .ds-page-btn:focus-visible {
+    outline: 2px solid var(--ds-border-strong);
+    outline-offset: 2px;
+  }
+
+  .deposits-page .ds-card-header th {
+    background: var(--ds-surface-strong);
+    color: var(--ds-text-tertiary);
+    font-weight: 600;
+    font-size: 12px;
+    border-bottom: 1px solid var(--ds-border-default);
+    text-align: center;
+    padding: 8px 6px;
+  }
+  .deposits-page input.input--ds,
+  .deposits-page select.input--ds {
+    height: 32px;
+    font-size: 12px;
+    border-radius: var(--ds-radius);
+    border: 1px solid var(--ds-border-default);
+    background: #fff;
+    color: var(--ds-text-primary);
+    padding: 0 10px;
+    outline: none;
+    transition: border-color 200ms;
+    width: 100%;
+  }
+  .deposits-page input.input--ds:hover,
+  .deposits-page select.input--ds:hover { border-color: #b0b0b0; }
+  .deposits-page input.input--ds:focus,
+  .deposits-page input.input--ds:focus-visible,
+  .deposits-page select.input--ds:focus,
+  .deposits-page select.input--ds:focus-visible { border-color: var(--ds-border-strong); }
+  .deposits-page input.input--ds::placeholder { color: #b0b0b0; }
